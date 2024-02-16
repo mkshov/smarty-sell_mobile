@@ -1,0 +1,1 @@
+# smarty-sell_mobile
