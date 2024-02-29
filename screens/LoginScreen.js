@@ -20,10 +20,13 @@ import Animated, {
 } from "react-native-reanimated";
 import { userLogin } from "../api/userApi";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios from "axios";
+import api from "../api/axios";
+import { LOGIN } from "../constants";
 
 export default function LoginScreen({ navigation }) {
   const [formData, setFormData] = useState({
-    email: "",
+    username: "",
     password: "",
   });
   let [loading, setLoading] = useState(false);
@@ -31,7 +34,7 @@ export default function LoginScreen({ navigation }) {
   const handleChange = (text, fieldName) => {
     setFormData((prev) => ({
       ...prev,
-      [fieldName]: text,
+      [fieldName]: text.toLowerCase(),
     }));
   };
   const validateEmail = (email) => {
@@ -43,7 +46,7 @@ export default function LoginScreen({ navigation }) {
     return password.length >= 6;
   };
   const handleLogin = async () => {
-    if (!validateEmail(formData.email)) {
+    if (!validateEmail(formData.username)) {
       Alert.alert("Ошибка", "Введите корректный адрес электронной почты");
       return;
     }
@@ -53,11 +56,11 @@ export default function LoginScreen({ navigation }) {
     }
     setLoading(true);
     try {
-      let res = await userLogin(formData);
-      console.log("res: ", res);
+      let res = await api.post(LOGIN, formData);
+      await AsyncStorage.setItem("_ss:access", res.data.token);
       setLoading(false);
 
-      navigation.navigate("Home");
+      navigation.navigate("WorkPlaces");
     } catch (error) {
       setLoading(false);
 
@@ -101,11 +104,11 @@ export default function LoginScreen({ navigation }) {
             <View className="flex items-center mx-4 space-y-4">
               <Animated.View
                 entering={FadeInDown.delay(200).duration(1000).springify()}
-                className="bg-black/5 rounded-2xl w-full"
+                className="bg-gray-100 rounded-2xl w-full"
               >
                 <TextInput
-                  value={formData.email}
-                  onChangeText={(text) => handleChange(text, "email")}
+                  value={formData.username}
+                  onChangeText={(text) => handleChange(text, "username")}
                   className="p-5"
                   placeholder="Ваша почта"
                   placeholderTextColor={"gray"}
@@ -113,7 +116,7 @@ export default function LoginScreen({ navigation }) {
               </Animated.View>
               <Animated.View
                 entering={FadeInDown.delay(400).duration(1000).springify()}
-                className="bg-black/5 rounded-2xl w-full mb-3"
+                className="bg-gray-100 rounded-2xl w-full mb-3"
               >
                 <TextInput
                   value={formData.password}
