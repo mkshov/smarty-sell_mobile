@@ -19,16 +19,16 @@ export default function ChooseWorkPlace({ navigation }) {
   console.log("selectedPlace: ", selectedPlace);
 
   const handlePlaceChoose = (place) => setSelectedPlace(place);
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const res = await getPlaces();
-        setPlaces(res.results);
-      } catch (error) {
-        console.error("Error fetching place:", error);
-      }
-    };
+  const fetchData = async () => {
+    try {
+      const res = await getPlaces();
+      setPlaces(res.results);
+    } catch (error) {
+      console.error("Error fetching place:", error);
+    }
+  };
 
+  useEffect(() => {
     fetchData();
   }, []);
 
