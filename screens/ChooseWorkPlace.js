@@ -32,14 +32,13 @@ export default function ChooseWorkPlace({ navigation }) {
     fetchData();
   }, []);
 
-  const handleSave = useCallback(() => {
-    AsyncStorage.setItem(
+  const handleSave = useCallback(async () => {
+    await AsyncStorage.setItem(
       LOCAL_STORAGE_KEYS.SALE_PLACE,
       JSON.stringify(selectedPlace)
     );
-    navigation.navigate("Home");
-    console.log("Success");
-  }, [selectedPlace]);
+    navigation.navigate("/");
+  }, [selectedPlace, navigation]);
   return (
     <View
       style={{ backgroundColor: "#f4f6f8" }}

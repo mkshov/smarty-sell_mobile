@@ -14,9 +14,17 @@ import DateIcon from "../assets/icons/date";
 import { LinearGradient } from "expo-linear-gradient";
 import Icon from "react-native-vector-icons/Ionicons";
 import { getTransfers } from "../services/transferActions";
+import { LOCAL_STORAGE_KEYS } from "../constants";
 export default function CreateShipment({ navigation }) {
   const [transfers, setTransfers] = useState([]);
-  console.log("transfers: ", transfers);
+  const [currentPlace, setCurrentPlace] = useState(null);
+  console.log("currentPlace: ", currentPlace);
+  const getCurrentPlace = async () => {
+    const savedPlace = JSON.parse(
+      (await AsyncStorage.getItem(LOCAL_STORAGE_KEYS.SALE_PLACE)) || null
+    );
+    setCurrentPlace(savedPlace);
+  };
 
   const formattedDates = transfers.map((item) => {
     const date = new Date(item.date);
@@ -35,7 +43,11 @@ export default function CreateShipment({ navigation }) {
 
   const getAllTransfers = async () => {
     try {
+      // const transfers = await getTransfers({
+      //   workplace: currentPlace.id,
+      // });
       const transfers = await getTransfers();
+      console.log("transfers: ", transfers);
       setTransfers(transfers);
     } catch (error) {
       console.log("error: ", error);
@@ -44,6 +56,7 @@ export default function CreateShipment({ navigation }) {
 
   useEffect(() => {
     getAllTransfers();
+    getCurrentPlace();
   }, []);
 
   const handleNavigate = (path) => {
@@ -53,7 +66,7 @@ export default function CreateShipment({ navigation }) {
     <SafeAreaProvider>
       <SafeAreaView>
         <TouchableOpacity
-          onPress={() => handleNavigate("Home")}
+          onPress={() => handleNavigate("/")}
           className="flex-row items-center ml-2"
         >
           <Icon name="chevron-back" size={25} />
@@ -73,7 +86,11 @@ export default function CreateShipment({ navigation }) {
                 <Text className="text-base">01.03.24</Text>
               </View>
             </View>
-            <ScrollView vertical={true} className="gap-5">
+            <ScrollView
+              style={{ height: 500 }}
+              vertical={true}
+              className="gap-5 pb-28"
+            >
               {transfers.map((transfer, i) => (
                 <View key={i} className="border rounded-xl border-gray-300">
                   <View className="p-4 border-b border-gray-300 mt-3">

@@ -1,5 +1,5 @@
 import { StatusBar } from "expo-status-bar";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import {
   Alert,
   Image,
@@ -18,18 +18,19 @@ import Animated, {
   FadeInUp,
   FadeInDown,
 } from "react-native-reanimated";
-import { userLogin } from "../api/userApi";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import api from "../api/axios";
 import { LOGIN } from "../constants";
+import { authContext } from "../contexts/authContext";
 
 export default function LoginScreen({ navigation }) {
+  const { isLoading, logIn, setIsLoading } = useContext(authContext);
+
   const [formData, setFormData] = useState({
-    username: "",
-    password: "",
+    username: "ex@gmail.com",
+    password: "fortest2020",
   });
-  let [loading, setLoading] = useState(false);
   const [data, setData] = useState(null);
   const handleChange = (text, fieldName) => {
     setFormData((prev) => ({
@@ -54,19 +55,7 @@ export default function LoginScreen({ navigation }) {
       Alert.alert("Ошибка", "Пароль должен содержать не менее 6 символов");
       return;
     }
-    setLoading(true);
-    try {
-      let res = await api.post(LOGIN, formData);
-      await AsyncStorage.setItem("_ss:access", res.data.token);
-      setLoading(false);
-
-      navigation.navigate("WorkPlaces");
-    } catch (error) {
-      setLoading(false);
-
-      console.log("error: ", error);
-      // setLoading(false);
-    }
+    logIn(formData, navigation);
   };
 
   return (
@@ -136,7 +125,7 @@ export default function LoginScreen({ navigation }) {
                   className="w-full bg-sky-400 p-3 rounded-2xl mb-3"
                 >
                   <Text className="text-xl font-bold text-white text-center">
-                    {loading ? "Загрузка..." : "Войти"}
+                    {isLoading ? "Загрузка..." : "Войти"}
                   </Text>
                 </TouchableOpacity>
               </Animated.View>
