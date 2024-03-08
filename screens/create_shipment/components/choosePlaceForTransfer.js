@@ -1,4 +1,5 @@
 import Checkbox from "expo-checkbox";
+import { LinearGradient } from "expo-linear-gradient";
 import React, { useState } from "react";
 import {
   Modal,
@@ -6,21 +7,26 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
+  TouchableWithoutFeedback,
   View,
 } from "react-native";
 import { SelectList } from "react-native-dropdown-select-list";
 
 export default function ModalTransfers(props) {
-  const { setModalVisible, modalVisible } = props;
+  const { setModalVisible, modalVisible, places, selectedPlace } = props;
+  console.log("selectedPlace: ", selectedPlace);
+  console.log("places: ", places);
   const [isChecked, setIsChecked] = useState(false);
   const [selected, setSelected] = useState([]);
+  console.log("selected: ", selected);
 
-  const data = [
-    { key: "1", value: "Jammu & Kashmir" },
-    { key: "2", value: "Gujrat" },
-    { key: "3", value: "Maharashtra" },
-    { key: "4", value: "Goa" },
-  ];
+  const data = places
+    .filter((place) => place.name !== selectedPlace?.name)
+    .map((place) => ({
+      key: place.id,
+      value: place.name,
+    }));
+
   const toggleCheckmark = () => {
     setIsChecked((prev) => !prev);
   };
@@ -42,12 +48,12 @@ export default function ModalTransfers(props) {
       >
         <TouchableOpacity
           activeOpacity={1}
-          className="bg-white h-2/4 w-full rounded-2xl p-7"
+          className="bg-white w-full rounded-2xl p-7"
         >
           <Text className="text-center text-xl font-semibold">
             Создать отгрузку
           </Text>
-          <View className="flex-row items-center gap-x-4 mt-7">
+          <View className="flex-row items-center gap-x-4 mt-14">
             <Checkbox
               className="w-6 h-6 rounded-lg"
               value={isChecked}
@@ -78,6 +84,18 @@ export default function ModalTransfers(props) {
               data={data}
             />
           </View>
+          <TouchableOpacity className="mt-10">
+            <LinearGradient
+              className="w-full py-5 px-10 rounded-2xl"
+              colors={["#8469a4", "#ed83c1", "#ce83e5"]}
+              start={{ x: 0, y: 0.5 }}
+              end={{ x: 1, y: 0.5 }}
+            >
+              <Text className="text-white text-xl font-bold text-center">
+                Создать отгрузку
+              </Text>
+            </LinearGradient>
+          </TouchableOpacity>
         </TouchableOpacity>
       </TouchableOpacity>
     </Modal>

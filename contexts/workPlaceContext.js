@@ -1,7 +1,8 @@
-import React, { createContext, useState, useEffect } from "react";
-import { LOGIN, TOKEN } from "../constants";
+import React, { createContext, useState, useEffect, useCallback } from "react";
+import { STORAGE, LOGIN, TOKEN } from "../constants";
 import api from "../api/axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useNavigation } from "@react-navigation/native";
 
 export const workPlaceContext = createContext();
 
@@ -17,6 +18,7 @@ const WorkPlaceContextProvider = ({ children }) => {
   const [admin, setAdmin] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [selectedPlace, setSelectedPlace] = useState(null);
 
   // для входа
   async function getPlaces(params) {
@@ -33,8 +35,28 @@ const WorkPlaceContextProvider = ({ children }) => {
     }
   }
 
+  const handleSave = useCallback(
+    async (navigation) => {
+      await AsyncStorage.setItem(
+        STORAGE.SAVED_PLACE,
+        JSON.stringify(selectedPlace)
+      );
+      navigation.navigate("/");
+    },
+    [selectedPlace]
+  );
+
   return (
-    <workPlaceContext.Provider value={{ places, getPlaces, isLoading }}>
+    <workPlaceContext.Provider
+      value={{
+        places,
+        isLoading,
+        selectedPlace,
+        setSelectedPlace,
+        getPlaces,
+        handleSave,
+      }}
+    >
       {children}
     </workPlaceContext.Provider>
   );

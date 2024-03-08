@@ -1,5 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useContext, useEffect, useState } from "react";
 import {
   Image,
   ImageBackground,
@@ -16,11 +16,14 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import DateIcon from "../../assets/icons/date";
 import Icon from "react-native-vector-icons/Ionicons";
 import { getTransfers } from "../../services/transferActions";
-import { LOCAL_STORAGE_KEYS } from "../../constants";
+
 import ModalTransfers, {
   ModalForTransfer,
 } from "./components/choosePlaceForTransfer";
+import { workPlaceContext } from "../../contexts/workPlaceContext";
+import { STORAGE } from "../../constants";
 export default function CreateShipment({ navigation }) {
+  const { getPlaces, places } = useContext(workPlaceContext);
   const [transfers, setTransfers] = useState([]);
   const [currentPlace, setCurrentPlace] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
@@ -38,7 +41,7 @@ export default function CreateShipment({ navigation }) {
   console.log("currentPlace: ", currentPlace?.id);
   const getCurrentPlace = async () => {
     const savedPlace = JSON.parse(
-      (await AsyncStorage.getItem(LOCAL_STORAGE_KEYS.SALE_PLACE)) || null
+      (await AsyncStorage.getItem(STORAGE.SAVED_PLACE)) || null
     );
     setCurrentPlace(savedPlace);
   };
@@ -72,6 +75,11 @@ export default function CreateShipment({ navigation }) {
     }
   };
 
+  const handleOpenModal = () => {
+    getPlaces();
+    setModalVisible(true);
+  };
+
   useEffect(() => {
     getAllTransfers();
     getCurrentPlace();
@@ -96,11 +104,13 @@ export default function CreateShipment({ navigation }) {
           </TouchableOpacity>
           <View className="h-full w-full flex justify-start items-center px-6">
             <ModalTransfers
+              places={places}
+              selectedPlace={currentPlace}
               setModalVisible={setModalVisible}
               modalVisible={modalVisible}
             />
             <TouchableOpacity
-              onPress={() => setModalVisible(true)}
+              onPress={handleOpenModal}
               className="bg-white w-full py-5 px-10 rounded-2xl mt-10"
             >
               <Text className="text-[#CD5297] text-xl font-bold text-center">
@@ -118,6 +128,7 @@ export default function CreateShipment({ navigation }) {
               <ScrollView
                 refreshControl={
                   <RefreshControl
+                    tintColor={"white"}
                     refreshing={refreshing}
                     onRefresh={onRefresh}
                   />

@@ -9,7 +9,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { LOCAL_STORAGE_KEYS, TOKEN } from "../constants";
+import { STORAGE, TOKEN } from "../constants";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
 export default function HomePage({ navigation }) {
@@ -17,7 +17,7 @@ export default function HomePage({ navigation }) {
 
   const getSavedPlace = async () => {
     const savedPlace = JSON.parse(
-      (await AsyncStorage.getItem(LOCAL_STORAGE_KEYS.SALE_PLACE)) || null
+      (await AsyncStorage.getItem(STORAGE.SAVED_PLACE)) || null
     );
     console.log("savedPlace: ", savedPlace);
     setSavedPlace(savedPlace);

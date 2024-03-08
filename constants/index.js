@@ -4,7 +4,7 @@ export const LOGIN = "/auth/v1/login/";
 
 export const TOKEN = "ss:token";
 
-export const LOCAL_STORAGE_KEYS = {
+export const STORAGE = {
   LANGUAGE: "ss:language",
-  SALE_PLACE: "ss:salePlace",
+  SAVED_PLACE: "ss:savedPlace",
 };

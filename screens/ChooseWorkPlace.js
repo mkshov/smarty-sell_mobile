@@ -1,43 +1,27 @@
 import React, { useCallback, useContext, useEffect, useState } from "react";
 import {
-  Image,
   ImageBackground,
   ScrollView,
-  StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
-import api from "../api/axios";
 import Icon from "react-native-vector-icons/Feather";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { LOCAL_STORAGE_KEYS } from "../constants";
 import { LinearGradient } from "expo-linear-gradient";
 import { workPlaceContext } from "../contexts/workPlaceContext";
 
 export default function ChooseWorkPlace({ navigation }) {
-  // const [place, setPlaces] = useState([]);
-  const { places, isLoading, getPlaces } = useContext(workPlaceContext);
-  console.log("places: ", places);
-  const [selectedPlace, setSelectedPlace] = useState(null);
-  console.log("selectedPlace: ", selectedPlace);
+  const { places, selectedPlace, setSelectedPlace, handleSave, getPlaces } =
+    useContext(workPlaceContext);
+  // const [selectedPlace, setSelectedPlace] = useState(null);
 
   const handlePlaceChoose = (place) => setSelectedPlace(place);
-  const fetchData = async () => {
-    getPlaces();
-  };
 
   useEffect(() => {
-    fetchData();
+    getPlaces();
   }, []);
 
-  const handleSave = useCallback(async () => {
-    await AsyncStorage.setItem(
-      LOCAL_STORAGE_KEYS.SALE_PLACE,
-      JSON.stringify(selectedPlace)
-    );
-    navigation.navigate("/");
-  }, [selectedPlace, navigation]);
   return (
     <ImageBackground
       source={require("../assets/places-bg.png")}
@@ -76,7 +60,7 @@ export default function ChooseWorkPlace({ navigation }) {
           colors={["#ED83C1", "#8469A4"]}
           className="py-4 rounded-2xl mb-3 mt-5 bg-[]"
         >
-          <TouchableOpacity onPress={handleSave}>
+          <TouchableOpacity onPress={() => handleSave(navigation)}>
             <Text className="text-xl font-bold text-white text-center">
               Применить
             </Text>
