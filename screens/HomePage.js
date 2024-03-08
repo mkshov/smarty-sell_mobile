@@ -51,7 +51,7 @@ export default function HomePage({ navigation }) {
           <View className="w-full h-full flex justify-center items-center">
             <View className="items-center justify-center w-full gap-4">
               <TouchableOpacity
-                onPress={() => handleNavigate("Create-transfers")}
+                onPress={() => handleNavigate("create-transfers")}
                 className="bg-sky-400 px-7 w-1/2 py-3 rounded-2xl"
               >
                 <Text className="text-white text-center text-base">

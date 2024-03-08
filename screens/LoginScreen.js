@@ -23,6 +23,9 @@ import axios from "axios";
 import api from "../api/axios";
 import { LOGIN } from "../constants";
 import { authContext } from "../contexts/authContext";
+import AccountIcon from "../assets/icons/accountIcon";
+import LockIcon from "../assets/icons/lockIcon";
+import LogoWhite from "../assets/icons/logoWhite";
 
 export default function LoginScreen({ navigation }) {
   const { isLoading, logIn, setIsLoading } = useContext(authContext);
@@ -60,60 +63,49 @@ export default function LoginScreen({ navigation }) {
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-      <View className="bg-white h-full w-full">
+      <View className=" h-full w-full">
         <StatusBar style="light" />
         <Image
           className="h-full w-full absolute"
-          source={require("../assets/background.png")}
+          source={require("../assets/login-bg.png")}
         />
-        <View className="flex-row justify-around w-full absolute">
-          <Animated.Image
-            entering={FadeInUp.delay(200).duration(1000).springify().damping(3)}
-            className="h-[225] w-[90]"
-            source={require("../assets/light.png")}
-          />
-          <Animated.Image
-            entering={FadeInUp.delay(400).duration(1000).springify().damping(2)}
-            className="h-[160] w-[65]"
-            source={require("../assets/light.png")}
-          />
-        </View>
 
         {/* title and form */}
-        <View className="h-full w-full flex justify-around pt-40 pb-10">
-          <View className="flex items-center">
-            <Animated.Text
-              entering={FadeInUp.duration(1000).springify()}
+        <View className="h-full w-full flex justify-center">
+          <View className="flex items-center mb-40">
+            <Animated.View
+              entering={FadeInUp.duration(7000).springify()}
               className="text-white font-bold tracking-wider text-5xl"
             >
-              Smarty-Sell
-            </Animated.Text>
+              <LogoWhite />
+            </Animated.View>
           </View>
-          <KeyboardAvoidingView behavior="padding" secureTextEntry={false}>
+          <KeyboardAvoidingView behavior="padding">
             <View className="flex items-center mx-4 space-y-4">
               <Animated.View
                 entering={FadeInDown.delay(200).duration(1000).springify()}
-                className="bg-gray-100 rounded-2xl w-full"
+                className="rounded-2xl w-full border-b-2 border-white flex-row items-center"
               >
+                <AccountIcon className="ml-5 mb-1" />
                 <TextInput
                   value={formData.username}
                   onChangeText={(text) => handleChange(text, "username")}
-                  className="p-5"
-                  placeholder="Ваша почта"
-                  placeholderTextColor={"gray"}
+                  className="text-white text-lg mb-3 ml-5 w-full"
+                  placeholder="Введите логин"
+                  placeholderTextColor={"white"}
                 />
               </Animated.View>
               <Animated.View
                 entering={FadeInDown.delay(400).duration(1000).springify()}
-                className="bg-gray-100 rounded-2xl w-full mb-3"
+                className="rounded-2xl w-full mb-3 border-b-2 border-white flex-row items-center"
               >
+                <LockIcon className="mb-1 ml-5" />
                 <TextInput
                   value={formData.password}
                   onChangeText={(text) => handleChange(text, "password")}
-                  className="p-5"
-                  placeholder="Ваш пароль"
-                  placeholderTextColor={"gray"}
-                  secureTextEntry
+                  className="text-white text-lg w-full mb-3 ml-5"
+                  placeholder="Введите пароль"
+                  placeholderTextColor={"white"}
                 />
               </Animated.View>
               <Animated.View
@@ -122,9 +114,9 @@ export default function LoginScreen({ navigation }) {
               >
                 <TouchableOpacity
                   onPress={handleLogin}
-                  className="w-full bg-sky-400 p-3 rounded-2xl mb-3"
+                  className="w-full bg-white py-4 rounded-2xl mb-3"
                 >
-                  <Text className="text-xl font-bold text-white text-center">
+                  <Text className="text-xl font-bold text-[#CD5297] text-center">
                     {isLoading ? "Загрузка..." : "Войти"}
                   </Text>
                 </TouchableOpacity>

@@ -1,6 +1,7 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useContext, useEffect, useState } from "react";
 import {
   Image,
+  ImageBackground,
   ScrollView,
   StyleSheet,
   Text,
@@ -8,24 +9,22 @@ import {
   View,
 } from "react-native";
 import api from "../api/axios";
-import { getPlaces } from "../services/workPlaceService";
 import Icon from "react-native-vector-icons/Feather";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { LOCAL_STORAGE_KEYS } from "../constants";
+import { LinearGradient } from "expo-linear-gradient";
+import { workPlaceContext } from "../contexts/workPlaceContext";
 
 export default function ChooseWorkPlace({ navigation }) {
-  const [place, setPlaces] = useState([]);
+  // const [place, setPlaces] = useState([]);
+  const { places, isLoading, getPlaces } = useContext(workPlaceContext);
+  console.log("places: ", places);
   const [selectedPlace, setSelectedPlace] = useState(null);
   console.log("selectedPlace: ", selectedPlace);
 
   const handlePlaceChoose = (place) => setSelectedPlace(place);
   const fetchData = async () => {
-    try {
-      const res = await getPlaces();
-      setPlaces(res.results);
-    } catch (error) {
-      console.error("Error fetching place:", error);
-    }
+    getPlaces();
   };
 
   useEffect(() => {
@@ -40,7 +39,9 @@ export default function ChooseWorkPlace({ navigation }) {
     navigation.navigate("/");
   }, [selectedPlace, navigation]);
   return (
-    <View
+    <ImageBackground
+      source={require("../assets/places-bg.png")}
+      resizeMode="cover"
       style={{ backgroundColor: "#f4f6f8" }}
       className="w-full h-full bg-orange-400 flex justify-center items-center"
     >
@@ -55,29 +56,33 @@ export default function ChooseWorkPlace({ navigation }) {
         </View>
 
         <ScrollView className=" mt-5 max-h-56" vertical={true}>
-          {place.map((place, i) => (
+          {places.map((place, i) => (
             <TouchableOpacity
               onPress={() => handlePlaceChoose(place)}
               key={i}
-              className="flex flex-row justify-between w-full border-gray-300 border-x-2 border-y-2 rounded-lg p-2 mt-2 items-center"
+              className="flex flex-row justify-between w-full border-[#7E8BCD] border-x-2 border-y-2 rounded-lg p-2 mt-2 items-center"
             >
               <View>
                 <Text className="text-base">{place.name}</Text>
                 <Text className="">{place.type.name}</Text>
               </View>
               {selectedPlace && selectedPlace.id === place.id && (
-                <Icon className="" name="check" size={30} />
+                <Icon color={"#7E8BCD"} name="check" size={30} />
               )}
             </TouchableOpacity>
           ))}
         </ScrollView>
-        <TouchableOpacity
-          onPress={handleSave}
-          className="bg-sky-400 p-3 rounded-2xl mt-5"
+        <LinearGradient
+          colors={["#ED83C1", "#8469A4"]}
+          className="py-4 rounded-2xl mb-3 mt-5 bg-[]"
         >
-          <Text className="text-white font-bold text-center">Применить</Text>
-        </TouchableOpacity>
+          <TouchableOpacity onPress={handleSave}>
+            <Text className="text-xl font-bold text-white text-center">
+              Применить
+            </Text>
+          </TouchableOpacity>
+        </LinearGradient>
       </View>
-    </View>
+    </ImageBackground>
   );
 }

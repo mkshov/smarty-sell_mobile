@@ -16,8 +16,10 @@ const AuthContextProvider = ({ children }) => {
   async function logIn(formData, navigation) {
     setIsLoading(true);
     try {
+      setIsLoggedIn(true);
       let res = await api.post(LOGIN, formData);
-      AsyncStorage.setItem(TOKEN, JSON.stringify(res.data.token));
+      await AsyncStorage.setItem(TOKEN, JSON.stringify(res.data.token));
+      await AsyncStorage.setItem("isLoggedIn", JSON.stringify(true));
       navigation.navigate("work-places");
       setIsLoading(false);
 
@@ -25,12 +27,13 @@ const AuthContextProvider = ({ children }) => {
     } catch (error) {
       console.log("error: ", error);
       setIsLoading(false);
+      setIsLoggedIn(false);
     }
   }
 
   return (
     <authContext.Provider
-      value={{ user, error, isLoading, logIn, setIsLoading }}
+      value={{ user, error, isLoading, isLoggedIn, logIn, setIsLoading }}
     >
       {children}
     </authContext.Provider>

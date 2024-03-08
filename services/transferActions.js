@@ -7,19 +7,19 @@ const ENDPOINTS = {
   ALLPLACES: "/company/v1/places/all/",
 };
 
-// export const getTransfers = async (params) => {
-//   try {
-//     const response = await api.get(ENDPOINTS.TRANSFER, { params: params });
-//     return response.data.results;
-//   } catch (error) {
-//     console.log("error: ", error);
-//   }
-// };
-export const getTransfers = async () => {
+export const getTransfers = async (params) => {
   try {
-    const response = await api.get(ENDPOINTS.TRANSFER);
+    const response = await api.get(ENDPOINTS.TRANSFER, { params: params });
     return response.data.results;
   } catch (error) {
     console.log("error: ", error);
   }
 };
+// export const getTransfers = async () => {
+//   try {
+//     const response = await api.get(ENDPOINTS.TRANSFER);
+//     return response.data.results;
+//   } catch (error) {
+//     console.log("error: ", error);
+//   }
+// };
