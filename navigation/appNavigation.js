@@ -12,10 +12,8 @@ const Stack = createNativeStackNavigator();
 
 export default function AppNavigation() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  console.log("isLoggedIn: ", isLoggedIn);
   const checkUser = async () => {
     const user = await AsyncStorage.getItem(TOKEN);
-    console.log("user: ", user);
     if (user) {
       setIsLoggedIn(true);
     } else {

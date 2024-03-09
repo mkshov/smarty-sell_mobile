@@ -39,7 +39,7 @@ export default function ChooseWorkPlace({ navigation }) {
           </Text>
         </View>
 
-        <ScrollView className=" mt-5 max-h-56" vertical={true}>
+        <ScrollView className=" mt-5 h-56" vertical={true}>
           {places.map((place, i) => (
             <TouchableOpacity
               onPress={() => handlePlaceChoose(place)}

@@ -26,7 +26,6 @@ const WorkPlaceContextProvider = ({ children }) => {
 
     try {
       const response = await api.get(ENDPOINTS.PLACES);
-      console.log("response: ", response);
       setPlaces(response.data.results);
       setIsLoading(false);
     } catch (error) {
@@ -45,6 +44,19 @@ const WorkPlaceContextProvider = ({ children }) => {
     },
     [selectedPlace]
   );
+
+  async function createTransfer(data, navigation) {
+    setIsLoading(true);
+
+    try {
+      const response = await api.post(ENDPOINTS.PLACES);
+      setPlaces(response.data.results);
+      setIsLoading(false);
+    } catch (error) {
+      setIsLoading(false);
+      console.log("error: ", error);
+    }
+  }
 
   return (
     <workPlaceContext.Provider

@@ -1,6 +1,6 @@
 import Checkbox from "expo-checkbox";
 import { LinearGradient } from "expo-linear-gradient";
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import {
   Modal,
   Pressable,
@@ -11,17 +11,24 @@ import {
   View,
 } from "react-native";
 import { SelectList } from "react-native-dropdown-select-list";
+import { transferContext } from "../../../contexts/transferContext";
 
 export default function ModalTransfers(props) {
-  const { setModalVisible, modalVisible, places, selectedPlace } = props;
-  console.log("selectedPlace: ", selectedPlace);
-  console.log("places: ", places);
+  const {
+    modalVisible,
+    places,
+    currentPlace,
+    navigation,
+    getAllTransfers,
+    setModalVisible,
+  } = props;
+
+  const { createTransfer, isLoading } = useContext(transferContext);
   const [isChecked, setIsChecked] = useState(false);
   const [selected, setSelected] = useState([]);
-  console.log("selected: ", selected);
 
   const data = places
-    .filter((place) => place.name !== selectedPlace?.name)
+    .filter((place) => place.name !== currentPlace?.name)
     .map((place) => ({
       key: place.id,
       value: place.name,
@@ -30,7 +37,16 @@ export default function ModalTransfers(props) {
   const toggleCheckmark = () => {
     setIsChecked((prev) => !prev);
   };
-  console.log("isChecked: ", isChecked);
+
+  const handleCreateTransfer = () => {
+    const data = {
+      from_place: currentPlace?.id,
+      to_place: selected,
+    };
+    createTransfer(data, navigation);
+    getAllTransfers();
+    setModalVisible(false);
+  };
   return (
     <Modal
       animationType="fade"
@@ -84,7 +100,10 @@ export default function ModalTransfers(props) {
               data={data}
             />
           </View>
-          <TouchableOpacity className="mt-10">
+          <TouchableOpacity
+            onPress={() => handleCreateTransfer()}
+            className="mt-10"
+          >
             <LinearGradient
               className="w-full py-5 px-10 rounded-2xl"
               colors={["#8469a4", "#ed83c1", "#ce83e5"]}
@@ -92,7 +111,7 @@ export default function ModalTransfers(props) {
               end={{ x: 1, y: 0.5 }}
             >
               <Text className="text-white text-xl font-bold text-center">
-                Создать отгрузку
+                {isLoading ? "Создаем..." : "Создать отгрузку"}
               </Text>
             </LinearGradient>
           </TouchableOpacity>

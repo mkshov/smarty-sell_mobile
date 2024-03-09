@@ -1,5 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useContext, useEffect, useState } from "react";
 import {
   Image,
   SafeAreaView,
@@ -11,15 +11,16 @@ import {
 } from "react-native";
 import { STORAGE, TOKEN } from "../constants";
 import { SafeAreaProvider } from "react-native-safe-area-context";
+import { transferContext } from "../contexts/transferContext";
 
 export default function HomePage({ navigation }) {
+  const { getTransfers } = useContext(transferContext);
   const [savedPlace, setSavedPlace] = useState(null);
 
   const getSavedPlace = async () => {
     const savedPlace = JSON.parse(
       (await AsyncStorage.getItem(STORAGE.SAVED_PLACE)) || null
     );
-    console.log("savedPlace: ", savedPlace);
     setSavedPlace(savedPlace);
   };
   useEffect(() => {
@@ -28,6 +29,9 @@ export default function HomePage({ navigation }) {
 
   const handleNavigate = (path) => {
     navigation.navigate(path);
+    if (path === "create-transfers") {
+      getTransfers({ from_place: savedPlace?.id, status: "preparing" });
+    }
   };
 
   const logOut = async () => {

@@ -15,16 +15,18 @@ import {
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import DateIcon from "../../assets/icons/date";
 import Icon from "react-native-vector-icons/Ionicons";
-import { getTransfers } from "../../services/transferActions";
 
 import ModalTransfers, {
   ModalForTransfer,
 } from "./components/choosePlaceForTransfer";
 import { workPlaceContext } from "../../contexts/workPlaceContext";
 import { STORAGE } from "../../constants";
+import { transferContext } from "../../contexts/transferContext";
+import { Skeleton } from "moti/skeleton";
+
 export default function CreateShipment({ navigation }) {
   const { getPlaces, places } = useContext(workPlaceContext);
-  const [transfers, setTransfers] = useState([]);
+  const { transfers, isLoading, getTransfers } = useContext(transferContext);
   const [currentPlace, setCurrentPlace] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [refreshing, setRefreshing] = React.useState(false);
@@ -35,10 +37,9 @@ export default function CreateShipment({ navigation }) {
       getAllTransfers();
       getCurrentPlace();
       setRefreshing(false);
-    }, 1000);
+    }, 2000);
   }, []);
 
-  console.log("currentPlace: ", currentPlace?.id);
   const getCurrentPlace = async () => {
     const savedPlace = JSON.parse(
       (await AsyncStorage.getItem(STORAGE.SAVED_PLACE)) || null
@@ -62,17 +63,7 @@ export default function CreateShipment({ navigation }) {
   });
 
   const getAllTransfers = async () => {
-    try {
-      const transfers = await getTransfers({
-        from_place: currentPlace?.id,
-        status: "preparing",
-      });
-      // const transfers = await getTransfers();
-      console.log("transfers-: ", transfers);
-      setTransfers(transfers);
-    } catch (error) {
-      console.log("error: ", error);
-    }
+    getTransfers({ from_place: currentPlace?.id, status: "preparing" });
   };
 
   const handleOpenModal = () => {
@@ -105,9 +96,10 @@ export default function CreateShipment({ navigation }) {
           <View className="h-full w-full flex justify-start items-center px-6">
             <ModalTransfers
               places={places}
-              selectedPlace={currentPlace}
-              setModalVisible={setModalVisible}
+              currentPlace={currentPlace}
               modalVisible={modalVisible}
+              setModalVisible={setModalVisible}
+              getAllTransfers={getAllTransfers}
             />
             <TouchableOpacity
               onPress={handleOpenModal}
@@ -143,28 +135,106 @@ export default function CreateShipment({ navigation }) {
                     className="rounded-xl border-x-4 border-y-4 border-[#efceff87] bg-white"
                   >
                     <View className="p-4 border-b border-gray-300 mt-3">
-                      <Text className="text-base">{formattedDates[i]}</Text>
+                      {isLoading ? (
+                        <Skeleton
+                          show
+                          height={24}
+                          width={"100%"}
+                          radius={"round"}
+                          colorMode="light"
+                        />
+                      ) : (
+                        <Text className="text-base">{formattedDates[i]}</Text>
+                      )}
                     </View>
                     <View className="p-3 flex-row justify-between">
-                      <Text>Отправитель</Text>
+                      <Text>
+                        {isLoading ? (
+                          <Skeleton
+                            show
+                            height={17}
+                            width={85}
+                            radius={"round"}
+                            colorMode="light"
+                          />
+                        ) : (
+                          "Отправитель"
+                        )}
+                      </Text>
                       <Text className="font-semibold text-[#2e2f2f]">
-                        {transfer.creator.name === null
-                          ? "Асель"
-                          : transfer.creator.name}
+                        {isLoading ? (
+                          <Skeleton
+                            show
+                            height={17}
+                            width={50}
+                            radius={"round"}
+                            colorMode="light"
+                          />
+                        ) : transfer.creator.name === null ? (
+                          "Асель"
+                        ) : (
+                          transfer.creator.name
+                        )}
                       </Text>
                     </View>
                     <View className="p-3 flex-row justify-between">
-                      <Text>Количество</Text>
+                      <Text>
+                        {isLoading ? (
+                          <Skeleton
+                            show
+                            height={17}
+                            width={85}
+                            radius={"round"}
+                            colorMode="light"
+                          />
+                        ) : (
+                          "Количество"
+                        )}
+                      </Text>
                       <Text className="font-semibold text-[#2e2f2f]">
-                        {transfer.quantity ? transfer.quantity : "неизвестно"}
+                        {isLoading ? (
+                          <Skeleton
+                            show
+                            height={17}
+                            width={100}
+                            radius={"round"}
+                            colorMode="light"
+                          />
+                        ) : transfer.quantity ? (
+                          transfer.quantity
+                        ) : (
+                          "неизвестно"
+                        )}
                       </Text>
                     </View>
                     <View className="p-3 flex-row justify-between mb-5">
-                      <Text>В торговую точку</Text>
+                      <Text>
+                        {isLoading ? (
+                          <Skeleton
+                            show
+                            height={17}
+                            width={150}
+                            radius={"round"}
+                            colorMode="light"
+                          />
+                        ) : (
+                          "В торговую точку"
+                        )}
+                      </Text>
                       <Text className="font-semibold text-[#2e2f2f]">
-                        {transfer.to_place?.name
-                          ? transfer.to_place?.name
-                          : "неизвестно"}
+                        {isLoading ? (
+                          <Skeleton
+                            show
+                            height={17}
+                            width={100}
+                            radius={"round"}
+                            colorMode="light"
+                          />
+                        ) : transfer.to_place?.name ? (
+                          transfer.to_place?.name
+                        ) : (
+                          "неизвестно"
+                        )}
                       </Text>
                     </View>
                   </View>
