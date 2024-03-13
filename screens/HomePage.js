@@ -31,12 +31,13 @@ export default function HomePage({ navigation }) {
     navigation.navigate(path);
     if (path === "create-transfers") {
       getTransfers({ from_place: savedPlace?.id, status: "preparing" });
+      navigation.navigate(path);
     }
   };
 
   const logOut = async () => {
     await AsyncStorage.removeItem(TOKEN);
-    await AsyncStorage.removeItem(LOCAL_STORAGE_KEYS.SALE_PLACE);
+    await AsyncStorage.removeItem(STORAGE.SAVED_PLACE);
     navigation.navigate("login");
   };
   return (

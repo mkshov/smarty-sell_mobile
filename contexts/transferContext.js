@@ -14,19 +14,55 @@ const ENDPOINTS = {
 
 const TransferContextProvider = ({ children }) => {
   const [transfers, setTransfers] = useState([]);
+  const [transfer, setTransfer] = useState(null);
+  const [transferProducts, setTransferProducts] = useState(null);
+  const [newTransfer, setNewTransfer] = useState(null);
   const [error, setError] = useState("");
   const [admin, setAdmin] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoadingTransfers, setIsLoadingTransfers] = useState(true);
 
   const getTransfers = async (params) => {
     setIsLoading(true);
     try {
       const response = await api.get(ENDPOINTS.TRANSFER, { params: params });
+      console.log("response: ", response);
       setTransfers(response.data.results);
+      setIsLoadingTransfers(false);
       setIsLoading(false);
 
       return response.data.results;
+    } catch (error) {
+      setIsLoadingTransfers(false);
+      setIsLoading(false);
+
+      console.log("error: ", error);
+    }
+  };
+
+  const getTransfer = async (id) => {
+    setIsLoading(true);
+    try {
+      const { data } = await api.get(`${ENDPOINTS.TRANSFER}${id}/`);
+      setTransfer(data);
+      setIsLoading(false);
+
+      return data;
+    } catch (error) {
+      setIsLoading(false);
+      console.log("error: ", error);
+    }
+  };
+
+  const getTransferProducts = async (id, params) => {
+    setIsLoading(true);
+    try {
+      const { data } = await api.get(`${ENDPOINTS.TRANSFER}${id}/products/`);
+      console.log("data: ", data);
+      setTransferProducts(data);
+      setIsLoading(false);
+
+      return data;
     } catch (error) {
       setIsLoading(false);
 
@@ -34,14 +70,13 @@ const TransferContextProvider = ({ children }) => {
     }
   };
 
-  const createTransfer = async (data, navigation) => {
+  const createTransfer = async (params, navigation) => {
     setIsLoading(true);
     try {
-      const response = await api.post(ENDPOINTS.TRANSFER, data);
-      console.log("response create: ", response);
-
+      const response = await api.post(ENDPOINTS.TRANSFER, params);
+      setNewTransfer(response.data);
       setIsLoading(false);
-      return response.data.results;
+      return response.data;
     } catch (error) {
       setIsLoading(false);
       console.log("error: ", error);
@@ -50,7 +85,18 @@ const TransferContextProvider = ({ children }) => {
 
   return (
     <transferContext.Provider
-      value={{ transfers, isLoading, getTransfers, createTransfer }}
+      value={{
+        transfers,
+        transfer,
+        isLoading,
+        newTransfer,
+        isLoadingTransfers,
+        transferProducts,
+        getTransfers,
+        getTransfer,
+        createTransfer,
+        getTransferProducts,
+      }}
     >
       {children}
     </transferContext.Provider>
