@@ -33,32 +33,26 @@ const AuthContextProvider = ({ children }) => {
     }
   }
 
-  const getToken = async () => {
-    const token = await AsyncStorage.getItem(TOKEN);
-    setToken(token);
-  };
+  // const getToken = async () => {
+  //   const token = await AsyncStorage.getItem(TOKEN);
+  //   setToken(token);
+  // };
 
-  const getUser = async () => {
-    const response = await api.get("/auth/v1/info/");
-    setUser(response.data);
-  };
+  // const getUser = async () => {
+  //   const response = await api.get("/auth/v1/info/");
+  //   setUser(response.data);
+  // };
 
-  useEffect(() => {
-    getToken();
-  }, [getToken]);
+  // useEffect(() => {
+  //   getToken();
+  // }, [getToken]);
 
-  useEffect(() => {
-    if (!user && token) {
-      getUser();
-    }
-  }, [user, token, getUser]);
+  // useEffect(() => {
+  //   if (!user && token) {
+  //     getUser();
+  //   }
+  // }, [user, token, getUser]);
 
-  return (
-    <authContext.Provider
-      value={{ user, error, isLoading, isLoggedIn, logIn, setIsLoading }}
-    >
-      {children}
-    </authContext.Provider>
-  );
+  return <authContext.Provider value={{ user, error, isLoading, isLoggedIn, logIn, setIsLoading }}>{children}</authContext.Provider>;
 };
 export default AuthContextProvider;

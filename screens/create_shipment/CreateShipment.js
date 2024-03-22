@@ -16,7 +16,7 @@ export default function CreateShipment({ navigation }) {
   const { transfers, newTransfer, isLoading, isLoadingTransfers, getTransfers } = useContext(transferContext);
   const [currentPlace, setCurrentPlace] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
-  const [refreshing, setRefreshing] = React.useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
@@ -48,7 +48,7 @@ export default function CreateShipment({ navigation }) {
   });
 
   const getAllTransfers = async () => {
-    getTransfers({ from_place: currentPlace?.id, status: "preparing" });
+    getTransfers({ status: "preparing" });
   };
 
   const handleOpenModal = () => {
@@ -134,7 +134,7 @@ export default function CreateShipment({ navigation }) {
                             )}
                           </Text>
                         </View>
-                        <View className="p-3 flex-row justify-between mb-5">
+                        <View className="p-3 flex-row justify-between">
                           <Text>{isLoading ? <Skeleton show height={17} width={150} radius={"round"} colorMode="light" /> : "В торговую точку"}</Text>
                           <Text className="font-semibold text-[#2e2f2f]">
                             {isLoading ? (
@@ -144,6 +144,12 @@ export default function CreateShipment({ navigation }) {
                             ) : (
                               transfer.to_place?.name
                             )}
+                          </Text>
+                        </View>
+                        <View className="p-3 flex-row justify-between mb-5">
+                          <Text>{isLoading ? <Skeleton show height={17} width={150} radius={"round"} colorMode="light" /> : "От куда"}</Text>
+                          <Text className="font-semibold text-[#2e2f2f]">
+                            {isLoading ? <Skeleton show height={17} width={100} radius={"round"} colorMode="light" /> : currentPlace?.name}
                           </Text>
                         </View>
                       </View>

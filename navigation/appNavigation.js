@@ -9,6 +9,7 @@ import { authContext } from "../contexts/authContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { TOKEN } from "../constants";
 import AddProductForTransfer from "../screens/create_shipment/AddProductForTransfer";
+import ScanQrForAddProduct from "../screens/create_shipment/ScanQr";
 const Stack = createNativeStackNavigator();
 
 export default function AppNavigation() {
@@ -39,6 +40,7 @@ export default function AppNavigation() {
         <Stack.Screen name="/" component={HomePage} />
         <Stack.Screen name="create-transfers" component={CreateShipment} />
         <Stack.Screen name="add-product-for-transfer" component={AddProductForTransfer} />
+        <Stack.Screen name="scan-qr-for-add-product" component={ScanQrForAddProduct} />
       </Stack.Navigator>
     </NavigationContainer>
   );

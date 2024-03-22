@@ -1,5 +1,16 @@
 {
   "expo": {
+    "plugins": [
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow $(PRODUCT_NAME) to access your camera",
+          "microphonePermission": "Allow $(PRODUCT_NAME) to access your microphone",
+          "recordAudioAndroid": true
+        }
+      ]
+    ],
+    "suppressWarnings": ["BarCodeScanner has been deprecated and will be removed in a future SDK version."],
     "name": "smarty-sell_mobile",
     "slug": "smarty-sell_mobile",
     "version": "1.0.0",
@@ -11,9 +22,7 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true
     },

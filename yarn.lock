@@ -5154,6 +5154,20 @@ expo-asset@~9.0.2:
     invariant "^2.2.4"
     md5-file "^3.2.3"
 
+expo-barcode-scanner@^12.9.3:
+  version "12.9.3"
+  resolved "https://registry.yarnpkg.com/expo-barcode-scanner/-/expo-barcode-scanner-12.9.3.tgz#b6be7975c7a347d5906255b2117eb8ea35dde275"
+  integrity sha512-I3zaKSINRMHbTc7sHIq14ug3fHkCsW4rweJF12yk0kHaympI2wxVgIo2DhzeZaYG1Ylkuj5aiKen3NuwDk1FSA==
+  dependencies:
+    expo-image-loader "~4.6.0"
+
+expo-camera@14.0.4:
+  version "14.0.4"
+  resolved "https://registry.yarnpkg.com/expo-camera/-/expo-camera-14.0.4.tgz#8705e6d8620854ba217480fd40700b66d287c28a"
+  integrity sha512-0kOSIkvRkkJInwzvcWvmogWz7ta6oqjS3HD81z/Vm+fFUtmZ13PZEOWD8arYySoU1qMlUw9LztoBY09bpNeWOg==
+  dependencies:
+    invariant "^2.2.4"
+
 expo-checkbox@^2.7.0:
   version "2.7.0"
   resolved "https://registry.yarnpkg.com/expo-checkbox/-/expo-checkbox-2.7.0.tgz#90bb07725724a8bd2f241188d03949b6d3efb0e0"
@@ -5166,6 +5180,13 @@ expo-constants@~15.4.0:
   dependencies:
     "@expo/config" "~8.5.0"
 
+expo-device@^5.9.3:
+  version "5.9.3"
+  resolved "https://registry.yarnpkg.com/expo-device/-/expo-device-5.9.3.tgz#0ad61da681424aa682fa03001d0344394c01f8a1"
+  integrity sha512-azH5rz8krDZUJb/arqkcA6oZGaX2T5s4aaXIMFsDDzvq8TW0CttZZy2HFp6itmFdiKGdRpFX3/Gj0n6ZmPoJ/w==
+  dependencies:
+    ua-parser-js "^0.7.33"
+
 expo-file-system@~16.0.0, expo-file-system@~16.0.6:
   version "16.0.6"
   resolved "https://registry.yarnpkg.com/expo-file-system/-/expo-file-system-16.0.6.tgz#07a140a7bcb44b42bd3f0b465e7583cc7f7d7078"
@@ -5177,6 +5198,11 @@ expo-font@~11.10.2:
   integrity sha512-AE0Q0LiWiVosQ/jlKUPoWoob7p3GwYM2xmLoUkuopO9RYh9NL1hZKHiMKcWBZyDG8Gww1GtBQwh7ZREST8+jjQ==
   dependencies:
     fontfaceobserver "^2.1.0"
+
+expo-image-loader@~4.6.0:
+  version "4.6.0"
+  resolved "https://registry.yarnpkg.com/expo-image-loader/-/expo-image-loader-4.6.0.tgz#ca7d4fdf53125bff2091d3a2c34a3155f10df147"
+  integrity sha512-RHQTDak7/KyhWUxikn2yNzXL7i2cs16cMp6gEAgkHOjVhoCJQoOJ0Ljrt4cKQ3IowxgCuOrAgSUzGkqs7omj8Q==
 
 expo-keep-awake@~12.8.2:
   version "12.8.2"
@@ -9653,6 +9679,11 @@ type-is@~1.6.18:
   dependencies:
     media-typer "0.3.0"
     mime-types "~2.1.24"
+
+ua-parser-js@^0.7.33:
+  version "0.7.37"
+  resolved "https://registry.yarnpkg.com/ua-parser-js/-/ua-parser-js-0.7.37.tgz#e464e66dac2d33a7a1251d7d7a99d6157ec27832"
+  integrity sha512-xV8kqRKM+jhMvcHWUKthV9fNebIzrNy//2O9ZwWcfiBFR5f25XVZPLlEajk/sf3Ra15V92isyQqnIEXRDaZWEA==
 
 ua-parser-js@^1.0.35:
   version "1.0.37"
