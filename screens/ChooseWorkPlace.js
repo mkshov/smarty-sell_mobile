@@ -1,5 +1,5 @@
 import React, { useCallback, useContext, useEffect, useState } from "react";
-import { ImageBackground, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { ImageBackground, Pressable, ScrollView, Text, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
 import Icon from "react-native-vector-icons/Feather";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { LinearGradient } from "expo-linear-gradient";
@@ -7,13 +7,21 @@ import { workPlaceContext } from "../contexts/workPlaceContext";
 
 export default function ChooseWorkPlace({ navigation }) {
   const { places, selectedPlace, setSelectedPlace, handleSave, getPlaces } = useContext(workPlaceContext);
-  // const [selectedPlace, setSelectedPlace] = useState(null);
+  const [disabledStyle, setDisabledStyle] = useState(null);
 
   const handlePlaceChoose = (place) => setSelectedPlace(place);
 
   useEffect(() => {
     getPlaces();
   }, []);
+
+  useEffect(() => {
+    if (!selectedPlace) {
+      setDisabledStyle({ opacity: 0.5 });
+    } else {
+      setDisabledStyle({ opacity: 1 });
+    }
+  }, [selectedPlace]);
 
   return (
     <ImageBackground
@@ -22,7 +30,7 @@ export default function ChooseWorkPlace({ navigation }) {
       style={{ backgroundColor: "#f4f6f8" }}
       className="w-full h-full bg-orange-400 flex justify-center items-center"
     >
-      <View className="bg-white max-w-sm w-full p-7 rounded-3xl shadow-lg">
+      <Pressable onPress={() => setSelectedPlace(null)} className="bg-white max-w-sm w-full p-7 rounded-3xl shadow-lg">
         <View className="">
           <Text className="font-bold text-base">Пожалуйста, укажите рабочее место</Text>
           <Text>Реализация будет происходить на продуктах выбранного рабочего местa</Text>
@@ -43,12 +51,12 @@ export default function ChooseWorkPlace({ navigation }) {
             </TouchableOpacity>
           ))}
         </ScrollView>
-        <TouchableOpacity onPress={() => handleSave(navigation)}>
+        <TouchableOpacity style={disabledStyle} disabled={!selectedPlace} onPress={() => handleSave(navigation)}>
           <LinearGradient colors={["#ED83C1", "#8469A4"]} className="py-4 rounded-2xl mb-3 mt-5">
             <Text className="text-xl font-bold text-white text-center">Применить</Text>
           </LinearGradient>
         </TouchableOpacity>
-      </View>
+      </Pressable>
     </ImageBackground>
   );
 }

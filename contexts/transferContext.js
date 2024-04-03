@@ -17,12 +17,14 @@ const TransferContextProvider = ({ children }) => {
   const [transfers, setTransfers] = useState([]);
   const [transfer, setTransfer] = useState(null);
   const [transferProducts, setTransferProducts] = useState(null);
+  console.log("transferProducts: ", transferProducts);
   const [newTransfer, setNewTransfer] = useState(null);
   const [scannedProduct, setScannedProduct] = useState(null);
   const [error, setError] = useState("");
   const [admin, setAdmin] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingTransfers, setIsLoadingTransfers] = useState(true);
+  const [scannedProducts, setScannedProducts] = useState([]);
 
   const getTransfers = async (params) => {
     setIsLoading(true);
@@ -36,8 +38,6 @@ const TransferContextProvider = ({ children }) => {
     } catch (error) {
       setIsLoadingTransfers(false);
       setIsLoading(false);
-
-      console.log("error: ", error);
     }
   };
 
@@ -45,13 +45,13 @@ const TransferContextProvider = ({ children }) => {
     setIsLoading(true);
     try {
       const { data } = await api.get(`${ENDPOINTS.TRANSFER}${id}/`);
+      console.log("data IN GET TRANSFER: ", data);
       setTransfer(data);
       setIsLoading(false);
 
       return data;
     } catch (error) {
       setIsLoading(false);
-      console.log("error: ", error);
     }
   };
 
@@ -65,7 +65,6 @@ const TransferContextProvider = ({ children }) => {
       return data;
     } catch (error) {
       setIsLoading(false);
-      console.log("error: ", error);
     }
   };
 
@@ -79,8 +78,6 @@ const TransferContextProvider = ({ children }) => {
       return data;
     } catch (error) {
       setIsLoading(false);
-
-      console.log("error: ", error);
     }
   };
 
@@ -93,7 +90,6 @@ const TransferContextProvider = ({ children }) => {
       return response.data;
     } catch (error) {
       setIsLoading(false);
-      console.log("error: ", error);
     }
   };
 
@@ -105,9 +101,22 @@ const TransferContextProvider = ({ children }) => {
       setIsLoading(false);
       return response.data;
     } catch (error) {
-      setIsLoading(false);
       console.log("error: ", error);
-      setError(error.response);
+      setIsLoading(false);
+      setError(error.response.data);
+      return error.response.data;
+    }
+  };
+  const addProductToTransfer = async (data, id) => {
+    setIsLoading(true);
+    try {
+      const response = await api.post(`${ENDPOINTS.TRANSFER}${id}/products/`, data);
+      setIsLoading(false);
+      return response.data;
+    } catch (error) {
+      setIsLoading(false);
+      setError(error.response.data);
+      return error.response.data;
     }
   };
 
@@ -122,12 +131,16 @@ const TransferContextProvider = ({ children }) => {
         isLoadingTransfers,
         transferProducts,
         scannedProduct,
+        scannedProducts,
+        setError,
+        setScannedProducts,
         getTransfers,
         getTransfer,
         createTransfer,
         getTransferProducts,
         deleteTransfer,
         scanProductForTransfer,
+        addProductToTransfer,
       }}
     >
       {children}

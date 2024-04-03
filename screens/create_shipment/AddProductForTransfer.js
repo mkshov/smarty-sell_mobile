@@ -9,6 +9,7 @@ import ModalChooseAddVariant from "./components/modalChooseAddVariant";
 
 export default function AddProductForTransfer({ route, navigation }) {
   const { transferId } = route.params;
+  console.log("transferId: ", transferId);
   const { transfer, transferProducts, getTransfer, getTransfers, getTransferProducts, deleteTransfer } = useContext(transferContext);
 
   const [productQuantities, setProductQuantities] = useState(null);
@@ -17,21 +18,16 @@ export default function AddProductForTransfer({ route, navigation }) {
 
   const handleChangeQuantity = (product, text) => {};
 
-  const getAllTransfers = () => {
-    getTransfers({ status: "preparing" });
-  };
-
   useEffect(() => {
     getTransfer(transferId);
+    console.log("INSIDE");
     getTransferProducts(transferId);
-  }, []);
+  }, [transferId]);
 
-  const onRefresh = React.useCallback(() => {
+  const onRefresh = React.useCallback(async () => {
     setRefreshing(true);
-    setTimeout(() => {
-      getAllTransfers();
-      setRefreshing(false);
-    }, 2000);
+    await getTransfers({ status: "preparing" });
+    setRefreshing(false);
   }, []);
 
   const handleNavigate = (path, id) => {
@@ -41,7 +37,7 @@ export default function AddProductForTransfer({ route, navigation }) {
   const handleDeleteTransfer = () => {
     deleteTransfer(transferId);
     Alert.alert("Трансфер удален");
-    getAllTransfers();
+    getTransfers({ status: "preparing" });
     navigation.navigate("create-transfers");
   };
 

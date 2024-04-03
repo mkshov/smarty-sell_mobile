@@ -6,18 +6,19 @@ import { BarCodeScanner } from "expo-barcode-scanner";
 import { transferContext } from "../../contexts/transferContext";
 import { LinearGradient } from "expo-linear-gradient";
 import Icon from "react-native-vector-icons/Ionicons";
+import ModalScannedProduct from "./components/modalScannedProduct";
 
 const windowWidth = Dimensions.get("window").width;
 const windowHeight = Dimensions.get("window").height;
 const initialText = "Наведитесь на QR code \n или штрих код";
 
 export default function ScanQrForAddProduct({ navigation }) {
-  const { transfer, scannedProduct, error, scanProductForTransfer } = useContext(transferContext);
-  console.log("scannedProduct: ", scannedProduct);
-  console.log("transfer qr: ", transfer);
+  const { transfer, scannedProduct, scanProductForTransfer, scannedProducts, setScannedProducts } = useContext(transferContext);
+
   const [hasPermission, setHasPermission] = useState(null);
   const [scanned, setScanned] = useState(false);
   const [text, setText] = useState(initialText);
+  const [modalVisible, setModalVisible] = useState(false);
 
   const askForCameraPermission = () => {
     (async () => {
@@ -39,9 +40,23 @@ export default function ScanQrForAddProduct({ navigation }) {
     handleScan(data);
   };
 
+  const newSkanForError = () => {
+    setScanned(false);
+    setModalVisible(false);
+    setText(initialText);
+  };
+
   const newScan = () => {
     setScanned(false);
+    setModalVisible(false);
     setText(initialText);
+    const isProductExist = scannedProducts.some((product) => product.id === scannedProduct.id);
+    if (!isProductExist) {
+      const newScannedProducts = [...scannedProducts, scannedProduct];
+      setScannedProducts(newScannedProducts);
+    } else {
+      Alert.alert("Продукт уже добавлен");
+    }
   };
 
   const handleScan = async (scanResult) => {
@@ -49,23 +64,21 @@ export default function ScanQrForAddProduct({ navigation }) {
       barcode: scanResult,
       place: transfer.from_place.id,
     };
-    scanProductForTransfer(data);
-    // Alert.alert("Добавить в корзину", "продукт добавить сначала в корзину, а после можно будет перепроверить", [
-    //   {
-    //     text: "Отмена",
-    //     onPress: () => console.log("Cancel Pressed"),
-    //     style: "Отменить",
-    //   },
-    //   { text: "Добавить", onPress: () => scanProductForTransfer(data) },
-    // ]);
-    // Alert.alert(scannedProduct?.barcode, scannedProduct?.product.name);
+    let res = await scanProductForTransfer(data);
+    if (res.barcode) {
+      setModalVisible(!modalVisible);
+    } else {
+      console.log(res.errors[0].message);
+      if (res.errors[0].code === "not_found") {
+        Alert.alert(`Продукт с кодом - ${scanResult} не найден!`);
+      }
+    }
   };
 
-  // if (error) {
-  //   Alert.alert(error.data.errors[0].message);
-  // }
+  const handleNavigate = (path) => {
+    navigation.navigate(path);
+  };
 
-  // Check permissions and return the screens
   if (hasPermission === null) {
     return (
       <View style={styles.container}>
@@ -84,12 +97,24 @@ export default function ScanQrForAddProduct({ navigation }) {
   // Return the View
   return (
     <SafeAreaProvider>
+      <ModalScannedProduct
+        scannedProduct={scannedProduct}
+        modalVisible={modalVisible}
+        setModalVisible={setModalVisible}
+        handleNavigate={handleNavigate}
+        newScan={newScan}
+      />
       <BarCodeScanner onBarCodeScanned={scanned ? undefined : handleBarCodeScanned} style={StyleSheet.absoluteFillObject} />
       <SafeAreaView style={{ height: windowHeight }}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-          <Icon name="chevron-back" color={"white"} size={25} />
-          <Text style={styles.backButton.text}>Назад</Text>
-        </TouchableOpacity>
+        <View style={styles.header}>
+          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+            <Icon name="chevron-back" color={"white"} size={25} />
+            <Text style={styles.backButton.text}>Назад</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => handleNavigate("cart-for-scann")}>
+            <Text style={styles.backButton.text}>Корзина</Text>
+          </TouchableOpacity>
+        </View>
         <View style={styles.container}>
           <Text style={styles.maintext}>{text}</Text>
           <View style={styles.barcodebox}>
@@ -98,13 +123,13 @@ export default function ScanQrForAddProduct({ navigation }) {
             <View style={[styles.cornerBottomLeft, styles.corner]} />
             <View style={[styles.cornerBottomRight, styles.corner]} />
           </View>
-          {scanned && (
-            <TouchableOpacity style={styles.newSkan} onPress={() => newScan()}>
+          {!modalVisible && scanned ? (
+            <TouchableOpacity style={styles.newSkan} onPress={() => newSkanForError()}>
               <LinearGradient colors={["#ED83C1", "#8469A4"]} style={styles.newSkan.bg}>
                 <Text style={styles.newSkan.text}>Сканировать еще раз</Text>
               </LinearGradient>
             </TouchableOpacity>
-          )}
+          ) : null}
         </View>
       </SafeAreaView>
     </SafeAreaProvider>
@@ -121,6 +146,13 @@ const styles = StyleSheet.create({
     },
     flexDirection: "row",
     alignItems: "center",
+  },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginRight: 15,
+    text: {},
   },
   container: {
     flex: 1,

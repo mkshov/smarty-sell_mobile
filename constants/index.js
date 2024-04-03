@@ -7,4 +7,4 @@ export const TOKEN = "ss:token";
 export const STORAGE = {
   LANGUAGE: "ss:language",
   SAVED_PLACE: "ss:savedPlace",
-};
+};  

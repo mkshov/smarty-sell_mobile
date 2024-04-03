@@ -57,7 +57,7 @@ export default function CreateShipment({ navigation }) {
   };
 
   useEffect(() => {
-    getAllTransfers();
+    // getAllTransfers();
     getCurrentPlace();
   }, []);
 
