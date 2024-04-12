@@ -6,6 +6,7 @@ import Icon from "react-native-vector-icons/Ionicons";
 import AddIcon from "react-native-vector-icons/AntDesign";
 import { LinearGradient } from "expo-linear-gradient";
 import ModalChooseAddVariant from "./components/modalChooseAddVariant";
+import FlashMessage, { showMessage } from "react-native-flash-message";
 
 export default function AddProductForTransfer({ route, navigation }) {
   const { transferId } = route.params;
@@ -34,10 +35,10 @@ export default function AddProductForTransfer({ route, navigation }) {
     navigation.navigate(path, { transferId: id });
   };
 
-  const handleDeleteTransfer = () => {
+  const handleDeleteTransfer = async () => {
     deleteTransfer(transferId);
     Alert.alert("Трансфер удален");
-    getTransfers({ status: "preparing" });
+    await getTransfers({ status: "preparing" });
     navigation.navigate("create-transfers");
   };
 
@@ -60,7 +61,7 @@ export default function AddProductForTransfer({ route, navigation }) {
             <Icon name="chevron-back" color={"white"} size={25} />
             <Text className="text-white">Назад</Text>
           </TouchableOpacity>
-          <Text className="text-center text-2xl font-bold text-white ">Details: {transferId}</Text>
+          <Text className="text-center text-2xl font-bold text-white ">Трансфер №{transferId}</Text>
           <View className="flex-row justify-between px-4 mt-5">
             <TouchableOpacity onPress={() => confirmDelete()}>
               <LinearGradient colors={["#efceff87", "#efceff87"]} className="py-5 rounded-2xl w-[180px]">

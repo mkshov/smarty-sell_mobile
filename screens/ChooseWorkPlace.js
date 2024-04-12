@@ -24,12 +24,7 @@ export default function ChooseWorkPlace({ navigation }) {
   }, [selectedPlace]);
 
   return (
-    <ImageBackground
-      source={require("../assets/places-bg.png")}
-      resizeMode="cover"
-      style={{ backgroundColor: "#f4f6f8" }}
-      className="w-full h-full bg-orange-400 flex justify-center items-center"
-    >
+    <LinearGradient colors={["#8469A4FF", "#ED83C1FF", "#7E8BCDFF"]} className="w-full h-full bg-orange-400 flex justify-center items-center">
       <Pressable onPress={() => setSelectedPlace(null)} className="bg-white max-w-sm w-full p-7 rounded-3xl shadow-lg">
         <View className="">
           <Text className="font-bold text-base">Пожалуйста, укажите рабочее место</Text>
@@ -57,6 +52,6 @@ export default function ChooseWorkPlace({ navigation }) {
           </LinearGradient>
         </TouchableOpacity>
       </Pressable>
-    </ImageBackground>
+    </LinearGradient>
   );
 }

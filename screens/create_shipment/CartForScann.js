@@ -6,6 +6,7 @@ import Icon from "react-native-vector-icons/Ionicons";
 import AddIcon from "react-native-vector-icons/AntDesign";
 import { LinearGradient } from "expo-linear-gradient";
 import ModalChooseAddVariant from "./components/modalChooseAddVariant";
+import FlashMessage, { showMessage } from "react-native-flash-message";
 
 export default function CartForScann({ route, navigation }) {
   const { transfer, scannedProducts, setScannedProducts, getTransfer, getTransferProducts, addProductToTransfer } = useContext(transferContext);
@@ -36,11 +37,22 @@ export default function CartForScann({ route, navigation }) {
   };
 
   const sendProduct = async () => {
-    await addProductToTransfer(productStates, transfer.id);
-    setScannedProducts([]);
-    await getTransferProducts(transfer.id);
-    console.log("transfer: ", transfer);
-    navigation.navigate("add-product-for-transfer", { transferId: transfer.id });
+    let res = await addProductToTransfer(productStates, transfer.id);
+    console.log("res: ", res);
+    if (res.errors) {
+      if (res.errors[0].code === "transfer_src_placement_not_enough") {
+        Alert.alert("Добавляемый продукт превышает кол-во на складе!");
+      }
+    } else {
+      setScannedProducts([]);
+      await getTransferProducts(transfer.id);
+      showMessage({
+        message: "Продукты успешно добавлены в отгрузку!",
+        type: "success",
+        position: "bottom",
+      });
+      navigation.navigate("add-product-for-transfer", { transferId: transfer.id });
+    }
   };
 
   const handleDeleteProduct = (productId) => {
@@ -124,6 +136,7 @@ export default function CartForScann({ route, navigation }) {
               </View>
             ))}
           </ScrollView>
+          <FlashMessage />
         </SafeAreaView>
       </SafeAreaProvider>
     </ImageBackground>

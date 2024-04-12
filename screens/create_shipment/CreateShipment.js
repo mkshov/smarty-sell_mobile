@@ -10,6 +10,7 @@ import { workPlaceContext } from "../../contexts/workPlaceContext";
 import { STORAGE } from "../../constants";
 import { transferContext } from "../../contexts/transferContext";
 import { Skeleton } from "moti/skeleton";
+import { LinearGradient } from "expo-linear-gradient";
 
 export default function CreateShipment({ navigation }) {
   const { getPlaces, places } = useContext(workPlaceContext);
@@ -66,7 +67,7 @@ export default function CreateShipment({ navigation }) {
   };
   return (
     <SafeAreaProvider>
-      <ImageBackground resizeMode="cover" source={require("../../assets/login-bg.png")}>
+      <LinearGradient colors={["#8469A4FF", "#ED83C1FF", "#7E8BCDFF"]}>
         <SafeAreaView>
           <TouchableOpacity onPress={() => handleNavigate("/")} className="flex-row items-center ml-2">
             <Icon name="chevron-back" color={"white"} size={25} />
@@ -99,6 +100,12 @@ export default function CreateShipment({ navigation }) {
               >
                 {isLoadingTransfers ? (
                   <Text className="text-white text-xl font-bold text-center">Загрузка...</Text>
+                ) : transfers.length === 0 ? (
+                  <View className="items-center">
+                    <Text className="text-center text-base color-white font-semibold">
+                      Отгрузки не созданы! Чтобы создать новую отгрузку, нажмите кнопку "Добавить отгрузку".
+                    </Text>
+                  </View>
                 ) : (
                   transfers.map((transfer, i) => (
                     <TouchableOpacity key={i} onPress={() => handleNavigate("add-product-for-transfer", transfer.id)}>
@@ -160,7 +167,7 @@ export default function CreateShipment({ navigation }) {
             </View>
           </View>
         </SafeAreaView>
-      </ImageBackground>
+      </LinearGradient>
     </SafeAreaProvider>
   );
 }

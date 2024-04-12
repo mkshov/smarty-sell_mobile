@@ -115,8 +115,7 @@ const TransferContextProvider = ({ children }) => {
       return response.data;
     } catch (error) {
       setIsLoading(false);
-      setError(error.response.data);
-      return error.response.data;
+      return error.response.data.errors[0];
     }
   };
 

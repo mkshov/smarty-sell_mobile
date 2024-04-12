@@ -7,6 +7,7 @@ import { transferContext } from "../../contexts/transferContext";
 import { LinearGradient } from "expo-linear-gradient";
 import Icon from "react-native-vector-icons/Ionicons";
 import ModalScannedProduct from "./components/modalScannedProduct";
+import FlashMessage, { showMessage } from "react-native-flash-message";
 
 const windowWidth = Dimensions.get("window").width;
 const windowHeight = Dimensions.get("window").height;
@@ -54,8 +55,23 @@ export default function ScanQrForAddProduct({ navigation }) {
     if (!isProductExist) {
       const newScannedProducts = [...scannedProducts, scannedProduct];
       setScannedProducts(newScannedProducts);
+      showMessage({
+        message: "Продукт успешно добавлен в корзину!",
+        type: "success",
+        position: "bottom",
+        titleStyle: {
+          fontSize: 16,
+        },
+      });
     } else {
-      Alert.alert("Продукт уже добавлен");
+      showMessage({
+        message: "Продукт уже в корзине!",
+        type: "warning",
+        position: "bottom",
+        titleStyle: {
+          fontSize: 16,
+        },
+      });
     }
   };
 
@@ -68,7 +84,6 @@ export default function ScanQrForAddProduct({ navigation }) {
     if (res.barcode) {
       setModalVisible(!modalVisible);
     } else {
-      console.log(res.errors[0].message);
       if (res.errors[0].code === "not_found") {
         Alert.alert(`Продукт с кодом - ${scanResult} не найден!`);
       }
@@ -131,6 +146,7 @@ export default function ScanQrForAddProduct({ navigation }) {
             </TouchableOpacity>
           ) : null}
         </View>
+        <FlashMessage />
       </SafeAreaView>
     </SafeAreaProvider>
   );
