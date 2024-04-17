@@ -38,7 +38,6 @@ export default function CartForScann({ route, navigation }) {
 
   const sendProduct = async () => {
     let res = await addProductToTransfer(productStates, transfer.id);
-    console.log("res: ", res);
     if (res.errors) {
       if (res.errors[0].code === "transfer_src_placement_not_enough") {
         Alert.alert("Добавляемый продукт превышает кол-во на складе!");
@@ -56,18 +55,15 @@ export default function CartForScann({ route, navigation }) {
   };
 
   const handleDeleteProduct = (productId) => {
-    console.log("productId: ", productId);
     const updatedProducts = scannedProducts.filter((product) => product.id !== productId);
-    console.log("updatedProducts: ", updatedProducts);
     setScannedProducts(updatedProducts);
-    console.log(scannedProducts);
   };
 
   return (
     <ImageBackground resizeMode="cover" className="h-full" source={require("../../assets/login-bg.png")}>
       <SafeAreaProvider>
         <SafeAreaView>
-          <TouchableOpacity onPress={() => navigation.goBack()} className="flex-row items-center ml-2">
+          <TouchableOpacity onPress={() => navigation.navigate("scan-qr-for-add-product")} className="flex-row items-center ml-2">
             <Icon name="chevron-back" color={"white"} size={25} />
             <Text className="text-white">Назад</Text>
           </TouchableOpacity>

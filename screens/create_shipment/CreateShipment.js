@@ -14,7 +14,7 @@ import { LinearGradient } from "expo-linear-gradient";
 
 export default function CreateShipment({ navigation }) {
   const { getPlaces, places } = useContext(workPlaceContext);
-  const { transfers, newTransfer, isLoading, isLoadingTransfers, getTransfers } = useContext(transferContext);
+  const { transfers, newTransfer, isLoading, isLoadingTransfers, getTransfers, getTransferProducts, getAmountInPlace } = useContext(transferContext);
   const [currentPlace, setCurrentPlace] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
@@ -22,7 +22,7 @@ export default function CreateShipment({ navigation }) {
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
     setTimeout(() => {
-      getAllTransfers();
+      getTransfers({ status: "preparing" });
       getCurrentPlace();
       setRefreshing(false);
     }, 2000);
@@ -30,6 +30,7 @@ export default function CreateShipment({ navigation }) {
 
   const getCurrentPlace = async () => {
     const savedPlace = JSON.parse((await AsyncStorage.getItem(STORAGE.SAVED_PLACE)) || null);
+    console.log("getCurrentPlace(): ", savedPlace);
     setCurrentPlace(savedPlace);
   };
 
@@ -48,28 +49,26 @@ export default function CreateShipment({ navigation }) {
     return formattedDate;
   });
 
-  const getAllTransfers = async () => {
-    getTransfers({ status: "preparing" });
-  };
-
   const handleOpenModal = () => {
+    getCurrentPlace();
     getPlaces();
     setModalVisible(true);
   };
 
   useEffect(() => {
-    // getAllTransfers();
     getCurrentPlace();
   }, []);
 
-  const handleNavigate = (path, id) => {
-    navigation.navigate(path, { transferId: id });
+  const handleNavigate = (path, id, onRefresh) => {
+    getTransferProducts(id);
+    getAmountInPlace(id);
+    navigation.navigate(path, { transferId: id, onRefreshTransfers: onRefresh });
   };
   return (
     <SafeAreaProvider>
       <LinearGradient colors={["#8469A4FF", "#ED83C1FF", "#7E8BCDFF"]}>
         <SafeAreaView>
-          <TouchableOpacity onPress={() => handleNavigate("/")} className="flex-row items-center ml-2">
+          <TouchableOpacity onPress={() => navigation.navigate("/")} className="flex-row items-center ml-2">
             <Icon name="chevron-back" color={"white"} size={25} />
             <Text className="text-white">Назад</Text>
           </TouchableOpacity>
@@ -80,6 +79,7 @@ export default function CreateShipment({ navigation }) {
               modalVisible={modalVisible}
               setModalVisible={setModalVisible}
               getAllTransfers={onRefresh}
+              getCurrentPlace={getCurrentPlace}
             />
             <TouchableOpacity onPress={handleOpenModal} className="bg-white w-full py-5 px-10 rounded-2xl mt-10">
               <Text className="text-[#CD5297] text-xl font-bold text-center">Добавить отгрузку</Text>
@@ -108,7 +108,7 @@ export default function CreateShipment({ navigation }) {
                   </View>
                 ) : (
                   transfers.map((transfer, i) => (
-                    <TouchableOpacity key={i} onPress={() => handleNavigate("add-product-for-transfer", transfer.id)}>
+                    <TouchableOpacity key={i} onPress={() => handleNavigate("add-product-for-transfer", transfer.id, onRefresh)}>
                       <View className="rounded-xl border-x-4 border-y-4 border-[#efceff87] bg-white">
                         <View className="p-4 border-b border-gray-300 mt-3">
                           {isLoading ? (
@@ -123,7 +123,7 @@ export default function CreateShipment({ navigation }) {
                             {isLoading ? (
                               <Skeleton show height={17} width={50} radius={"round"} colorMode="light" />
                             ) : transfer.creator.name === null ? (
-                              "Асель"
+                              "Отправитель не указан"
                             ) : (
                               transfer.creator.name
                             )}
@@ -156,7 +156,7 @@ export default function CreateShipment({ navigation }) {
                         <View className="p-3 flex-row justify-between mb-5">
                           <Text>{isLoading ? <Skeleton show height={17} width={150} radius={"round"} colorMode="light" /> : "От куда"}</Text>
                           <Text className="font-semibold text-[#2e2f2f]">
-                            {isLoading ? <Skeleton show height={17} width={100} radius={"round"} colorMode="light" /> : currentPlace?.name}
+                            {isLoading ? <Skeleton show height={17} width={100} radius={"round"} colorMode="light" /> : transfer?.from_place.name}
                           </Text>
                         </View>
                       </View>

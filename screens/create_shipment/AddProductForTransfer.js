@@ -9,9 +9,11 @@ import ModalChooseAddVariant from "./components/modalChooseAddVariant";
 import FlashMessage, { showMessage } from "react-native-flash-message";
 
 export default function AddProductForTransfer({ route, navigation }) {
-  const { transferId } = route.params;
-  console.log("transferId: ", transferId);
-  const { transfer, transferProducts, getTransfer, getTransfers, getTransferProducts, deleteTransfer } = useContext(transferContext);
+  const { transferId, onRefreshTransfers } = route.params;
+  console.log("route.params: ", route);
+  const { transfer, transferProducts, getTransfer, getTransfers, getTransferProducts, deleteTransfer, amountInPlace, sendTransfer } =
+    useContext(transferContext);
+  console.log("transferProducts length: ", transferProducts);
 
   const [productQuantities, setProductQuantities] = useState(null);
   const [modalAddVariant, setModalAddVariant] = useState(false);
@@ -21,11 +23,10 @@ export default function AddProductForTransfer({ route, navigation }) {
 
   useEffect(() => {
     getTransfer(transferId);
-    console.log("INSIDE");
     getTransferProducts(transferId);
   }, [transferId]);
 
-  const onRefresh = React.useCallback(async () => {
+  const onRefreshProducts = React.useCallback(async () => {
     setRefreshing(true);
     await getTransfers({ status: "preparing" });
     setRefreshing(false);
@@ -53,11 +54,23 @@ export default function AddProductForTransfer({ route, navigation }) {
     ]);
   };
 
+  const handleSendTransfer = async () => {
+    const res = await sendTransfer(transferId);
+    console.log("res: ", res);
+    if (res.code === "emptiness") {
+      Alert.alert(res.message);
+    } else {
+      getTransfers({ status: "preparing" });
+      onRefreshTransfers();
+      handleNavigate("create-transfers");
+    }
+  };
+
   return (
     <ImageBackground resizeMode="cover" className="h-full" source={require("../../assets/login-bg.png")}>
       <SafeAreaProvider>
         <SafeAreaView>
-          <TouchableOpacity onPress={() => handleNavigate("create-transfers")} className="flex-row items-center ml-2">
+          <TouchableOpacity onPress={() => navigation.navigate("create-transfers")} className="flex-row items-center ml-2">
             <Icon name="chevron-back" color={"white"} size={25} />
             <Text className="text-white">Назад</Text>
           </TouchableOpacity>
@@ -81,62 +94,81 @@ export default function AddProductForTransfer({ route, navigation }) {
           </TouchableOpacity>
           <ModalChooseAddVariant handleNavigate={handleNavigate} setModalVisible={setModalAddVariant} modalVisible={modalAddVariant} />
           <ScrollView
-            refreshControl={<RefreshControl tintColor={"white"} refreshing={refreshing} onRefresh={onRefresh} />}
+            refreshControl={<RefreshControl tintColor={"white"} refreshing={refreshing} onRefresh={onRefreshProducts} />}
             vertical={true}
-            className="px-6 mt-10 max-h-[400px]"
+            className="px-6 min-h-[380px]"
           >
-            {transferProducts?.results.map((element, i) => (
-              <View key={i} className="rounded-xl border-x-4 border-y-4 border-[#efceff87] bg-white p-7 mt-5">
-                <View>
-                  <Text>Название</Text>
-                  <Text className="text-base font-semibold mt-1">{element.product.name}</Text>
-                </View>
-                <View className="flex-row  mt-10">
-                  <View className="w-1/2">
-                    <Text>Модель</Text>
-                    <Text className="text-base font-semibold mt-1">{element.product.model}</Text>
-                  </View>
-                  <View>
-                    <Text>Тип</Text>
-                    <Text className="text-base font-semibold mt-1">{element.product.type.name}</Text>
-                  </View>
-                </View>
-                <View className="flex-row mt-10">
-                  <View className="w-1/2">
-                    <Text>Артикул модели</Text>
-                    <Text className="text-base font-semibold mt-1">{element.product.model_code}</Text>
-                  </View>
-                  <View>
-                    <Text>Артикул ткани</Text>
-                    <Text className="text-base font-semibold mt-1">Quattro Siyah</Text>
-                  </View>
-                </View>
-                <View className="flex-row mt-10">
-                  <View className="w-1/2">
-                    <Text>Размер</Text>
-                    <View className="bg-gray-200 max-w-[80px] py-1 items-center mt-2 rounded-full">
-                      <Text className="text-base font-medium">{element.size.name}</Text>
+            {transferProducts?.results.length ? (
+              transferProducts?.results.map((element, i) => (
+                <View key={i} className="rounded-xl border-x-4 border-y-4 border-[#efceff87] bg-white p-7 mt-5">
+                  <View className="flex-row">
+                    <View className="w-1/2">
+                      <Text>Название</Text>
+                      <Text className="text-base font-semibold mt-1">{element.product.name}</Text>
+                    </View>
+                    <View>
+                      <Text>Тип</Text>
+                      <Text className="text-base font-semibold mt-1">{element.product.type.name}</Text>
                     </View>
                   </View>
-                  <View>
-                    <Text>Кол-во </Text>
-                    <View className="flex-row items-end max-w-[100px] gap-x-7">
-                      <TextInput
-                        keyboardType="name-phone-pad"
-                        // defaultValue={element.quantity_sent}
-                        value={element.quantity_sent.toString()}
-                        // onChangeText={(text) => handleChangeQuantity(element, text)}
-                        className="text-base font-semibold w-1/2 mt-1 border-b-[1px] pb-1"
-                      />
-                      <TouchableOpacity>
-                        <AddIcon name="pluscircleo" size={25} color={"#CD5297"} />
-                      </TouchableOpacity>
+                  <View className="flex-row  mt-10">
+                    <View className="w-1/2">
+                      <Text>Модель</Text>
+                      <Text className="text-base font-semibold mt-1">{element.product.model}</Text>
+                    </View>
+                    <View>
+                      <Text>Артикул ткани</Text>
+                      <Text className="text-base font-semibold mt-1">Quattro Siyah</Text>
+                    </View>
+                  </View>
+                  <View className="flex-row mt-10">
+                    <View className="w-1/2">
+                      <Text>Артикул модели</Text>
+                      <Text className="text-base font-semibold mt-1">{element.product.model_code}</Text>
+                    </View>
+                    <View>
+                      <Text>Кол-во на складе</Text>
+                      <Text className="text-base font-semibold mt-1">{amountInPlace[i]?.amount_in_place || 0}</Text>
+                    </View>
+                  </View>
+                  <View className="flex-row mt-10">
+                    <View className="w-1/2">
+                      <Text>Размер</Text>
+                      <View className="bg-gray-200 max-w-[80px] py-1 items-center mt-2 rounded-full">
+                        <Text className="text-base font-medium">{element.size.name}</Text>
+                      </View>
+                    </View>
+                    <View>
+                      <Text>Кол-во </Text>
+                      <View className="flex-row items-end max-w-[100px] gap-x-7">
+                        <TextInput
+                          keyboardType="name-phone-pad"
+                          // defaultValue={element.quantity_sent}
+                          value={element.quantity_sent.toString()}
+                          // onChangeText={(text) => handleChangeQuantity(element, text)}
+                          className="text-base font-semibold w-1/2 mt-1 border-b-[1px] pb-1"
+                        />
+                        <TouchableOpacity>
+                          <AddIcon name="pluscircleo" size={25} color={"#CD5297"} />
+                        </TouchableOpacity>
+                      </View>
                     </View>
                   </View>
                 </View>
+              ))
+            ) : (
+              <View className="items-center mt-10">
+                <Text className="text-center text-base color-white font-semibold">
+                  Продукты не добавлены! Для добавления, нажмите кнопку "Добавить продукт".
+                </Text>
               </View>
-            ))}
+            )}
           </ScrollView>
+          <TouchableOpacity onPress={() => handleSendTransfer()} className="px-4 mt-5">
+            <LinearGradient colors={["#efceff87", "#efceff87"]} className="py-5 rounded-2xl w-full">
+              <Text className="text-center text-white font-semibold">Перевезти в {transfer?.to_place.name}</Text>
+            </LinearGradient>
+          </TouchableOpacity>
         </SafeAreaView>
       </SafeAreaProvider>
     </ImageBackground>

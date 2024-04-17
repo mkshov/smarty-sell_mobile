@@ -4,42 +4,31 @@ import { Image, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, Vi
 import { STORAGE, TOKEN } from "../constants";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { transferContext } from "../contexts/transferContext";
+import { workPlaceContext } from "../contexts/workPlaceContext";
 
 export default function HomePage({ navigation }) {
   const { getTransfers } = useContext(transferContext);
-  const [savedPlace, setSavedPlace] = useState(null);
+  const { savedPlace, logOut } = useContext(workPlaceContext);
 
-  const getSavedPlace = async () => {
-    const savedPlace = JSON.parse((await AsyncStorage.getItem(STORAGE.SAVED_PLACE)) || null);
-    setSavedPlace(savedPlace);
-  };
-  useEffect(() => {
-    getSavedPlace();
-  }, []);
-
-  const handleNavigate = (path) => {
-    navigation.navigate(path);
+  const handleNavigate = async (path) => {
     if (path === "create-transfers") {
       getTransfers({ status: "preparing" });
       navigation.navigate(path);
     }
+    navigation.navigate(path);
   };
 
-  const logOut = async () => {
-    await AsyncStorage.removeItem(TOKEN);
-    await AsyncStorage.removeItem(STORAGE.SAVED_PLACE);
-    navigation.navigate("login");
-  };
   return (
     <SafeAreaProvider>
       <SafeAreaView>
         <View style={{ backgroundColor: "#f4f6f8" }}>
           <View className="w-full flex-row-reverse items-center justify-evenly">
-            <TouchableOpacity onPress={() => logOut()} className="bg-sky-400 px-7 py-3 rounded-2xl">
+            <TouchableOpacity onPress={() => logOut(navigation)} className="bg-sky-400 px-7 py-3 rounded-2xl">
               <Text className="text-white text-base ">Выйти</Text>
             </TouchableOpacity>
             <Text className="text-xl">Торговая точка: {savedPlace?.name}</Text>
           </View>
+
           <View className="w-full h-full flex justify-center items-center">
             <View className="items-center justify-center w-full gap-4">
               <TouchableOpacity onPress={() => handleNavigate("create-transfers")} className="bg-sky-400 px-7 w-1/2 py-3 rounded-2xl">
@@ -58,3 +47,20 @@ export default function HomePage({ navigation }) {
     </SafeAreaProvider>
   );
 }
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#fff",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  DrawerButton: {
+    backgroundColor: "#000",
+    paddingVertical: 8,
+    paddingHorizontal: 20,
+    borderRadius: 10,
+  },
+  ButtonText: {
+    color: "#fff",
+  },
+});

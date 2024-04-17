@@ -11,39 +11,47 @@ import { TOKEN } from "../constants";
 import AddProductForTransfer from "../screens/create_shipment/AddProductForTransfer";
 import ScanQrForAddProduct from "../screens/create_shipment/ScanQr";
 import CartForScann from "../screens/create_shipment/CartForScann";
+import { createDrawerNavigator } from "@react-navigation/drawer";
+import CustomDrawer from "../components/Drawer";
+import { workPlaceContext } from "../contexts/workPlaceContext";
 const Stack = createNativeStackNavigator();
 
 export default function AppNavigation() {
+  const Drawer = createDrawerNavigator();
+  const { savedPlace } = useContext(workPlaceContext);
   const [user, setUser] = useState(null);
+  const [initialRoute, setInitialRoute] = useState("login");
+
+  const restoreUser = async () => {
+    try {
+      const storedUser = await AsyncStorage.getItem(TOKEN);
+      if (storedUser) {
+        setUser(JSON.parse(storedUser));
+        setInitialRoute("/");
+      } else {
+        setUser(null);
+        setInitialRoute("login");
+      }
+    } catch (error) {
+      console.error("Error retrieving user from AsyncStorage:", error);
+    }
+  };
 
   useEffect(() => {
-    const restoreUser = async () => {
-      try {
-        const storedUser = await AsyncStorage.getItem(TOKEN);
-        console.log("storedUser: ", storedUser);
-        if (storedUser) {
-          setUser(JSON.parse(storedUser));
-        }
-      } catch (error) {
-        console.error("Error retrieving user from AsyncStorage:", error);
-      }
-    };
-
     restoreUser();
-  }, []);
+  }, [savedPlace]);
 
-  const initialRoute = {};
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName={user ? "/" : "login"} screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="login" component={LoginScreen} />
-        <Stack.Screen name="work-places" component={ChooseWorkPlace} />
-        <Stack.Screen name="/" component={HomePage} />
-        <Stack.Screen name="create-transfers" component={CreateShipment} />
-        <Stack.Screen name="add-product-for-transfer" component={AddProductForTransfer} />
-        <Stack.Screen name="scan-qr-for-add-product" component={ScanQrForAddProduct} />
-        <Stack.Screen name="cart-for-scann" component={CartForScann} />
-      </Stack.Navigator>
+      <Drawer.Navigator drawerContent={(props) => <CustomDrawer {...props} />}>
+        <Drawer.Screen name="login" options={{ headerShown: false }} component={LoginScreen} />
+        <Drawer.Screen name="work-places" options={{ headerShown: false }} component={ChooseWorkPlace} />
+        <Drawer.Screen name="/" component={HomePage} />
+        <Drawer.Screen name="create-transfers" component={CreateShipment} />
+        <Drawer.Screen name="add-product-for-transfer" component={AddProductForTransfer} />
+        <Drawer.Screen name="scan-qr-for-add-product" component={ScanQrForAddProduct} />
+        <Drawer.Screen name="cart-for-scann" component={CartForScann} />
+      </Drawer.Navigator>
     </NavigationContainer>
   );
 }

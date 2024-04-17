@@ -122,7 +122,7 @@ export default function ScanQrForAddProduct({ navigation }) {
       <BarCodeScanner onBarCodeScanned={scanned ? undefined : handleBarCodeScanned} style={StyleSheet.absoluteFillObject} />
       <SafeAreaView style={{ height: windowHeight }}>
         <View style={styles.header}>
-          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+          <TouchableOpacity onPress={() => navigation.navigate("create-transfers")} style={styles.backButton}>
             <Icon name="chevron-back" color={"white"} size={25} />
             <Text style={styles.backButton.text}>Назад</Text>
           </TouchableOpacity>

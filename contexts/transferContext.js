@@ -17,7 +17,6 @@ const TransferContextProvider = ({ children }) => {
   const [transfers, setTransfers] = useState([]);
   const [transfer, setTransfer] = useState(null);
   const [transferProducts, setTransferProducts] = useState(null);
-  console.log("transferProducts: ", transferProducts);
   const [newTransfer, setNewTransfer] = useState(null);
   const [scannedProduct, setScannedProduct] = useState(null);
   const [error, setError] = useState("");
@@ -25,6 +24,7 @@ const TransferContextProvider = ({ children }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingTransfers, setIsLoadingTransfers] = useState(true);
   const [scannedProducts, setScannedProducts] = useState([]);
+  const [amountInPlace, setAmountInPlace] = useState(null);
 
   const getTransfers = async (params) => {
     setIsLoading(true);
@@ -45,7 +45,6 @@ const TransferContextProvider = ({ children }) => {
     setIsLoading(true);
     try {
       const { data } = await api.get(`${ENDPOINTS.TRANSFER}${id}/`);
-      console.log("data IN GET TRANSFER: ", data);
       setTransfer(data);
       setIsLoading(false);
 
@@ -118,6 +117,35 @@ const TransferContextProvider = ({ children }) => {
       return error.response.data.errors[0];
     }
   };
+  const getAmountInPlace = async (id) => {
+    setIsLoading(true);
+    try {
+      const response = await api.get(`${ENDPOINTS.TRANSFER}${id}/products/?get_amount=true`);
+      setIsLoading(false);
+      setAmountInPlace(response.data.results);
+      return response.data;
+    } catch (error) {
+      setIsLoading(false);
+      return error.response.data.errors[0];
+    }
+  };
+
+  const sendTransfer = async (id) => {
+    setIsLoading(true);
+    try {
+      await api.post(`${ENDPOINTS.TRANSFER}${id}/send/`);
+      setIsLoading(false);
+      return response.data;
+    } catch (error) {
+      setIsLoading(false);
+
+      if (error.response.data.errors[0].message === "Transfer is empty!") {
+        return { code: "emptiness", message: "Невозможно перевезти пустой трансфер! Для перевозки добавьте продукты." };
+      } else {
+        error.response.data.errors[0];
+      }
+    }
+  };
 
   return (
     <transferContext.Provider
@@ -131,6 +159,7 @@ const TransferContextProvider = ({ children }) => {
         transferProducts,
         scannedProduct,
         scannedProducts,
+        amountInPlace,
         setError,
         setScannedProducts,
         getTransfers,
@@ -140,6 +169,8 @@ const TransferContextProvider = ({ children }) => {
         deleteTransfer,
         scanProductForTransfer,
         addProductToTransfer,
+        getAmountInPlace,
+        sendTransfer,
       }}
     >
       {children}

@@ -19,6 +19,7 @@ const WorkPlaceContextProvider = ({ children }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [selectedPlace, setSelectedPlace] = useState(null);
+  const [savedPlace, setSavedPlace] = useState(null);
 
   // для входа
   async function getPlaces(params) {
@@ -36,14 +37,25 @@ const WorkPlaceContextProvider = ({ children }) => {
 
   const handleSave = useCallback(
     async (navigation) => {
-      await AsyncStorage.setItem(
-        STORAGE.SAVED_PLACE,
-        JSON.stringify(selectedPlace)
-      );
+      await AsyncStorage.setItem(STORAGE.SAVED_PLACE, JSON.stringify(selectedPlace));
+      getSavedPlace();
       navigation.navigate("/");
     },
     [selectedPlace]
   );
+
+  const getSavedPlace = async () => {
+    let placeStr = await AsyncStorage.getItem(STORAGE.SAVED_PLACE); // Получаем строку из AsyncStorage
+    let place = JSON.parse(placeStr); // Парсим строку в объект
+    setSavedPlace(place);
+  };
+
+  const logOut = async (navigation) => {
+    await AsyncStorage.removeItem(TOKEN);
+    await AsyncStorage.removeItem(STORAGE.SAVED_PLACE);
+    setSavedPlace(null);
+    navigation.navigate("login");
+  };
 
   return (
     <workPlaceContext.Provider
@@ -51,9 +63,12 @@ const WorkPlaceContextProvider = ({ children }) => {
         places,
         isLoading,
         selectedPlace,
+        savedPlace,
         setSelectedPlace,
         getPlaces,
         handleSave,
+        getSavedPlace,
+        logOut,
       }}
     >
       {children}

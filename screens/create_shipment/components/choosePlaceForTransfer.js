@@ -11,7 +11,7 @@ const initState = {
 };
 
 export default function ModalTransfers(props) {
-  const { modalVisible, places, currentPlace, navigation, getAllTransfers, setModalVisible } = props;
+  const { modalVisible, places, currentPlace, navigation, getAllTransfers, setModalVisible, getCurrentPlace } = props;
 
   const { createTransfer, isLoading } = useContext(transferContext);
   const [isChecked, setIsChecked] = useState(false);
@@ -37,6 +37,8 @@ export default function ModalTransfers(props) {
   };
 
   const handleCreateTransfer = () => {
+    getCurrentPlace();
+    console.log("handleCreateTransfer()", currentPlace);
     const param = isChecked ? "is_export" : "to_place";
     const data = {
       from_place: currentPlace?.id,
