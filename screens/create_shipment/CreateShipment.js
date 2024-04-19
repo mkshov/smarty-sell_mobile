@@ -1,6 +1,19 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { useCallback, useContext, useEffect, useState } from "react";
-import { Image, ImageBackground, Modal, RefreshControl, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  Image,
+  ImageBackground,
+  Modal,
+  Platform,
+  RefreshControl,
+  SafeAreaView,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import DateIcon from "../../assets/icons/date";
 import Icon from "react-native-vector-icons/Ionicons";
@@ -30,7 +43,6 @@ export default function CreateShipment({ navigation }) {
 
   const getCurrentPlace = async () => {
     const savedPlace = JSON.parse((await AsyncStorage.getItem(STORAGE.SAVED_PLACE)) || null);
-    console.log("getCurrentPlace(): ", savedPlace);
     setCurrentPlace(savedPlace);
   };
 
@@ -59,15 +71,16 @@ export default function CreateShipment({ navigation }) {
     getCurrentPlace();
   }, []);
 
-  const handleNavigate = (path, id, onRefresh) => {
-    getTransferProducts(id);
-    getAmountInPlace(id);
-    navigation.navigate(path, { transferId: id, onRefreshTransfers: onRefresh });
+  const handleNavigate = async (path, id) => {
+    console.log("id: ", id);
+    await getTransferProducts(id);
+    await getAmountInPlace(id);
+    navigation.navigate(path, { transferId: id });
   };
   return (
     <SafeAreaProvider>
       <LinearGradient colors={["#8469A4FF", "#ED83C1FF", "#7E8BCDFF"]}>
-        <SafeAreaView>
+        <SafeAreaView style={styles.AndroidSafeArea}>
           <TouchableOpacity onPress={() => navigation.navigate("/")} className="flex-row items-center ml-2">
             <Icon name="chevron-back" color={"white"} size={25} />
             <Text className="text-white">Назад</Text>
@@ -94,7 +107,7 @@ export default function CreateShipment({ navigation }) {
               </View>
               <ScrollView
                 refreshControl={<RefreshControl tintColor={"white"} refreshing={refreshing} onRefresh={onRefresh} />}
-                style={{ height: 500 }}
+                style={{ height: 350 }}
                 vertical={true}
                 className="gap-3 pb-28"
               >
@@ -108,7 +121,7 @@ export default function CreateShipment({ navigation }) {
                   </View>
                 ) : (
                   transfers.map((transfer, i) => (
-                    <TouchableOpacity key={i} onPress={() => handleNavigate("add-product-for-transfer", transfer.id, onRefresh)}>
+                    <TouchableOpacity key={i} onPress={() => handleNavigate("add-product-for-transfer", transfer.id)}>
                       <View className="rounded-xl border-x-4 border-y-4 border-[#efceff87] bg-white">
                         <View className="p-4 border-b border-gray-300 mt-3">
                           {isLoading ? (
@@ -171,3 +184,8 @@ export default function CreateShipment({ navigation }) {
     </SafeAreaProvider>
   );
 }
+let styles = StyleSheet.create({
+  AndroidSafeArea: {
+    paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,
+  },
+});

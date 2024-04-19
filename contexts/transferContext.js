@@ -135,14 +135,19 @@ const TransferContextProvider = ({ children }) => {
     try {
       await api.post(`${ENDPOINTS.TRANSFER}${id}/send/`);
       setIsLoading(false);
-      return response.data;
+      return { success: true };
     } catch (error) {
       setIsLoading(false);
 
-      if (error.response.data.errors[0].message === "Transfer is empty!") {
-        return { code: "emptiness", message: "Невозможно перевезти пустой трансфер! Для перевозки добавьте продукты." };
+      if (error.response && error.response.data && error.response.data.errors && error.response.data.errors.length > 0) {
+        const errorMessage = error.response.data.errors[0].message;
+        if (errorMessage === "Transfer is empty!") {
+          return { error: { code: "emptiness", message: "Невозможно перевезти пустой трансфер! Для перевозки добавьте продукты." } };
+        } else {
+          return { error: { code: "unknown", message: errorMessage } };
+        }
       } else {
-        error.response.data.errors[0];
+        return { error: { code: "unknown", message: "Произошла неизвестная ошибка" } };
       }
     }
   };

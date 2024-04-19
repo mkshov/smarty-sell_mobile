@@ -9,8 +9,11 @@ import ModalChooseAddVariant from "./components/modalChooseAddVariant";
 import FlashMessage, { showMessage } from "react-native-flash-message";
 
 export default function CartForScann({ route, navigation }) {
-  const { transfer, scannedProducts, setScannedProducts, getTransfer, getTransferProducts, addProductToTransfer } = useContext(transferContext);
+  const { transfer, scannedProducts, setScannedProducts, getTransfer, getTransferProducts, addProductToTransfer, getAmountInPlace } =
+    useContext(transferContext);
+  console.log("scannedProducts: ", scannedProducts);
   const [productStates, setProductStates] = useState([]);
+  console.log("productStates: ", productStates);
   const [refreshing, setRefreshing] = useState(false);
 
   const onRefresh = React.useCallback(() => {
@@ -27,7 +30,8 @@ export default function CartForScann({ route, navigation }) {
       quantity_sent: 1,
     }));
     setProductStates(initialProductStates);
-  }, []);
+  }, [scannedProducts]);
+
   const handleQuantityChange = (index, newQuantity) => {
     setProductStates((prevStates) => {
       const updatedStates = [...prevStates];
@@ -38,19 +42,22 @@ export default function CartForScann({ route, navigation }) {
 
   const sendProduct = async () => {
     let res = await addProductToTransfer(productStates, transfer.id);
-    if (res.errors) {
-      if (res.errors[0].code === "transfer_src_placement_not_enough") {
-        Alert.alert("Добавляемый продукт превышает кол-во на складе!");
+    console.log("res: ", res);
+    if (productStates.length) {
+      if (res.errors) {
+        if (res.errors[0].code === "transfer_src_placement_not_enough") {
+          Alert.alert("Добавляемый продукт превышает кол-во на складе!");
+        }
+      } else {
+        setScannedProducts([]);
+        setProductStates([]);
+        await getTransferProducts(transfer.id);
+        await getAmountInPlace(transfer.id);
+        Alert.alert("Продукты успешно добавлены в отгрузку!");
+        navigation.navigate("add-product-for-transfer", { transferId: transfer.id });
       }
     } else {
-      setScannedProducts([]);
-      await getTransferProducts(transfer.id);
-      showMessage({
-        message: "Продукты успешно добавлены в отгрузку!",
-        type: "success",
-        position: "bottom",
-      });
-      navigation.navigate("add-product-for-transfer", { transferId: transfer.id });
+      Alert.alert("Добавьте хотя бы один продукт в корзину!");
     }
   };
 
@@ -71,7 +78,7 @@ export default function CartForScann({ route, navigation }) {
 
           <TouchableOpacity onPress={() => sendProduct()} className="px-4 mt-5">
             <LinearGradient colors={["#efceff87", "#efceff87"]} className="py-5 rounded-2xl w-full">
-              <Text className="text-center text-white font-semibold">Добавить продукт</Text>
+              <Text className="text-center text-white font-semibold">Добавить в отгрузку</Text>
             </LinearGradient>
           </TouchableOpacity>
           <ScrollView refreshControl={<RefreshControl tintColor={"white"} />} vertical={true} className="px-6 mt-10 max-h-[400px]">

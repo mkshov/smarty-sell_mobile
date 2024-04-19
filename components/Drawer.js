@@ -15,7 +15,7 @@ const CustomDrawer = (props) => {
         }}
       >
         <ImageBackground source={require("../assets/background.png")} style={{ padding: 20 }}>
-          <Image alt="Not find" source={require("../assets/icons/accountIcon")} style={styles.userAvatar} />
+          {/* <Image alt="Not find" source={require("../assets/icons/accountIcon")} style={styles.userAvatar} /> */}
           <Text
             style={{
               color: "#fff",

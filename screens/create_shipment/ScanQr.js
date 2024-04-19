@@ -37,7 +37,6 @@ export default function ScanQrForAddProduct({ navigation }) {
   const handleBarCodeScanned = ({ type, data }) => {
     setScanned(true);
     setText(data);
-    console.log("Type: " + type + "\nData: " + data);
     handleScan(data);
   };
 
@@ -52,26 +51,18 @@ export default function ScanQrForAddProduct({ navigation }) {
     setModalVisible(false);
     setText(initialText);
     const isProductExist = scannedProducts.some((product) => product.id === scannedProduct.id);
-    if (!isProductExist) {
-      const newScannedProducts = [...scannedProducts, scannedProduct];
-      setScannedProducts(newScannedProducts);
-      showMessage({
-        message: "Продукт успешно добавлен в корзину!",
-        type: "success",
-        position: "bottom",
-        titleStyle: {
-          fontSize: 16,
-        },
-      });
+    console.log("scannedProduct: ", !scannedProduct.quantity);
+    if (!scannedProduct.quantity) {
+      Alert.alert("Нет продуктов для добавления!");
+      return;
     } else {
-      showMessage({
-        message: "Продукт уже в корзине!",
-        type: "warning",
-        position: "bottom",
-        titleStyle: {
-          fontSize: 16,
-        },
-      });
+      if (!isProductExist) {
+        const newScannedProducts = [...scannedProducts, scannedProduct];
+        setScannedProducts(newScannedProducts);
+        Alert.alert("Продукт успешно добавлен в корзину!");
+      } else {
+        Alert.alert("Продукт уже есть в корзине!");
+      }
     }
   };
 
@@ -120,7 +111,7 @@ export default function ScanQrForAddProduct({ navigation }) {
         newScan={newScan}
       />
       <BarCodeScanner onBarCodeScanned={scanned ? undefined : handleBarCodeScanned} style={StyleSheet.absoluteFillObject} />
-      <SafeAreaView style={{ height: windowHeight }}>
+      <SafeAreaView style={{ height: windowHeight }} className="pt-11">
         <View style={styles.header}>
           <TouchableOpacity onPress={() => navigation.navigate("create-transfers")} style={styles.backButton}>
             <Icon name="chevron-back" color={"white"} size={25} />

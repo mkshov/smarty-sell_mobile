@@ -38,7 +38,6 @@ export default function ModalTransfers(props) {
 
   const handleCreateTransfer = () => {
     getCurrentPlace();
-    console.log("handleCreateTransfer()", currentPlace);
     const param = isChecked ? "is_export" : "to_place";
     const data = {
       from_place: currentPlace?.id,

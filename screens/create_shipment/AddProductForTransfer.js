@@ -1,5 +1,18 @@
 import React, { useContext, useEffect, useState } from "react";
-import { Alert, ImageBackground, RefreshControl, SafeAreaView, ScrollView, Text, TextInput, TouchableOpacity, View } from "react-native";
+import {
+  Alert,
+  ImageBackground,
+  Platform,
+  RefreshControl,
+  SafeAreaView,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { transferContext } from "../../contexts/transferContext";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import Icon from "react-native-vector-icons/Ionicons";
@@ -9,11 +22,10 @@ import ModalChooseAddVariant from "./components/modalChooseAddVariant";
 import FlashMessage, { showMessage } from "react-native-flash-message";
 
 export default function AddProductForTransfer({ route, navigation }) {
-  const { transferId, onRefreshTransfers } = route.params;
-  console.log("route.params: ", route);
+  const { transferId } = route.params;
   const { transfer, transferProducts, getTransfer, getTransfers, getTransferProducts, deleteTransfer, amountInPlace, sendTransfer } =
     useContext(transferContext);
-  console.log("transferProducts length: ", transferProducts);
+  console.log("amountInPlace: ", amountInPlace);
 
   const [productQuantities, setProductQuantities] = useState(null);
   const [modalAddVariant, setModalAddVariant] = useState(false);
@@ -38,8 +50,8 @@ export default function AddProductForTransfer({ route, navigation }) {
 
   const handleDeleteTransfer = async () => {
     deleteTransfer(transferId);
-    Alert.alert("Трансфер удален");
     await getTransfers({ status: "preparing" });
+    Alert.alert("Трансфер удален");
     navigation.navigate("create-transfers");
   };
 
@@ -55,34 +67,45 @@ export default function AddProductForTransfer({ route, navigation }) {
   };
 
   const handleSendTransfer = async () => {
-    const res = await sendTransfer(transferId);
-    console.log("res: ", res);
-    if (res.code === "emptiness") {
-      Alert.alert(res.message);
-    } else {
-      getTransfers({ status: "preparing" });
-      onRefreshTransfers();
+    const { error, success } = await sendTransfer(transferId);
+    if (error) {
+      const { code, message } = error;
+      if (code === "emptiness") {
+        Alert.alert(message);
+      } else {
+        Alert.alert("Ошибка", message);
+      }
+    } else if (success) {
+      showMessage({
+        message: "Продукты успешно отправились!",
+        type: "success",
+        position: "top",
+        statusBarHeight: 1,
+        textProps: {
+          style: { fontSize: 17, color: "white" },
+        },
+      });
+      await getTransfers({ status: "preparing" });
       handleNavigate("create-transfers");
     }
   };
-
   return (
     <ImageBackground resizeMode="cover" className="h-full" source={require("../../assets/login-bg.png")}>
       <SafeAreaProvider>
-        <SafeAreaView>
+        <SafeAreaView style={styles.AndroidSafeArea}>
           <TouchableOpacity onPress={() => navigation.navigate("create-transfers")} className="flex-row items-center ml-2">
             <Icon name="chevron-back" color={"white"} size={25} />
             <Text className="text-white">Назад</Text>
           </TouchableOpacity>
-          <Text className="text-center text-2xl font-bold text-white ">Трансфер №{transferId}</Text>
-          <View className="flex-row justify-between px-4 mt-5">
+          <Text className="text-center text-2xl font-bold text-white ">Отгрузка №{transferId}</Text>
+          <View className="flex-row justify-between items-center px-4 mt-5 w-full">
             <TouchableOpacity onPress={() => confirmDelete()}>
-              <LinearGradient colors={["#efceff87", "#efceff87"]} className="py-5 rounded-2xl w-[180px]">
-                <Text className="text-center text-white font-semibold">Удалить трансфер</Text>
+              <LinearGradient colors={["#efceff87", "#efceff87"]} className="py-5 px-5 rounded-2xl">
+                <Text className="text-center text-white font-semibold">Удалить отгрузку</Text>
               </LinearGradient>
             </TouchableOpacity>
             <TouchableOpacity>
-              <LinearGradient colors={["#efceff87", "#efceff87"]} className="py-5 rounded-2xl w-[180px]">
+              <LinearGradient colors={["#efceff87", "#efceff87"]} className="py-5 px-5 rounded-2xl">
                 <Text className="text-center text-white font-semibold">Редактировать</Text>
               </LinearGradient>
             </TouchableOpacity>
@@ -92,10 +115,18 @@ export default function AddProductForTransfer({ route, navigation }) {
               <Text className="text-center text-white font-semibold">Добавить продукт</Text>
             </LinearGradient>
           </TouchableOpacity>
+          <TouchableOpacity onPress={() => handleSendTransfer()} className="px-4 mt-5">
+            <LinearGradient colors={["#efceff87", "#efceff87"]} className="py-5 rounded-2xl w-full">
+              <Text className="text-center text-white font-semibold">
+                {transfer?.to_place?.name ? `Перевезти в ${transfer?.to_place?.name}` : "Отправить на экспорт"}
+              </Text>
+            </LinearGradient>
+          </TouchableOpacity>
           <ModalChooseAddVariant handleNavigate={handleNavigate} setModalVisible={setModalAddVariant} modalVisible={modalAddVariant} />
           <ScrollView
             refreshControl={<RefreshControl tintColor={"white"} refreshing={refreshing} onRefresh={onRefreshProducts} />}
             vertical={true}
+            style={{ height: 450 }}
             className="px-6 min-h-[380px]"
           >
             {transferProducts?.results.length ? (
@@ -139,7 +170,7 @@ export default function AddProductForTransfer({ route, navigation }) {
                       </View>
                     </View>
                     <View>
-                      <Text>Кол-во </Text>
+                      <Text>Кол-во в отгрузке</Text>
                       <View className="flex-row items-end max-w-[100px] gap-x-7">
                         <TextInput
                           keyboardType="name-phone-pad"
@@ -164,13 +195,14 @@ export default function AddProductForTransfer({ route, navigation }) {
               </View>
             )}
           </ScrollView>
-          <TouchableOpacity onPress={() => handleSendTransfer()} className="px-4 mt-5">
-            <LinearGradient colors={["#efceff87", "#efceff87"]} className="py-5 rounded-2xl w-full">
-              <Text className="text-center text-white font-semibold">Перевезти в {transfer?.to_place.name}</Text>
-            </LinearGradient>
-          </TouchableOpacity>
         </SafeAreaView>
+        <FlashMessage />
       </SafeAreaProvider>
     </ImageBackground>
   );
 }
+let styles = StyleSheet.create({
+  AndroidSafeArea: {
+    paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,
+  },
+});

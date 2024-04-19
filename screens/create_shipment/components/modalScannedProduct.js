@@ -45,7 +45,7 @@ export default function ModalScannedProduct(props) {
             <Text className="text-center text-lg">{scannedProduct?.product.type.name}</Text>
           </View>
           <View className="flex-row justify-between mt-2">
-            <Text className="text-center font-semibold text-lg">Кол-во на складе:</Text>
+            <Text className="text-center font-semibold text-lg">Кол-во на вашем складе:</Text>
             <Text className="text-center text-lg">{scannedProduct?.quantity}</Text>
           </View>
           <LinearGradient colors={["#ED83C1", "#8469A4"]} className="py-4 rounded-2xl mb-3 mt-10">
