@@ -1,4 +1,5 @@
 import AuthContextProvider from "./contexts/authContext";
+import SellContextProvider from "./contexts/sellContext";
 import TransferContextProvider from "./contexts/transferContext";
 import WorkPlaceContextProvider from "./contexts/workPlaceContext";
 import AppNavigation from "./navigation/appNavigation";
@@ -10,9 +11,11 @@ export default function App() {
   return (
     <AuthContextProvider>
       <WorkPlaceContextProvider>
-        <TransferContextProvider>
-          <AppNavigation />
-        </TransferContextProvider>
+        <SellContextProvider>
+          <TransferContextProvider>
+            <AppNavigation />
+          </TransferContextProvider>
+        </SellContextProvider>
       </WorkPlaceContextProvider>
     </AuthContextProvider>
   );

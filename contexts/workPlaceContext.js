@@ -45,9 +45,10 @@ const WorkPlaceContextProvider = ({ children }) => {
   );
 
   const getSavedPlace = async () => {
-    let placeStr = await AsyncStorage.getItem(STORAGE.SAVED_PLACE); // Получаем строку из AsyncStorage
-    let place = JSON.parse(placeStr); // Парсим строку в объект
+    let placeStr = await AsyncStorage.getItem(STORAGE.SAVED_PLACE);
+    let place = JSON.parse(placeStr);
     setSavedPlace(place);
+    return place;
   };
 
   const logOut = async (navigation) => {
