@@ -11,7 +11,7 @@ import { sellContext } from "../contexts/sellContext";
 export default function HomePage({ navigation }) {
   const { getTransfers } = useContext(transferContext);
   const { savedPlace, logOut, getSavedPlace } = useContext(workPlaceContext);
-  const { getSellPlaces } = useContext(sellContext);
+  const { getSellPlaces, getSellCurrencies, getSellCustomers } = useContext(sellContext);
 
   const handleNavigate = async (path) => {
     if (path === "create-transfers") {
@@ -25,6 +25,8 @@ export default function HomePage({ navigation }) {
           limit: 100,
         };
         await getSellPlaces(params);
+        await getSellCurrencies(savedPlace.id);
+        await getSellCustomers();
       } else {
         getSavedPlace();
       }
