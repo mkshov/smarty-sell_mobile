@@ -70,7 +70,7 @@ export default function CartForScann({ route, navigation }) {
     <ImageBackground resizeMode="cover" className="h-full" source={require("../../assets/login-bg.png")}>
       <SafeAreaProvider>
         <SafeAreaView>
-          <TouchableOpacity onPress={() => navigation.navigate("scan-qr-for-add-product")} className="flex-row items-center ml-2">
+          <TouchableOpacity onPress={() => navigation.navigate("scan-product-transfer")} className="flex-row items-center ml-2">
             <Icon name="chevron-back" color={"white"} size={25} />
             <Text className="text-white">Назад</Text>
           </TouchableOpacity>

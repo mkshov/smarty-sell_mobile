@@ -16,6 +16,8 @@ import CustomDrawer from "../components/Drawer";
 import { workPlaceContext } from "../contexts/workPlaceContext";
 import Icon from "react-native-vector-icons/Feather";
 import SellScreen from "../screens/sell";
+import SellCart from "../screens/sell/sellCart";
+import SellScan from "../screens/sell/scanQr";
 
 const Stack = createNativeStackNavigator();
 
@@ -64,9 +66,11 @@ export default function AppNavigation() {
         <Drawer.Screen name="/" component={HomePage} />
         <Drawer.Screen name="create-transfers" component={CreateShipment} />
         <Drawer.Screen name="add-product-for-transfer" component={AddProductForTransfer} />
-        <Drawer.Screen name="scan-qr-for-add-product" component={ScanQrForAddProduct} />
+        <Drawer.Screen name="scan-product-transfer" component={ScanQrForAddProduct} />
         <Drawer.Screen name="cart-for-scann" component={CartForScann} />
         <Drawer.Screen name="sell" component={SellScreen} />
+        <Drawer.Screen name="sell-cart" component={SellCart} />
+        <Drawer.Screen name="sell-scan" component={SellScan} />
       </Drawer.Navigator>
     </NavigationContainer>
   );

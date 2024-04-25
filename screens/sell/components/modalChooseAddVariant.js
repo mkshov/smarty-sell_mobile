@@ -3,11 +3,11 @@ import React from "react";
 import { Modal, Pressable, Text, TouchableOpacity, TouchableWithoutFeedback } from "react-native";
 
 export default function ModalChooseAddVariant(props) {
-  const { modalVisible, setModalVisible, handleNavigate, scanPath } = props;
+  const { modalVisible, setModalVisible, handleNavigate } = props;
 
   const toScan = () => {
     setModalVisible(!modalVisible);
-    handleNavigate(scanPath);
+    // handleNavigate("scan-qr-for-add-product");
   };
   return (
     <Modal

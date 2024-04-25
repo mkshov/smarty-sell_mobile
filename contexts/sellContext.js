@@ -59,7 +59,7 @@ const SellContextProvider = ({ children }) => {
     }
   };
   return (
-    <sellContext.Provider value={{ sellPlaces, sellCurrencies, sellCustomers, getSellPlaces, getSellCurrencies, getSellCustomers }}>
+    <sellContext.Provider value={{ isLoading, sellPlaces, sellCurrencies, sellCustomers, getSellPlaces, getSellCurrencies, getSellCustomers }}>
       {children}
     </sellContext.Provider>
   );

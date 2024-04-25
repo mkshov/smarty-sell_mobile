@@ -122,7 +122,12 @@ export default function AddProductForTransfer({ route, navigation }) {
               </Text>
             </LinearGradient>
           </TouchableOpacity>
-          <ModalChooseAddVariant handleNavigate={handleNavigate} setModalVisible={setModalAddVariant} modalVisible={modalAddVariant} />
+          <ModalChooseAddVariant
+            scanPath="scan-product-transfer"
+            handleNavigate={handleNavigate}
+            setModalVisible={setModalAddVariant}
+            modalVisible={modalAddVariant}
+          />
           <ScrollView
             refreshControl={<RefreshControl tintColor={"white"} refreshing={refreshing} onRefresh={onRefreshProducts} />}
             vertical={true}

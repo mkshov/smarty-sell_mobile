@@ -24,6 +24,7 @@ export default function HomePage({ navigation }) {
           type: savedPlace.type.id,
           limit: 100,
         };
+        navigation.navigate(path);
         await getSellPlaces(params);
         await getSellCurrencies(savedPlace.id);
         await getSellCustomers();
@@ -40,22 +41,22 @@ export default function HomePage({ navigation }) {
         <SafeAreaView style={styles.AndroidSafeArea}>
           <View>
             <View className="w-full flex-row-reverse items-center justify-evenly">
-              <TouchableOpacity onPress={() => logOut(navigation)} className="bg-sky-400 px-7 py-3 rounded-2xl">
-                <Text className="text-white text-base ">Выйти</Text>
+              <TouchableOpacity onPress={() => logOut(navigation)} className="bg-white px-5 py-3 rounded-2xl">
+                <Text className="font-bold text-base text-[#CD5297]">Выйти</Text>
               </TouchableOpacity>
-              <Text className="text-xl">Торговая точка: {savedPlace?.name}</Text>
+              <Text className="text-xl text-white font-bold">Торговая точка: {savedPlace?.name}</Text>
             </View>
 
             <View className="w-full h-full flex justify-center items-center">
               <View className="items-center justify-center w-full gap-4">
-                <TouchableOpacity onPress={() => handleNavigate("create-transfers")} className="bg-sky-400 px-7 w-1/2 py-3 rounded-2xl">
-                  <Text className="text-white text-center text-base">Исходящие отгрузки</Text>
+                <TouchableOpacity onPress={() => handleNavigate("create-transfers")} className="bg-white px-7 w-[250px] py-3 rounded-2xl">
+                  <Text className="text-center font-bold text-base text-[#CD5297]">Исходящие отгрузки</Text>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => handleNavigate("sell")} className="bg-sky-400 px-7 w-1/2 py-3 rounded-2xl">
-                  <Text className="text-white text-center text-base">Продажа</Text>
+                <TouchableOpacity onPress={() => handleNavigate("sell")} className="bg-white px-7 w-[250px] py-3 rounded-2xl">
+                  <Text className="text-center font-bold text-base text-[#CD5297]">Продажа</Text>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => handleNavigate("transfers/history")} className="bg-sky-400 px-7 py-3 w-1/2 rounded-2xl">
-                  <Text className="text-white text-center text-base">История отгрузок</Text>
+                <TouchableOpacity onPress={() => handleNavigate("transfers/history")} className="bg-white px-7 py-3 w-[250px] rounded-2xl">
+                  <Text className="text-center font-bold text-base text-[#CD5297]">История отгрузок</Text>
                 </TouchableOpacity>
               </View>
             </View>
