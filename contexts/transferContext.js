@@ -92,15 +92,17 @@ const TransferContextProvider = ({ children }) => {
     }
   };
 
-  const scanProductForTransfer = async (data) => {
+  const scanInPlace = async (data) => {
     setIsLoading(true);
     try {
       const response = await api.post(ENDPOINTS.SCAN_IN_PLACE, data);
+      console.log("response: context scan transfer ", response);
       setScannedProduct(response.data);
       setIsLoading(false);
       return response.data;
     } catch (error) {
       console.log("error: ", error);
+      setScannedProduct(null);
       setIsLoading(false);
       setError(error.response.data);
       return error.response.data;
@@ -167,12 +169,13 @@ const TransferContextProvider = ({ children }) => {
         amountInPlace,
         setError,
         setScannedProducts,
+        setScannedProduct,
         getTransfers,
         getTransfer,
         createTransfer,
         getTransferProducts,
         deleteTransfer,
-        scanProductForTransfer,
+        scanInPlace,
         addProductToTransfer,
         getAmountInPlace,
         sendTransfer,

@@ -18,10 +18,11 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import Icon from "react-native-vector-icons/Ionicons";
 import AddIcon from "react-native-vector-icons/AntDesign";
 import { LinearGradient } from "expo-linear-gradient";
-import ModalChooseAddVariant from "./components/modalChooseAddVariant";
 import FlashMessage, { showMessage } from "react-native-flash-message";
+import ModalChooseAddVariant from "../../components/AddVariant/modalChooseAddVariant";
 
 export default function AddProductForTransfer({ route, navigation }) {
+  console.log("navigation: ", navigation);
   const { transferId } = route.params;
   const { transfer, transferProducts, getTransfer, getTransfers, getTransferProducts, deleteTransfer, amountInPlace, sendTransfer } =
     useContext(transferContext);

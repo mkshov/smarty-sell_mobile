@@ -1,9 +1,11 @@
 import { LinearGradient } from "expo-linear-gradient";
-import React from "react";
+import React, { useContext } from "react";
 import { Modal, Pressable, Text, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
+import { transferContext } from "../../contexts/transferContext";
 
 export default function ModalScannedProduct(props) {
-  const { modalVisible, scannedProduct, setModalVisible, handleNavigate, newScan } = props;
+  const { modalVisible, setModalVisible, handleNavigate, newScan } = props;
+  const { scannedProduct } = useContext(transferContext);
   console.log("scannedProduct: ", scannedProduct);
 
   return (

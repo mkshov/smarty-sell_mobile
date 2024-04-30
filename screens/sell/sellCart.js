@@ -18,7 +18,7 @@ export default function SellCart({ navigation }) {
       <LinearGradient colors={["#8469A4FF", "#ED83C1FF"]}>
         <SafeAreaView style={styles.AndroidSafeArea}>
           <View className="flex-row justify-between pl-2 pr-5">
-            <TouchableOpacity onPress={() => navigation.navigate("sell")} className="flex-row items-center">
+            <TouchableOpacity onPress={() => navigation.goBack()} className="flex-row items-center">
               <Icon name="chevron-back" color={"white"} size={25} />
               <Text className="text-white">Назад</Text>
             </TouchableOpacity>

@@ -18,6 +18,7 @@ import Icon from "react-native-vector-icons/Feather";
 import SellScreen from "../screens/sell";
 import SellCart from "../screens/sell/sellCart";
 import SellScan from "../screens/sell/scanQr";
+import Scanner from "../components/scanner/Scanner";
 
 const Stack = createNativeStackNavigator();
 
@@ -48,30 +49,31 @@ export default function AppNavigation() {
 
   return (
     <NavigationContainer>
-      <Drawer.Navigator
+      <Stack.Navigator
         screenOptions={{
-          headerStyle: {},
-          headerTransparent: true,
-          drawerPosition: "right",
-          headerLeft: false,
-          headerRight: () => <Icon size={20} name="menu" color="white" style={{ marginRight: 20 }} />,
-          headerTintColor: "white",
+          // headerStyle: {},
+          // headerTransparent: true,
+          // drawerPosition: "right",
+          // headerLeft: false,
+          // headerRight: () => <Icon size={20} name="menu" color="white" style={{ marginRight: 20 }} />,
+          // headerTintColor: "white",
           headerShown: false,
         }}
 
         // drawerContent={(props) => <CustomDrawer {...props} />}
       >
-        <Drawer.Screen name="login" options={{ headerShown: false }} component={LoginScreen} />
-        <Drawer.Screen name="work-places" options={{ headerShown: false }} component={ChooseWorkPlace} />
-        <Drawer.Screen name="/" component={HomePage} />
-        <Drawer.Screen name="create-transfers" component={CreateShipment} />
-        <Drawer.Screen name="add-product-for-transfer" component={AddProductForTransfer} />
-        <Drawer.Screen name="scan-product-transfer" component={ScanQrForAddProduct} />
-        <Drawer.Screen name="cart-for-scann" component={CartForScann} />
-        <Drawer.Screen name="sell" component={SellScreen} />
-        <Drawer.Screen name="sell-cart" component={SellCart} />
-        <Drawer.Screen name="sell-scan" component={SellScan} />
-      </Drawer.Navigator>
+        <Stack.Screen name="login" options={{ headerShown: false, swipeEnabled: false }} component={LoginScreen} />
+        <Stack.Screen name="work-places" options={{ headerShown: false, swipeEnabled: false }} component={ChooseWorkPlace} />
+        <Stack.Screen name="/" component={HomePage} />
+        <Stack.Screen name="create-transfers" component={CreateShipment} />
+        <Stack.Screen name="add-product-for-transfer" component={AddProductForTransfer} />
+        <Stack.Screen name="scan-product-transfer" component={ScanQrForAddProduct} />
+        <Stack.Screen name="cart-for-scan" component={CartForScann} />
+        <Stack.Screen name="sell" component={SellScreen} />
+        <Stack.Screen name="sell-cart" component={SellCart} />
+        <Stack.Screen name="sell-scan" component={SellScan} />
+        {/* <Drawer.Screen name="scanner" component={Scanner} /> */}
+      </Stack.Navigator>
     </NavigationContainer>
   );
 }

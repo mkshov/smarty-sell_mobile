@@ -5,7 +5,6 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import Icon from "react-native-vector-icons/Ionicons";
 import AddIcon from "react-native-vector-icons/AntDesign";
 import { LinearGradient } from "expo-linear-gradient";
-import ModalChooseAddVariant from "./components/modalChooseAddVariant";
 import FlashMessage, { showMessage } from "react-native-flash-message";
 
 export default function CartForScann({ route, navigation }) {

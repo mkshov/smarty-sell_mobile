@@ -19,10 +19,10 @@ import Octicons from "react-native-vector-icons/Octicons";
 import { sellContext } from "../../contexts/sellContext";
 import { workPlaceContext } from "../../contexts/workPlaceContext";
 import { SelectList } from "react-native-dropdown-select-list";
-import ModalChooseAddVariant from "../create_shipment/components/modalChooseAddVariant";
+import ModalChooseAddVariant from "../../components/AddVariant/modalChooseAddVariant";
 
 export default function SellScreen({ navigation }) {
-  const { getSellPlaces, sellPlaces, sellCustomers, sellCurrencies, isLoading } = useContext(sellContext);
+  const { sellPlaces, sellCustomers, sellCurrencies, selected, isLoading, setSelected, getSellPlaces } = useContext(sellContext);
   const { getSavedPlace, savedPlace } = useContext(workPlaceContext);
 
   const [modalVisible, setModalVisible] = useState(false);
@@ -30,12 +30,6 @@ export default function SellScreen({ navigation }) {
   useEffect(() => {
     getSavedPlace();
   }, []);
-
-  const [selected, setSelected] = useState({
-    selectedPlace: null,
-    selectedCurency: null,
-    selectedCustomer: null,
-  });
 
   const data = {
     places: sellPlaces?.map((place) => ({
@@ -143,7 +137,7 @@ export default function SellScreen({ navigation }) {
                     })
                   }
                   placeholder={"Выбрать покупателя..."}
-                  search={false}
+                  searchPlaceholder="Поиск..."
                   data={data.customers}
                 />
               </View>
