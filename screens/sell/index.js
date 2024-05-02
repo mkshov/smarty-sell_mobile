@@ -20,9 +20,11 @@ import { sellContext } from "../../contexts/sellContext";
 import { workPlaceContext } from "../../contexts/workPlaceContext";
 import { SelectList } from "react-native-dropdown-select-list";
 import ModalChooseAddVariant from "../../components/AddVariant/modalChooseAddVariant";
+import Animated, { useSharedValue, withTiming, useAnimatedStyle, withRepeat, withSequence } from "react-native-reanimated";
 
 export default function SellScreen({ navigation }) {
-  const { sellPlaces, sellCustomers, sellCurrencies, selected, isLoading, setSelected, getSellPlaces } = useContext(sellContext);
+  const { sellCart, sellPlaces, sellCustomers, sellCurrencies, selectedSellPlace, isLoading, setSelectedSellPlace, getSellPlaces } =
+    useContext(sellContext);
   const { getSavedPlace, savedPlace } = useContext(workPlaceContext);
 
   const [modalVisible, setModalVisible] = useState(false);
@@ -58,6 +60,27 @@ export default function SellScreen({ navigation }) {
     navigation.navigate(path);
   };
 
+  const offset = useSharedValue(0);
+
+  const style = useAnimatedStyle(() => ({
+    transform: [{ translateX: offset.value }],
+  }));
+
+  const OFFSET = 5;
+  const TIME = 250;
+
+  const handlePress = () => {
+    offset.value = withSequence(withRepeat(withTiming(OFFSET, { duration: TIME }), 5, true), withTiming(0, { duration: TIME / 2 }));
+  };
+
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      handlePress();
+    }, 3000);
+
+    return () => clearInterval(intervalId);
+  }, []);
+
   return (
     <SafeAreaProvider>
       <LinearGradient colors={["#8469A4FF", "#ED83C1FF", "#7E8BCD"]}>
@@ -86,8 +109,8 @@ export default function SellScreen({ navigation }) {
                   dropdownItemStyles={styles.dropdownItemStyles}
                   defaultOption={data.basePlace}
                   setSelected={(place) =>
-                    setSelected({
-                      ...selected,
+                    setSelectedSellPlace({
+                      ...selectedSellPlace,
                       selectedPlace: place,
                     })
                   }
@@ -109,8 +132,8 @@ export default function SellScreen({ navigation }) {
                   dropdownItemStyles={styles.dropdownItemStyles}
                   defaultOption={data.baseCurrency}
                   setSelected={(currency) =>
-                    setSelected({
-                      ...selected,
+                    setSelectedSellPlace({
+                      ...selectedSellPlace,
                       selectedCurency: currency,
                     })
                   }
@@ -131,8 +154,8 @@ export default function SellScreen({ navigation }) {
                   arrowicon={<Icon name="arrow-down" color="white" size={20} />}
                   dropdownItemStyles={styles.dropdownItemStyles}
                   setSelected={(customer) =>
-                    setSelected({
-                      ...selected,
+                    setSelectedSellPlace({
+                      ...selectedSellPlace,
                       selectedCustomer: customer,
                     })
                   }
@@ -147,10 +170,16 @@ export default function SellScreen({ navigation }) {
                     <Text className="text-lg font-bold text-[#CD5297] text-center">Добавить продукт</Text>
                   </TouchableOpacity>
                 </View>
-                <Text className="text-xl text-white font-bold text-center mb-2">В корзине 0 продуктов</Text>
+                <Text style={{ fontSize: 20, color: "white", fontWeight: "bold", textAlign: "center", marginBottom: 2 }}>
+                  В корзине {sellCart.length}{" "}
+                  {sellCart.length === 1 ? "продукт" : sellCart.length > 1 && sellCart.length < 5 ? "продукта" : "продуктов"}
+                </Text>
+
                 <TouchableOpacity onPress={() => navigation.navigate("sell-cart")} className="flex-row justify-center items-center">
                   <Text className="text-lg font-bold text-white text-center">Перейти в корзину</Text>
-                  <Octicons name="arrow-right" size={22} color="white" style={{ marginTop: 4, marginLeft: 10 }} />
+                  <Animated.View style={[style]}>
+                    <Octicons name="arrow-right" size={22} color="white" style={{ marginTop: 4, marginLeft: 15 }} />
+                  </Animated.View>
                 </TouchableOpacity>
               </View>
             </View>

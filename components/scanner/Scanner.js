@@ -15,10 +15,8 @@ const initialText = "Наведитесь на QR code \n или штрих ко
 
 export default function Scanner({ actionType, actionTitle, cartPath }) {
   const navigation = useNavigation();
-  console.log("actionType: ", actionType);
   const { transfer, scannedProduct, scanInPlace, scannedProducts, setScannedProducts, setScannedProduct } = useContext(transferContext);
-  const { selected } = useContext(sellContext);
-  console.log("selected: ", selected);
+  const { selectedSellPlace, sellCart, setSellCart } = useContext(sellContext);
 
   const [hasPermission, setHasPermission] = useState(null);
   const [scanned, setScanned] = useState(false);
@@ -33,15 +31,13 @@ export default function Scanner({ actionType, actionTitle, cartPath }) {
   }, []);
 
   const handleBarCodeScanned = async ({ data }) => {
-    console.log("data: ", data.length);
     setScanned(true);
     setText(data);
     const dataSend = {
       barcode: data,
-      place: actionType === "transfer" ? transfer.from_place.id : selected.selectedPlace,
+      place: actionType === "transfer" ? transfer.from_place.id : selectedSellPlace.selectedPlace,
     };
     let res = await scanInPlace(dataSend);
-    console.log("res scanner: ", res);
     if (res.barcode && data.length >= 12) {
       setModalVisible(!modalVisible);
     } else if (data.length < 12) {
@@ -58,7 +54,6 @@ export default function Scanner({ actionType, actionTitle, cartPath }) {
     setScanned(false);
     setModalVisible(false);
     setText(initialText);
-    // Reset any state if needed
     if (actionType === "transfer") {
       const isProductExist = scannedProducts.some((product) => product.id === scannedProduct.id);
       if (!scannedProduct.quantity) {
@@ -74,7 +69,21 @@ export default function Scanner({ actionType, actionTitle, cartPath }) {
         }
       }
     } else if (actionType === "sell") {
+      const isProductExist = sellCart.some((product) => product.id === scannedProduct.id);
+      console.log("isProductExist: ", isProductExist);
       console.log("For sell cart");
+      if (!scannedProduct.quantity) {
+        Alert.alert("Нет продуктов для добавления!");
+        return;
+      } else {
+        if (!isProductExist) {
+          const newScannedProducts = [...sellCart, scannedProduct];
+          setSellCart(newScannedProducts);
+          Alert.alert("Продукт успешно добавлен в корзину!");
+        } else {
+          Alert.alert("Продукт уже есть в корзине!");
+        }
+      }
     }
   };
 

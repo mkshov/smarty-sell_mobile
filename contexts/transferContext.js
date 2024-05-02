@@ -66,7 +66,6 @@ const TransferContextProvider = ({ children }) => {
       setIsLoading(false);
     }
   };
-
   const getTransferProducts = async (id, params) => {
     setIsLoading(true);
     try {

@@ -15,11 +15,13 @@ const SellContextProvider = ({ children }) => {
   const [sellPlaces, setSellPlaces] = useState(null);
   const [sellCurrencies, setSellCurrencies] = useState(null);
   const [sellCustomers, setSellCustomers] = useState(null);
-  const [selected, setSelected] = useState({
+  const [selectedSellPlace, setSelectedSellPlace] = useState({
     selectedPlace: null,
     selectedCurency: null,
     selectedCustomer: null,
   });
+  const [sellCart, setSellCart] = useState([]);
+  console.log("sellCart: ", sellCart);
 
   const getSellPlaces = async (params) => {
     setIsLoading(true);
@@ -65,7 +67,19 @@ const SellContextProvider = ({ children }) => {
   };
   return (
     <sellContext.Provider
-      value={{ isLoading, sellPlaces, sellCurrencies, sellCustomers, selected, setSelected, getSellPlaces, getSellCurrencies, getSellCustomers }}
+      value={{
+        isLoading,
+        sellPlaces,
+        sellCurrencies,
+        sellCustomers,
+        selectedSellPlace,
+        sellCart,
+        setSellCart,
+        setSelectedSellPlace,
+        getSellPlaces,
+        getSellCurrencies,
+        getSellCustomers,
+      }}
     >
       {children}
     </sellContext.Provider>

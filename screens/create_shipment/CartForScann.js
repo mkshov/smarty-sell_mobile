@@ -10,9 +10,7 @@ import FlashMessage, { showMessage } from "react-native-flash-message";
 export default function CartForScann({ route, navigation }) {
   const { transfer, scannedProducts, setScannedProducts, getTransfer, getTransferProducts, addProductToTransfer, getAmountInPlace } =
     useContext(transferContext);
-  console.log("scannedProducts: ", scannedProducts);
   const [productStates, setProductStates] = useState([]);
-  console.log("productStates: ", productStates);
   const [refreshing, setRefreshing] = useState(false);
 
   const onRefresh = React.useCallback(() => {
@@ -123,8 +121,7 @@ export default function CartForScann({ route, navigation }) {
                     <Text>Добавляемое кол-во</Text>
                     <View className="flex-row items-end max-w-[100px] gap-x-7">
                       <TextInput
-                        // defaultValue="1"
-                        value={String(productStates[index]?.quantity_sent)} // Передаем значение из состояния
+                        value={String(productStates[index]?.quantity_sent)}
                         onChangeText={(e) => handleQuantityChange(index, e)}
                         keyboardType="numeric"
                         className="text-base font-semibold w-1/2 mt-1 border-b-[1px] pb-1"
