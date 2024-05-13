@@ -26,20 +26,30 @@ export default function SellScreen({ navigation }) {
   const { sellCart, sellPlaces, sellCustomers, sellCurrencies, selectedSellPlace, isLoading, setSelectedSellPlace, getSellPlaces } =
     useContext(sellContext);
   const { getSavedPlace, savedPlace } = useContext(workPlaceContext);
+  console.log("savedPlace: ", savedPlace);
 
   const [modalVisible, setModalVisible] = useState(false);
 
+  // const totalPrice = sellCart.reduce((sum, item) => {
+  //   if (item.product.price_rule) {
+  //     return sum + item.product.price_rule.price;
+  //   }
+  //   return sum;
+  // }, 0);
+
   useEffect(() => {
     getSavedPlace();
+    setSelectedSellPlace({ ...selectedSellPlace, selectedPlace: [savedPlace?.type.id, savedPlace?.name] });
   }, []);
+  console.log("selectedSellPlace: ", selectedSellPlace);
 
   const data = {
     places: sellPlaces?.map((place) => ({
-      key: place.type.id,
+      key: [place.type.id, place.name],
       value: place.name,
     })),
     currencies: sellCurrencies?.map((currency) => ({
-      key: currency.currency.id,
+      key: { id: currency.currency.id, name: currency.currency.name },
       value: currency.currency.name,
     })),
     customers: sellCustomers?.map((customer) => ({
@@ -51,10 +61,11 @@ export default function SellScreen({ navigation }) {
       value: savedPlace?.name,
     },
     baseCurrency: {
-      key: sellCurrencies?.find((currency) => currency.is_base_currency).currency.id,
+      key: sellCurrencies?.find((currency) => currency.is_base_currency).currency,
       value: sellCurrencies?.find((currency) => currency.is_base_currency).currency.name,
     },
   };
+  console.log("basePlace: ", data.basePlace);
 
   const handleNavigate = (path) => {
     navigation.navigate(path);
@@ -108,12 +119,13 @@ export default function SellScreen({ navigation }) {
                   arrowicon={<Icon name="arrow-down" color="white" size={20} />}
                   dropdownItemStyles={styles.dropdownItemStyles}
                   defaultOption={data.basePlace}
-                  setSelected={(place) =>
+                  setSelected={(place) => {
+                    console.log("place: ", place);
                     setSelectedSellPlace({
                       ...selectedSellPlace,
                       selectedPlace: place,
-                    })
-                  }
+                    });
+                  }}
                   placeholder={"Выбрать от куда продать"}
                   search={false}
                   data={data.places}
@@ -131,12 +143,12 @@ export default function SellScreen({ navigation }) {
                   arrowicon={<Icon name="arrow-down" color="white" size={20} />}
                   dropdownItemStyles={styles.dropdownItemStyles}
                   defaultOption={data.baseCurrency}
-                  setSelected={(currency) =>
+                  setSelected={(currency) => {
                     setSelectedSellPlace({
                       ...selectedSellPlace,
                       selectedCurency: currency,
-                    })
-                  }
+                    });
+                  }}
                   placeholder={"Выбрать валюту"}
                   search={false}
                   data={data.currencies}
@@ -184,7 +196,10 @@ export default function SellScreen({ navigation }) {
               </View>
             </View>
             <View>
-              <Text className="text-xl text-white font-bold text-center mb-2">Итого: 0.00 {data.baseCurrency.value}</Text>
+              <Text className="text-xl text-white font-bold text-center mb-2">
+                Итого: 55
+                {/* {totalPrice} {selectedSellPlace.selectedCurency?.name} */}
+              </Text>
               <TouchableOpacity style={styles.addProductButton} className="">
                 <Text className="text-lg font-bold text-[#CD5297] text-center">Оформить продажу</Text>
               </TouchableOpacity>

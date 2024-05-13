@@ -39,7 +39,6 @@ export default function CartForScann({ route, navigation }) {
 
   const sendProduct = async () => {
     let res = await addProductToTransfer(productStates, transfer.id);
-    console.log("res: ", res);
     if (productStates.length) {
       if (res.errors) {
         if (res.errors[0].code === "transfer_src_placement_not_enough") {

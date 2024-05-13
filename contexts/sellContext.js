@@ -21,7 +21,7 @@ const SellContextProvider = ({ children }) => {
     selectedCustomer: null,
   });
   const [sellCart, setSellCart] = useState([]);
-  console.log("sellCart: ", sellCart);
+  const [productStates, setProductStates] = useState([]);
 
   const getSellPlaces = async (params) => {
     setIsLoading(true);
@@ -65,10 +65,21 @@ const SellContextProvider = ({ children }) => {
       console.log("error: ", error);
     }
   };
+
+  async function getSavedProduct() {
+    try {
+      const str = await AsyncStorage.getItem("sellCartData");
+      const fromStorage = JSON.parse(str);
+      setProductStates(fromStorage);
+    } catch (error) {
+      console.log("error: ", error);
+    }
+  }
   return (
     <sellContext.Provider
       value={{
         isLoading,
+        productStates,
         sellPlaces,
         sellCurrencies,
         sellCustomers,
@@ -79,6 +90,8 @@ const SellContextProvider = ({ children }) => {
         getSellPlaces,
         getSellCurrencies,
         getSellCustomers,
+        getSavedProduct,
+        setProductStates,
       }}
     >
       {children}

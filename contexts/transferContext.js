@@ -95,7 +95,6 @@ const TransferContextProvider = ({ children }) => {
     setIsLoading(true);
     try {
       const response = await api.post(ENDPOINTS.SCAN_IN_PLACE, data);
-      console.log("response: context scan transfer ", response);
       setScannedProduct(response.data);
       setIsLoading(false);
       return response.data;

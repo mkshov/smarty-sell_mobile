@@ -35,8 +35,10 @@ export default function Scanner({ actionType, actionTitle, cartPath }) {
     setText(data);
     const dataSend = {
       barcode: data,
-      place: actionType === "transfer" ? transfer.from_place.id : selectedSellPlace.selectedPlace,
+      place: actionType === "transfer" ? transfer.from_place.id : selectedSellPlace.selectedPlace[0],
     };
+    console.log("selectedSellPlace: ", selectedSellPlace);
+    console.log("dataSend: ", dataSend);
     let res = await scanInPlace(dataSend);
     if (res.barcode && data.length >= 12) {
       setModalVisible(!modalVisible);
@@ -51,9 +53,6 @@ export default function Scanner({ actionType, actionTitle, cartPath }) {
   };
 
   const newScan = () => {
-    setScanned(false);
-    setModalVisible(false);
-    setText(initialText);
     if (actionType === "transfer") {
       const isProductExist = scannedProducts.some((product) => product.id === scannedProduct.id);
       if (!scannedProduct.quantity) {
@@ -70,8 +69,6 @@ export default function Scanner({ actionType, actionTitle, cartPath }) {
       }
     } else if (actionType === "sell") {
       const isProductExist = sellCart.some((product) => product.id === scannedProduct.id);
-      console.log("isProductExist: ", isProductExist);
-      console.log("For sell cart");
       if (!scannedProduct.quantity) {
         Alert.alert("Нет продуктов для добавления!");
         return;
@@ -85,6 +82,9 @@ export default function Scanner({ actionType, actionTitle, cartPath }) {
         }
       }
     }
+    setScanned(false);
+    setModalVisible(false);
+    setText(initialText);
   };
 
   const toInitial = () => {
@@ -116,7 +116,13 @@ export default function Scanner({ actionType, actionTitle, cartPath }) {
 
   return (
     <SafeAreaView style={{ height: windowHeight }} className="pt-11">
-      <ModalScannedProduct modalVisible={modalVisible} setModalVisible={setModalVisible} handleNavigate={handleNavigate} newScan={newScan} />
+      <ModalScannedProduct
+        type={actionType === "sell" ? "sell" : null}
+        modalVisible={modalVisible}
+        setModalVisible={setModalVisible}
+        handleNavigate={handleNavigate}
+        newScan={newScan}
+      />
       <BarCodeScanner onBarCodeScanned={scanned ? undefined : handleBarCodeScanned} style={StyleSheet.absoluteFillObject} />
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>

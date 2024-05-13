@@ -1,7 +1,6 @@
 import { StatusBar } from "expo-status-bar";
 import { useContext, useEffect, useState } from "react";
-import { Alert, Image, Keyboard, KeyboardAvoidingView, Text, TextInput, TouchableOpacity, View } from "react-native";
-import { TouchableWithoutFeedback } from "react-native";
+import { Alert, Keyboard, KeyboardAvoidingView, Text, TextInput, TouchableOpacity, View, TouchableWithoutFeedback } from "react-native";
 
 import Animated, { FadeIn, FadeOut, FadeInUp, FadeInDown } from "react-native-reanimated";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -10,6 +9,7 @@ import api from "../api/axios";
 import { LOGIN } from "../constants";
 import { authContext } from "../contexts/authContext";
 import AccountIcon from "../assets/icons/accountIcon";
+import logoWhite from "../assets/icons/logoWhite.svg";
 import LockIcon from "../assets/icons/lockIcon";
 import LogoWhite from "../assets/icons/logoWhite";
 import { LinearGradient } from "expo-linear-gradient";

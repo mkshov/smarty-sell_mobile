@@ -45,7 +45,7 @@ export default function AppNavigation() {
 
   useEffect(() => {
     restoreUser();
-  }, [savedPlace]);
+  }, [savedPlace, user]);
 
   return (
     <NavigationContainer>
@@ -58,20 +58,25 @@ export default function AppNavigation() {
           // headerRight: () => <Icon size={20} name="menu" color="white" style={{ marginRight: 20 }} />,
           // headerTintColor: "white",
           headerShown: false,
+          headerTransparent: true,
+          headerTitleStyle: {
+            color: "white",
+          },
         }}
 
         // drawerContent={(props) => <CustomDrawer {...props} />}
       >
         <Stack.Screen name="login" options={{ headerShown: false, swipeEnabled: false }} component={LoginScreen} />
         <Stack.Screen name="work-places" options={{ headerShown: false, swipeEnabled: false }} component={ChooseWorkPlace} />
-        <Stack.Screen name="/" component={HomePage} />
-        <Stack.Screen name="create-transfers" component={CreateShipment} />
+        <Stack.Screen name="/" options={{ headerShown: false }} component={HomePage} />
+        <Stack.Screen name="create-transfers" options={{ title: "Создать отгрузку" }} component={CreateShipment} />
         <Stack.Screen name="add-product-for-transfer" component={AddProductForTransfer} />
         <Stack.Screen name="scan-product-transfer" component={ScanQrForAddProduct} />
         <Stack.Screen name="cart-for-scan" component={CartForScann} />
         <Stack.Screen name="sell" component={SellScreen} />
         <Stack.Screen name="sell-cart" component={SellCart} />
         <Stack.Screen name="sell-scan" component={SellScan} />
+
         {/* <Drawer.Screen name="scanner" component={Scanner} /> */}
       </Stack.Navigator>
     </NavigationContainer>

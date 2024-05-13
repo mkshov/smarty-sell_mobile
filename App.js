@@ -1,3 +1,4 @@
+import FlashMessage from "react-native-flash-message";
 import AuthContextProvider from "./contexts/authContext";
 import SellContextProvider from "./contexts/sellContext";
 import TransferContextProvider from "./contexts/transferContext";
@@ -14,6 +15,7 @@ export default function App() {
         <SellContextProvider>
           <TransferContextProvider>
             <AppNavigation />
+            <FlashMessage />
           </TransferContextProvider>
         </SellContextProvider>
       </WorkPlaceContextProvider>

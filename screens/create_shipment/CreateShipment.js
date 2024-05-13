@@ -72,7 +72,6 @@ export default function CreateShipment({ navigation }) {
   }, []);
 
   const handleNavigate = async (path, id) => {
-    console.log("id: ", id);
     await getTransferProducts(id);
     await getAmountInPlace(id);
     navigation.navigate(path, { transferId: id });
@@ -99,7 +98,7 @@ export default function CreateShipment({ navigation }) {
             </TouchableOpacity>
             <View className="w-full">
               <View className="w-full justify-start mt-10 mb-10">
-                <Text className="text-base mb-2 text-white">Дата</Text>  
+                <Text className="text-base mb-2 text-white">Дата</Text>
                 <View className="flex-row items-center gap-x-3 ml-1">
                   <DateIcon color="white" />
                   <Text className="text-base text-white">01.03.24</Text>

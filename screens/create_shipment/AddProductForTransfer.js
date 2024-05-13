@@ -22,11 +22,9 @@ import FlashMessage, { showMessage } from "react-native-flash-message";
 import ModalChooseAddVariant from "../../components/AddVariant/modalChooseAddVariant";
 
 export default function AddProductForTransfer({ route, navigation }) {
-  console.log("navigation: ", navigation);
   const { transferId } = route.params;
   const { transfer, transferProducts, getTransfer, getTransfers, getTransferProducts, deleteTransfer, amountInPlace, sendTransfer } =
     useContext(transferContext);
-  console.log("amountInPlace: ", amountInPlace);
 
   const [productQuantities, setProductQuantities] = useState(null);
   const [modalAddVariant, setModalAddVariant] = useState(false);
