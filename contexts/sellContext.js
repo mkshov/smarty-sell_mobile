@@ -70,7 +70,10 @@ const SellContextProvider = ({ children }) => {
     try {
       const str = await AsyncStorage.getItem("sellCartData");
       const fromStorage = JSON.parse(str);
-      setProductStates(fromStorage);
+      console.log("fromStorage: ", fromStorage);
+      if (fromStorage !== null) {
+        setSellCart(fromStorage);
+      }
     } catch (error) {
       console.log("error: ", error);
     }

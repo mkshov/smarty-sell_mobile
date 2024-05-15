@@ -21,6 +21,7 @@ import { workPlaceContext } from "../../contexts/workPlaceContext";
 import { SelectList } from "react-native-dropdown-select-list";
 import ModalChooseAddVariant from "../../components/AddVariant/modalChooseAddVariant";
 import Animated, { useSharedValue, withTiming, useAnimatedStyle, withRepeat, withSequence } from "react-native-reanimated";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function SellScreen({ navigation }) {
   const { sellCart, sellPlaces, sellCustomers, sellCurrencies, selectedSellPlace, isLoading, setSelectedSellPlace, getSellPlaces } =
@@ -30,12 +31,16 @@ export default function SellScreen({ navigation }) {
 
   const [modalVisible, setModalVisible] = useState(false);
 
-  // const totalPrice = sellCart.reduce((sum, item) => {
-  //   if (item.product.price_rule) {
-  //     return sum + item.product.price_rule.price;
-  //   }
-  //   return sum;
-  // }, 0);
+  const totalPrice = sellCart.reduce((sum, item) => {
+    if (item.product.price_rule) {
+      return sum + item.product.price_rule.price * item.newQuantity;
+    }
+    return sum;
+  }, 0);
+
+  const totalQuantity = sellCart.reduce((sum, item) => {
+    return sum + item.newQuantity;
+  }, 0);
 
   useEffect(() => {
     getSavedPlace();
@@ -91,6 +96,12 @@ export default function SellScreen({ navigation }) {
 
     return () => clearInterval(intervalId);
   }, []);
+
+  async function handleClick() {
+    let from = await AsyncStorage.getItem("sellCart");
+    let res = JSON.parse(from);
+    console.log("res: ", res);
+  }
 
   return (
     <SafeAreaProvider>
@@ -182,13 +193,16 @@ export default function SellScreen({ navigation }) {
                     <Text className="text-lg font-bold text-[#CD5297] text-center">Добавить продукт</Text>
                   </TouchableOpacity>
                 </View>
-                <Text style={{ fontSize: 20, color: "white", fontWeight: "bold", textAlign: "center", marginBottom: 2 }}>
+                <Text style={{ fontSize: 17, color: "white", fontWeight: "bold", textAlign: "center", marginBottom: 2 }}>
                   В корзине {sellCart.length}{" "}
                   {sellCart.length === 1 ? "продукт" : sellCart.length > 1 && sellCart.length < 5 ? "продукта" : "продуктов"}
                 </Text>
+                <Text style={{ fontSize: 17, color: "white", fontWeight: "bold", textAlign: "center", marginBottom: 2 }}>
+                  Общее добавляемое кол-во - {totalQuantity}шт.
+                </Text>
 
-                <TouchableOpacity onPress={() => navigation.navigate("sell-cart")} className="flex-row justify-center items-center">
-                  <Text className="text-lg font-bold text-white text-center">Перейти в корзину</Text>
+                <TouchableOpacity onPress={() => navigation.navigate("sell-cart")} className="flex-row justify-center items-center mt-2">
+                  <Text className="text-xl font-bold text-white text-center">Перейти в корзину</Text>
                   <Animated.View style={[style]}>
                     <Octicons name="arrow-right" size={22} color="white" style={{ marginTop: 4, marginLeft: 15 }} />
                   </Animated.View>
@@ -197,10 +211,9 @@ export default function SellScreen({ navigation }) {
             </View>
             <View>
               <Text className="text-xl text-white font-bold text-center mb-2">
-                Итого: 55
-                {/* {totalPrice} {selectedSellPlace.selectedCurency?.name} */}
+                Итого: {totalPrice.toFixed(2)} {selectedSellPlace.selectedCurency?.name}
               </Text>
-              <TouchableOpacity style={styles.addProductButton} className="">
+              <TouchableOpacity style={styles.addProductButton} className="" onPress={handleClick}>
                 <Text className="text-lg font-bold text-[#CD5297] text-center">Оформить продажу</Text>
               </TouchableOpacity>
             </View>

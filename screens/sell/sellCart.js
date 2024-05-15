@@ -1,8 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { useCallback, useContext, useEffect, useState } from "react";
 import {
-  Image,
-  Keyboard,
+  Alert,
   KeyboardAvoidingView,
   Platform,
   RefreshControl,
@@ -13,7 +12,6 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  TouchableWithoutFeedback,
   View,
 } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
@@ -39,79 +37,95 @@ export default function SellCart({ navigation }) {
     productStates,
     setProductStates,
   } = useContext(sellContext);
-  console.log("productStates: ", productStates);
   const [refreshing, setRefreshing] = useState(false);
+  console.log("sellCart: ", sellCart);
 
-  const onRefresh = React.useCallback(() => {
+  // useEffect(() => {
+  //   loadCart();
+  // }, []);
+
+  const loadCart = async () => {
+    try {
+      const cartData = await AsyncStorage.getItem("sellCart");
+      console.log("cartData: ", JSON.parse(cartData));
+      if (cartData !== null) {
+        setSellCart(JSON.parse(cartData));
+      }
+    } catch (error) {
+      console.error("Failed to load cart from storage", error);
+    }
+  };
+
+  const saveCart = () => {
+    try {
+      sellCart.forEach(async (item) => {
+        if (item.newQuantity > item.quantity) {
+          Alert.alert("Добавляемое кол-во превышает кол-во на складе!");
+          return;
+        } else {
+          await AsyncStorage.setItem("sellCart", JSON.stringify(sellCart));
+          loadCart();
+          showMessage({
+            message: "Корзина сохранена",
+            type: "success",
+          });
+        }
+      });
+    } catch (error) {
+      console.error("Failed to save cart to storage", error);
+    }
+  };
+
+  const onRefresh = useCallback(() => {
     setRefreshing(true);
     setTimeout(() => {
       setRefreshing(false);
     }, 2000);
   }, []);
 
-  useEffect(() => {
-    const initialProductStates = sellCart.map((product, idx) => ({
-      product: product.product.id,
-      size: product.size.id,
-      quantity: 1,
-      id: product.id,
-    }));
-    setProductStates(initialProductStates);
-  }, [sellCart]);
+  const handleQuantityChange = (index, newQuantity) => {
+    const quantity = parseInt(newQuantity, 10) || 0;
+    const updatedCart = [...sellCart];
+    const stockQuantity = updatedCart[index].quantity;
 
-  // useEffect(() => {
-  //   getSavedProduct();
-  // }, []);
-
-  const handleQuantityChange = (index, newQuantity, item) => {
-    setProductStates((prevStates) => {
-      const updatedStates = [...prevStates];
-      updatedStates[index].quantity = newQuantity > item.quantity ? item.quantity : newQuantity;
-      return updatedStates;
-    });
-  };
-
-  const handleDeleteProduct = async (productId) => {
-    const updatedProducts = sellCart.filter((product) => product.id !== productId);
-    setSellCart(updatedProducts);
-    try {
-      const str = await AsyncStorage.getItem("sellCartData");
-      if (str) {
-        const fromStorage = JSON.parse(str);
-        const updatedStorage = fromStorage.filter((item) => item.id !== productId);
-        await AsyncStorage.setItem("sellCartData", JSON.stringify(updatedStorage));
-      }
-    } catch (error) {
-      console.log("Ошибка при удалении данных из AsyncStorage:", error);
+    if (quantity <= stockQuantity) {
+      updatedCart[index].newQuantity = quantity;
+      setSellCart(updatedCart);
+    } else {
+      showMessage({
+        message: `Количество не может превышать количество на складе (${stockQuantity})`,
+        type: "danger",
+      });
     }
   };
-
-  const totalChangePrice = (item, idx) => {
-    return productStates[idx]?.quantity * item.product.price_rule.price;
+  const handleDeleteProduct = async (productId) => {
+    const updatedCart = sellCart.filter((item) => item.id !== productId);
+    setSellCart(updatedCart);
+    await AsyncStorage.setItem("sellCart", JSON.stringify(updatedCart));
   };
 
-  const saveData = async () => {
-    try {
-      const inputData = productStates.map((item) => ({
-        product: item.product,
-        size: item.size,
-        quantity: +item.quantity,
-        id: item.id,
-      }));
-      console.log("inputData: ", inputData);
-      await AsyncStorage.setItem("sellCartData", JSON.stringify(inputData));
-      navigation.navigate("sell");
-      showMessage({
-        message: "Кол-во успешно обновилось!",
-        type: "success",
-        position: "bottom",
-        statusBarHeight: 1,
-        textProps: {
-          style: { fontSize: 17, color: "white" },
-        },
-      });
-    } catch (error) {
-      console.error("Ошибка при сохранении данных в AsyncStorage:", error);
+  const totalChangePrice = (item) => {
+    return (item.newQuantity || 0) * item.product.price_rule.price;
+  };
+
+  const checkEmptyInputs = () => {
+    for (let item of sellCart) {
+      console.log("item: ", item);
+      if (item.newQuantity === 0) {
+        console.log(false);
+        showMessage({
+          message: "Пожалуйста, заполните все поля количества",
+          type: "danger",
+        });
+        return false;
+      }
+    }
+    return true;
+  };
+
+  const handleSaveCart = () => {
+    if (checkEmptyInputs()) {
+      saveCart();
     }
   };
 
@@ -126,11 +140,15 @@ export default function SellCart({ navigation }) {
                 <Text className="text-white">Назад</Text>
               </TouchableOpacity>
               <TouchableOpacity>
-                <Text className="text-2xl text-white font-bold">Коризина продаж</Text>
+                <Text className="text-2xl text-white font-bold">Корзина продаж</Text>
               </TouchableOpacity>
             </View>
 
-            <ScrollView refreshControl={<RefreshControl tintColor={"white"} />} vertical={true} className="mt-10 px-6">
+            <ScrollView
+              refreshControl={<RefreshControl tintColor={"white"} refreshing={refreshing} onRefresh={onRefresh} />}
+              vertical={true}
+              className="mt-10 px-6"
+            >
               {sellCart.map((item, index) => (
                 <View key={index} className="rounded-xl border-x-4 border-y-4 border-[#efceff87] bg-white p-7 mt-5">
                   <View className="flex-row justify-between">
@@ -142,7 +160,7 @@ export default function SellCart({ navigation }) {
                       <Text className="text-white">Удалить</Text>
                     </TouchableOpacity>
                   </View>
-                  <View className="flex-row  mt-10">
+                  <View className="flex-row mt-10">
                     <View className="w-1/2">
                       <Text>Модель</Text>
                       <Text className="text-base font-semibold mt-1">{item.product.model}</Text>
@@ -175,7 +193,7 @@ export default function SellCart({ navigation }) {
                       <Text>Итого</Text>
                       <Text className="text-base font-semibold mt-1">
                         {item.product.price_rule
-                          ? `${totalChangePrice(item, index).toFixed(2)} ${selectedSellPlace.selectedCurency?.name}`
+                          ? `${totalChangePrice(item).toFixed(2)} ${selectedSellPlace.selectedCurency?.name}`
                           : "price_rule = null"}
                       </Text>
                     </View>
@@ -191,12 +209,12 @@ export default function SellCart({ navigation }) {
                       <Text>Добавляемое кол-во</Text>
                       <View className="flex-row items-end max-w-[100px] gap-x-7">
                         <TextInput
-                          value={String(productStates[index]?.quantity)}
-                          onChangeText={(e) => handleQuantityChange(index, e, item)}
+                          value={String(item.newQuantity || "")}
+                          onChangeText={(e) => handleQuantityChange(index, e)}
                           keyboardType="numeric"
                           className="text-base font-semibold w-1/2 mt-1 border-b-[1px] pb-1"
                         />
-                        <TouchableOpacity>
+                        <TouchableOpacity onPress={() => handleQuantityChange(index, (item.newQuantity || 0) + 1)}>
                           <AddIcon name="pluscircleo" size={25} color={"#CD5297"} />
                         </TouchableOpacity>
                       </View>
@@ -206,7 +224,7 @@ export default function SellCart({ navigation }) {
               ))}
             </ScrollView>
             <View className="py-4 rounded-2xl mb-3 mt-5 bg-white mx-6">
-              <TouchableOpacity onPress={() => saveData()}>
+              <TouchableOpacity onPress={handleSaveCart}>
                 <Text className="text-lg font-bold text-[#CD5297] text-center">Сохранить</Text>
               </TouchableOpacity>
             </View>
@@ -216,6 +234,7 @@ export default function SellCart({ navigation }) {
     </SafeAreaProvider>
   );
 }
+
 const styles = StyleSheet.create({
   AndroidSafeArea: {
     paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,

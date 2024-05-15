@@ -69,12 +69,15 @@ export default function Scanner({ actionType, actionTitle, cartPath }) {
       }
     } else if (actionType === "sell") {
       const isProductExist = sellCart.some((product) => product.id === scannedProduct.id);
+
       if (!scannedProduct.quantity) {
         Alert.alert("Нет продуктов для добавления!");
         return;
+      } else if (!scannedProduct.product.price_rule) {
+        Alert.alert("У продукта нет цены, такой продукт невозможно добавить в корзину!");
       } else {
         if (!isProductExist) {
-          const newScannedProducts = [...sellCart, scannedProduct];
+          const newScannedProducts = [...sellCart, { ...scannedProduct, newQuantity: 1 }];
           setSellCart(newScannedProducts);
           Alert.alert("Продукт успешно добавлен в корзину!");
         } else {

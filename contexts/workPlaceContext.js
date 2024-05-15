@@ -54,6 +54,7 @@ const WorkPlaceContextProvider = ({ children }) => {
   const logOut = async (navigation) => {
     await AsyncStorage.removeItem(TOKEN);
     await AsyncStorage.removeItem(STORAGE.SAVED_PLACE);
+    await AsyncStorage.removeItem("sellCart");
     setSavedPlace(null);
     navigation.navigate("login");
   };
