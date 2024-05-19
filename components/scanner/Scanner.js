@@ -8,6 +8,7 @@ import { sellContext } from "../../contexts/sellContext";
 import { transferContext } from "../../contexts/transferContext";
 import { useNavigation } from "@react-navigation/native";
 import ModalScannedProduct from "../modalForProduct";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const windowWidth = Dimensions.get("window").width;
 const windowHeight = Dimensions.get("window").height;
@@ -16,7 +17,7 @@ const initialText = "Наведитесь на QR code \n или штрих ко
 export default function Scanner({ actionType, actionTitle, cartPath }) {
   const navigation = useNavigation();
   const { transfer, scannedProduct, scanInPlace, scannedProducts, setScannedProducts, setScannedProduct } = useContext(transferContext);
-  const { selectedSellPlace, sellCart, setSellCart } = useContext(sellContext);
+  const { selectedSellPlace, sellCart, setSellCart, saveCart } = useContext(sellContext);
 
   const [hasPermission, setHasPermission] = useState(null);
   const [scanned, setScanned] = useState(false);
@@ -52,7 +53,7 @@ export default function Scanner({ actionType, actionTitle, cartPath }) {
     }
   };
 
-  const newScan = () => {
+  const newScan = async () => {
     if (actionType === "transfer") {
       const isProductExist = scannedProducts.some((product) => product.id === scannedProduct.id);
       if (!scannedProduct.quantity) {
@@ -79,6 +80,7 @@ export default function Scanner({ actionType, actionTitle, cartPath }) {
         if (!isProductExist) {
           const newScannedProducts = [...sellCart, { ...scannedProduct, newQuantity: 1 }];
           setSellCart(newScannedProducts);
+          await AsyncStorage.setItem("sellCart", JSON.stringify(newScannedProducts));
           Alert.alert("Продукт успешно добавлен в корзину!");
         } else {
           Alert.alert("Продукт уже есть в корзине!");

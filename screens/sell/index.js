@@ -2,6 +2,7 @@ import React, { useCallback, useContext, useEffect, useState } from "react";
 import {
   Image,
   Platform,
+  RefreshControl,
   SafeAreaView,
   ScrollView,
   ScrollViewBase,
@@ -24,19 +25,48 @@ import Animated, { useSharedValue, withTiming, useAnimatedStyle, withRepeat, wit
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function SellScreen({ navigation }) {
-  const { sellCart, sellPlaces, sellCustomers, sellCurrencies, selectedSellPlace, isLoading, setSelectedSellPlace, getSellPlaces } =
-    useContext(sellContext);
+  const { sellCart, sellPlaces, sellCustomers, sellCurrencies, selectedSellPlace, setSelectedSellPlace, setSellCart } = useContext(sellContext);
   const { getSavedPlace, savedPlace } = useContext(workPlaceContext);
-  console.log("savedPlace: ", savedPlace);
 
   const [modalVisible, setModalVisible] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
-  const totalPrice = sellCart.reduce((sum, item) => {
-    if (item.product.price_rule) {
-      return sum + item.product.price_rule.price * item.newQuantity;
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    getCartFromStorage();
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 500);
+  }, []);
+
+  const totalPrice = (
+    currency = {
+      id: selectedSellPlace.selectedCurency?.currency?.id || selectedSellPlace.selectedCurency?.id,
+      name: selectedSellPlace.selectedCurency?.currency?.name || selectedSellPlace.selectedCurency?.name,
+      rate: selectedSellPlace.selectedCurency?.rate,
     }
-    return sum;
-  }, 0);
+  ) => {
+    console.log("currency: ", currency);
+    if (!currency) {
+      console.log("No currency selected");
+      return "0.00";
+    }
+    return sellCart
+      .reduce((sum, item) => {
+        if (item.product.price_rule) {
+          return sum + item.product.price_rule.price * item.newQuantity * currency.rate;
+        }
+        return sum;
+      }, 0)
+      .toFixed(2);
+  };
+  console.log("totalPrice: ", totalPrice());
+  // const totalPrice2 = sellCart.reduce((sum, item) => {
+  //   if (item.product.price_rule) {
+  //     if(selectedSellPlace.currencies[])
+  //   }
+  //   return sum;
+  // }, 0);
 
   const totalQuantity = sellCart.reduce((sum, item) => {
     return sum + item.newQuantity;
@@ -44,9 +74,11 @@ export default function SellScreen({ navigation }) {
 
   useEffect(() => {
     getSavedPlace();
-    setSelectedSellPlace({ ...selectedSellPlace, selectedPlace: [savedPlace?.type.id, savedPlace?.name] });
+    setSelectedSellPlace({
+      ...selectedSellPlace,
+      selectedPlace: [savedPlace?.type.id, savedPlace?.name],
+    });
   }, []);
-  console.log("selectedSellPlace: ", selectedSellPlace);
 
   const data = {
     places: sellPlaces?.map((place) => ({
@@ -54,7 +86,7 @@ export default function SellScreen({ navigation }) {
       value: place.name,
     })),
     currencies: sellCurrencies?.map((currency) => ({
-      key: { id: currency.currency.id, name: currency.currency.name },
+      key: { id: currency.currency.id, name: currency.currency.name, rate: currency.rate },
       value: currency.currency.name,
     })),
     customers: sellCustomers?.map((customer) => ({
@@ -66,11 +98,10 @@ export default function SellScreen({ navigation }) {
       value: savedPlace?.name,
     },
     baseCurrency: {
-      key: sellCurrencies?.find((currency) => currency.is_base_currency).currency,
+      key: sellCurrencies?.find((currency) => currency.is_base_currency),
       value: sellCurrencies?.find((currency) => currency.is_base_currency).currency.name,
     },
   };
-  console.log("basePlace: ", data.basePlace);
 
   const handleNavigate = (path) => {
     navigation.navigate(path);
@@ -97,10 +128,14 @@ export default function SellScreen({ navigation }) {
     return () => clearInterval(intervalId);
   }, []);
 
-  async function handleClick() {
+  useEffect(() => {
+    getCartFromStorage();
+  }, []);
+
+  async function getCartFromStorage() {
     let from = await AsyncStorage.getItem("sellCart");
-    let res = JSON.parse(from);
-    console.log("res: ", res);
+    let res = JSON.parse(from) || [];
+    setSellCart(res);
   }
 
   return (
@@ -108,7 +143,7 @@ export default function SellScreen({ navigation }) {
       <LinearGradient colors={["#8469A4FF", "#ED83C1FF", "#7E8BCD"]}>
         <SafeAreaView style={styles.AndroidSafeArea}>
           <View className="flex-row justify-between pl-2 pr-5">
-            <TouchableOpacity onPress={() => navigation.navigate("/")} className="flex-row items-center">
+            <TouchableOpacity onPress={() => navigation.goBack()} className="flex-row items-center">
               <Icon name="chevron-back" color={"white"} size={25} />
               <Text className="text-white">Назад</Text>
             </TouchableOpacity>
@@ -116,7 +151,10 @@ export default function SellScreen({ navigation }) {
               <Text className="text-2xl text-white font-bold">Продажа</Text>
             </TouchableOpacity>
           </View>
-          <ScrollView contentContainerStyle={{ justifyContent: "space-between", flex: 1, paddingHorizontal: 20 }}>
+          <ScrollView
+            refreshControl={<RefreshControl tintColor={"white"} refreshing={refreshing} onRefresh={onRefresh} />}
+            contentContainerStyle={{ justifyContent: "space-between", flex: 1, paddingHorizontal: 20 }}
+          >
             <View>
               <View style={{ marginTop: 20, position: "relative", zIndex: 10 }}>
                 <Text style={{ color: "white", fontWeight: "bold", marginLeft: 5, marginBottom: 5 }}>Продать товар из другой точки</Text>
@@ -155,6 +193,8 @@ export default function SellScreen({ navigation }) {
                   dropdownItemStyles={styles.dropdownItemStyles}
                   defaultOption={data.baseCurrency}
                   setSelected={(currency) => {
+                    console.log("currency: ", currency);
+                    totalPrice(currency);
                     setSelectedSellPlace({
                       ...selectedSellPlace,
                       selectedCurency: currency,
@@ -211,9 +251,9 @@ export default function SellScreen({ navigation }) {
             </View>
             <View>
               <Text className="text-xl text-white font-bold text-center mb-2">
-                Итого: {totalPrice.toFixed(2)} {selectedSellPlace.selectedCurency?.name}
+                Итого: {totalPrice()} {selectedSellPlace.selectedCurency?.name}
               </Text>
-              <TouchableOpacity style={styles.addProductButton} className="" onPress={handleClick}>
+              <TouchableOpacity style={styles.addProductButton} className="" onPress={getCartFromStorage}>
                 <Text className="text-lg font-bold text-[#CD5297] text-center">Оформить продажу</Text>
               </TouchableOpacity>
             </View>

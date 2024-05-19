@@ -2,6 +2,7 @@ import React, { createContext, useState, useEffect } from "react";
 import { LOGIN, TOKEN } from "../constants";
 import api from "../api/axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { showMessage } from "react-native-flash-message";
 
 const ENDPOINTS = {
   PLACES: "/company/v1/places/",
@@ -66,18 +67,31 @@ const SellContextProvider = ({ children }) => {
     }
   };
 
-  async function getSavedProduct() {
+  const loadCart = async () => {
     try {
-      const str = await AsyncStorage.getItem("sellCartData");
-      const fromStorage = JSON.parse(str);
-      console.log("fromStorage: ", fromStorage);
-      if (fromStorage !== null) {
-        setSellCart(fromStorage);
+      const cartData = await AsyncStorage.getItem("sellCart");
+      console.log("cartData: ", JSON.parse(cartData));
+      if (cartData !== null) {
+        setSellCart(JSON.parse(cartData));
       }
     } catch (error) {
-      console.log("error: ", error);
+      console.error("Failed to load cart from storage", error);
     }
-  }
+  };
+
+  const saveCart = async () => {
+    try {
+      await AsyncStorage.setItem("sellCart", JSON.stringify(sellCart));
+      loadCart();
+      showMessage({
+        message: "Корзина сохранена",
+        type: "success",
+      });
+    } catch (error) {
+      console.error("Failed to save cart to storage", error);
+    }
+  };
+
   return (
     <sellContext.Provider
       value={{
@@ -93,8 +107,9 @@ const SellContextProvider = ({ children }) => {
         getSellPlaces,
         getSellCurrencies,
         getSellCustomers,
-        getSavedProduct,
         setProductStates,
+        loadCart,
+        saveCart,
       }}
     >
       {children}

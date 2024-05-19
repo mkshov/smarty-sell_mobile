@@ -24,57 +24,15 @@ import AddIcon from "react-native-vector-icons/AntDesign";
 import FlashMessage, { showMessage } from "react-native-flash-message";
 
 export default function SellCart({ navigation }) {
-  const { savedPlace, logOut, getSavedPlace } = useContext(workPlaceContext);
-  const { transfer, setScannedProducts, getTransfer, getTransferProducts, addProductToTransfer, getAmountInPlace } = useContext(transferContext);
-  const {
-    getSellPlaces,
-    getSellCurrencies,
-    getSellCustomers,
-    sellCart,
-    setSellCart,
-    selectedSellPlace,
-    getSavedProduct,
-    productStates,
-    setProductStates,
-  } = useContext(sellContext);
+  const { sellCart, setSellCart, selectedSellPlace, saveCart, loadCart } = useContext(sellContext);
+  console.log("selectedSellPlace: ", selectedSellPlace);
   const [refreshing, setRefreshing] = useState(false);
+
   console.log("sellCart: ", sellCart);
 
-  // useEffect(() => {
-  //   loadCart();
-  // }, []);
-
-  const loadCart = async () => {
-    try {
-      const cartData = await AsyncStorage.getItem("sellCart");
-      console.log("cartData: ", JSON.parse(cartData));
-      if (cartData !== null) {
-        setSellCart(JSON.parse(cartData));
-      }
-    } catch (error) {
-      console.error("Failed to load cart from storage", error);
-    }
-  };
-
-  const saveCart = () => {
-    try {
-      sellCart.forEach(async (item) => {
-        if (item.newQuantity > item.quantity) {
-          Alert.alert("Добавляемое кол-во превышает кол-во на складе!");
-          return;
-        } else {
-          await AsyncStorage.setItem("sellCart", JSON.stringify(sellCart));
-          loadCart();
-          showMessage({
-            message: "Корзина сохранена",
-            type: "success",
-          });
-        }
-      });
-    } catch (error) {
-      console.error("Failed to save cart to storage", error);
-    }
-  };
+  useEffect(() => {
+    loadCart();
+  }, []);
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
@@ -83,10 +41,15 @@ export default function SellCart({ navigation }) {
     }, 2000);
   }, []);
 
-  const handleQuantityChange = (index, newQuantity) => {
+  const handleQuantityChange = (index, newQuantity, action) => {
+    console.log("action: ", action);
     const quantity = parseInt(newQuantity, 10) || 0;
     const updatedCart = [...sellCart];
     const stockQuantity = updatedCart[index].quantity;
+
+    if (action === "minus" && quantity < 1) {
+      return;
+    }
 
     if (quantity <= stockQuantity) {
       updatedCart[index].newQuantity = quantity;
@@ -149,79 +112,91 @@ export default function SellCart({ navigation }) {
               vertical={true}
               className="mt-10 px-6"
             >
-              {sellCart.map((item, index) => (
-                <View key={index} className="rounded-xl border-x-4 border-y-4 border-[#efceff87] bg-white p-7 mt-5">
-                  <View className="flex-row justify-between">
-                    <View>
-                      <Text>Название</Text>
-                      <Text className="text-base font-semibold mt-1">{item.product.name}</Text>
+              {sellCart.length ? (
+                sellCart.map((item, index) => (
+                  <View key={index} className="rounded-xl border-x-4 border-y-4 border-[#efceff87] bg-white p-7 mt-5">
+                    <View className="flex-row justify-between">
+                      <View>
+                        <Text>Название</Text>
+                        <Text className="text-base font-semibold mt-1">{item.product.name}</Text>
+                      </View>
+                      <TouchableOpacity onPress={() => handleDeleteProduct(item.id)} className="bg-red-500 justify-center px-3 rounded-2xl">
+                        <Text className="text-white">Удалить</Text>
+                      </TouchableOpacity>
                     </View>
-                    <TouchableOpacity onPress={() => handleDeleteProduct(item.id)} className="bg-red-500 justify-center px-3 rounded-2xl">
-                      <Text className="text-white">Удалить</Text>
-                    </TouchableOpacity>
-                  </View>
-                  <View className="flex-row mt-10">
-                    <View className="w-1/2">
-                      <Text>Модель</Text>
-                      <Text className="text-base font-semibold mt-1">{item.product.model}</Text>
-                    </View>
-                    <View>
-                      <Text>Тип</Text>
-                      <Text className="text-base font-semibold mt-1">{item.product.type.name}</Text>
-                    </View>
-                  </View>
-                  <View className="flex-row mt-10">
-                    <View className="w-1/2">
-                      <Text>Артикул модели</Text>
-                      <Text className="text-base font-semibold mt-1">{item.product.model_code}</Text>
-                    </View>
-                    <View>
-                      <Text>Кол-во на складе</Text>
-                      <Text className="text-base font-semibold mt-1">{item.quantity}</Text>
-                    </View>
-                  </View>
-                  <View className="flex-row mt-10">
-                    <View className="w-1/2">
-                      <Text>Цена</Text>
-                      <Text className="text-base font-semibold mt-1">
-                        {item.product.price_rule
-                          ? `${item.product.price_rule.price.toFixed(2)} ${selectedSellPlace.selectedCurency?.name}`
-                          : "price_rule = null"}
-                      </Text>
-                    </View>
-                    <View>
-                      <Text>Итого</Text>
-                      <Text className="text-base font-semibold mt-1">
-                        {item.product.price_rule
-                          ? `${totalChangePrice(item).toFixed(2)} ${selectedSellPlace.selectedCurency?.name}`
-                          : "price_rule = null"}
-                      </Text>
-                    </View>
-                  </View>
-                  <View className="flex-row mt-10">
-                    <View className="w-1/2">
-                      <Text>Размер</Text>
-                      <View className="bg-gray-200 max-w-[80px] py-1 items-center mt-2 rounded-full">
-                        <Text className="text-base font-medium">{item.size.name}</Text>
+                    <View className="flex-row mt-10">
+                      <View className="w-1/2">
+                        <Text>Модель</Text>
+                        <Text className="text-base font-semibold mt-1">{item.product.model}</Text>
+                      </View>
+                      <View>
+                        <Text>Тип</Text>
+                        <Text className="text-base font-semibold mt-1">{item.product.type.name}</Text>
                       </View>
                     </View>
-                    <View>
-                      <Text>Добавляемое кол-во</Text>
-                      <View className="flex-row items-end max-w-[100px] gap-x-7">
-                        <TextInput
-                          value={String(item.newQuantity || "")}
-                          onChangeText={(e) => handleQuantityChange(index, e)}
-                          keyboardType="numeric"
-                          className="text-base font-semibold w-1/2 mt-1 border-b-[1px] pb-1"
-                        />
-                        <TouchableOpacity onPress={() => handleQuantityChange(index, (item.newQuantity || 0) + 1)}>
-                          <AddIcon name="pluscircleo" size={25} color={"#CD5297"} />
-                        </TouchableOpacity>
+                    <View className="flex-row mt-10">
+                      <View className="w-1/2">
+                        <Text>Артикул модели</Text>
+                        <Text className="text-base font-semibold mt-1">{item.product.model_code}</Text>
+                      </View>
+                      <View>
+                        <Text>Кол-во на складе</Text>
+                        <Text className="text-base font-semibold mt-1">{item.quantity}</Text>
+                      </View>
+                    </View>
+                    <View className="flex-row mt-10">
+                      <View className="w-1/2">
+                        <Text>Цена</Text>
+                        <Text className="text-base font-semibold mt-1">
+                          {item.product.price_rule
+                            ? `${item.product.price_rule.price.toFixed(2)} USD`
+                            : // ? `${item.product.price_rule.price.toFixed(2)} ${selectedSellPlace.selectedCurency?.name}`
+                              "price_rule = null"}
+                        </Text>
+                      </View>
+                      <View>
+                        <Text>Итого</Text>
+                        <Text className="text-base font-semibold mt-1">
+                          {item.product.price_rule
+                            ? `${totalChangePrice(item).toFixed(2)} USD`
+                            : // ? `${totalChangePrice(item).toFixed(2)} ${selectedSellPlace.selectedCurency?.name}`
+                              "price_rule = null"}
+                        </Text>
+                      </View>
+                    </View>
+                    <View className="flex-row mt-10">
+                      <View className="w-1/2">
+                        <Text>Размер</Text>
+                        <View className="bg-gray-200 max-w-[80px] py-1 items-center mt-2 rounded-full">
+                          <Text className="text-base font-medium">{item.size.name}</Text>
+                        </View>
+                      </View>
+                      <View>
+                        <Text>Добавляемое кол-во</Text>
+                        <View className="flex-row items-center max-w-[100px] mt-2">
+                          <TextInput
+                            value={String(item.newQuantity || "")}
+                            onChangeText={(e) => handleQuantityChange(index, e)}
+                            keyboardType="numeric"
+                            className="text-base font-semibold w-1/2 mt-1 border-b-[1px] pb-1"
+                          />
+                          <TouchableOpacity
+                            className="ml-3 border-2 border-[#CD5297] rounded-full"
+                            onPress={() => handleQuantityChange(index, (item.newQuantity || 0) - 1, "minus")}
+                          >
+                            <AddIcon name="minus" size={22} color={"#CD5297"} />
+                          </TouchableOpacity>
+                          <TouchableOpacity className="ml-3" onPress={() => handleQuantityChange(index, (item.newQuantity || 0) + 1, "plus")}>
+                            <AddIcon name="pluscircleo" size={26} color={"#CD5297"} />
+                          </TouchableOpacity>
+                        </View>
                       </View>
                     </View>
                   </View>
-                </View>
-              ))}
+                ))
+              ) : (
+                <Text className="text-lg font-bold text-center color-white">В корзине пусто :(</Text>
+              )}
             </ScrollView>
             <View className="py-4 rounded-2xl mb-3 mt-5 bg-white mx-6">
               <TouchableOpacity onPress={handleSaveCart}>
