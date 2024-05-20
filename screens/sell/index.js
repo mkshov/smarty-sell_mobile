@@ -23,12 +23,15 @@ import { SelectList } from "react-native-dropdown-select-list";
 import ModalChooseAddVariant from "../../components/AddVariant/modalChooseAddVariant";
 import Animated, { useSharedValue, withTiming, useAnimatedStyle, withRepeat, withSequence } from "react-native-reanimated";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import ModalForSellWithOutCustomer from "./modals/WithOutCustomer";
 
 export default function SellScreen({ navigation }) {
   const { sellCart, sellPlaces, sellCustomers, sellCurrencies, selectedSellPlace, setSelectedSellPlace, setSellCart } = useContext(sellContext);
   const { getSavedPlace, savedPlace } = useContext(workPlaceContext);
 
+  console.log("selectedSellPlace: ", selectedSellPlace);
   const [modalVisible, setModalVisible] = useState(false);
+  const [withOutCustomerModal, setWithOutCustomerModal] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
 
   const onRefresh = useCallback(() => {
@@ -46,7 +49,6 @@ export default function SellScreen({ navigation }) {
       rate: selectedSellPlace.selectedCurency?.rate,
     }
   ) => {
-    console.log("currency: ", currency);
     if (!currency) {
       console.log("No currency selected");
       return "0.00";
@@ -61,6 +63,7 @@ export default function SellScreen({ navigation }) {
       .toFixed(2);
   };
   console.log("totalPrice: ", totalPrice());
+
   // const totalPrice2 = sellCart.reduce((sum, item) => {
   //   if (item.product.price_rule) {
   //     if(selectedSellPlace.currencies[])
@@ -251,9 +254,9 @@ export default function SellScreen({ navigation }) {
             </View>
             <View>
               <Text className="text-xl text-white font-bold text-center mb-2">
-                Итого: {totalPrice()} {selectedSellPlace.selectedCurency?.name}
+                Итого: {totalPrice()} {selectedSellPlace.selectedCurency?.name || selectedSellPlace.selectedCurency?.currency.name}
               </Text>
-              <TouchableOpacity style={styles.addProductButton} className="" onPress={getCartFromStorage}>
+              <TouchableOpacity style={styles.addProductButton} className="" onPress={() => setWithOutCustomerModal(!withOutCustomerModal)}>
                 <Text className="text-lg font-bold text-[#CD5297] text-center">Оформить продажу</Text>
               </TouchableOpacity>
             </View>
@@ -262,6 +265,14 @@ export default function SellScreen({ navigation }) {
               handleNavigate={handleNavigate}
               setModalVisible={setModalVisible}
               modalVisible={modalVisible}
+            />
+            <ModalForSellWithOutCustomer
+              data={data}
+              totalPrice={totalPrice}
+              setSelectedSellPlace={setSelectedSellPlace}
+              selectedSellPlace={selectedSellPlace}
+              setModalVisible={setWithOutCustomerModal}
+              modalVisible={withOutCustomerModal}
             />
           </ScrollView>
         </SafeAreaView>
