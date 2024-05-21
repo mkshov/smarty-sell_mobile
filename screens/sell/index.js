@@ -27,9 +27,9 @@ import ModalForSellWithOutCustomer from "./modals/WithOutCustomer";
 
 export default function SellScreen({ navigation }) {
   const { sellCart, sellPlaces, sellCustomers, sellCurrencies, selectedSellPlace, setSelectedSellPlace, setSellCart } = useContext(sellContext);
+  console.log("sellCart: ", sellCart);
   const { getSavedPlace, savedPlace } = useContext(workPlaceContext);
 
-  console.log("selectedSellPlace: ", selectedSellPlace);
   const [modalVisible, setModalVisible] = useState(false);
   const [withOutCustomerModal, setWithOutCustomerModal] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
@@ -62,7 +62,6 @@ export default function SellScreen({ navigation }) {
       }, 0)
       .toFixed(2);
   };
-  console.log("totalPrice: ", totalPrice());
 
   // const totalPrice2 = sellCart.reduce((sum, item) => {
   //   if (item.product.price_rule) {
@@ -254,7 +253,7 @@ export default function SellScreen({ navigation }) {
             </View>
             <View>
               <Text className="text-xl text-white font-bold text-center mb-2">
-                Итого: {totalPrice()} {selectedSellPlace.selectedCurency?.name || selectedSellPlace.selectedCurency?.currency.name}
+                Итого: {totalPrice()} {selectedSellPlace.selectedCurency?.name || selectedSellPlace.selectedCurency?.currency?.name}
               </Text>
               <TouchableOpacity style={styles.addProductButton} className="" onPress={() => setWithOutCustomerModal(!withOutCustomerModal)}>
                 <Text className="text-lg font-bold text-[#CD5297] text-center">Оформить продажу</Text>
@@ -268,11 +267,12 @@ export default function SellScreen({ navigation }) {
             />
             <ModalForSellWithOutCustomer
               data={data}
-              totalPrice={totalPrice}
+              sellCart={sellCart}
               setSelectedSellPlace={setSelectedSellPlace}
               selectedSellPlace={selectedSellPlace}
-              setModalVisible={setWithOutCustomerModal}
               modalVisible={withOutCustomerModal}
+              totalPrice={totalPrice}
+              setModalVisible={setWithOutCustomerModal}
             />
           </ScrollView>
         </SafeAreaView>
