@@ -3,42 +3,41 @@ import React, { useEffect, useState } from "react";
 import { KeyboardAvoidingView, Modal, Platform, Pressable, StatusBar, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { SelectList } from "react-native-dropdown-select-list";
 import Icon from "react-native-vector-icons/Ionicons";
-import SellCheckModal from "./sellCheckModal";
 
-export default function SellConfirmModal(props) {
-  const { modalVisible, setModalVisible, handleClick, modalCheck, setModalCheck } = props;
+export default function SellCheckModal(props) {
+  const { modalCheck, setModalCheck } = props;
+  console.log("modalCheck: ", modalCheck);
 
   return (
     <Modal
       animationType="fade"
       transparent={true}
-      visible={modalVisible}
+      visible={modalCheck}
       onRequestClose={() => {
         Alert.alert("Modal has been closed.");
-        setModalVisible(!modalVisible);
+        setModalCheck(!modalCheck);
       }}
-      onBackdropPress={() => this.setModalVisible(false)}
+      onBackdropPress={() => this.setModalCheck(false)}
     >
       <KeyboardAvoidingView behavior="padding">
-        <Pressable onPress={() => setModalVisible(!modalVisible)} className="items-center justify-center w-full h-full px-6 bg-[#000000dc]">
+        <Pressable onPress={() => setModalCheck(!modalCheck)} className="items-center justify-center w-full h-full px-6 bg-[#000000dc]">
           <Pressable activeOpacity={1} className="bg-white w-full rounded-2xl p-7">
-            <Text className="font-bold text-base text-[#CD5297]">Оформление продажи</Text>
+            <Text className="font-bold text-base text-[#CD5297]">Продажа произошла успешно!</Text>
             <View className="w-full h-[1px] bg-[#cd5298] my-3"></View>
-            <Text className="font-semibold text-[#CD5297]">Вы действительно хотите оформить продажу? </Text>
+            <Text className="font-semibold text-[#CD5297]">У вас есть возможность посмотреть чек. Открыть странцицу страницу чека? </Text>
             <View className="flex-row justify-end gap-5 mt-2">
-              <TouchableOpacity onPress={() => setModalVisible(!modalVisible)}>
+              <TouchableOpacity onPress={() => setModalCheck(!modalCheck)}>
                 <LinearGradient colors={["#ED83C1", "#8469A4"]} className="py-4 px-5 rounded-2xl">
-                  <Text className="text-white font-semibold">Отмена</Text>
+                  <Text className="text-white font-semibold">Завершить продажу</Text>
                 </LinearGradient>
               </TouchableOpacity>
-              <TouchableOpacity onPress={handleClick}>
+              <TouchableOpacity>
                 <LinearGradient colors={["#ED83C1", "#8469A4"]} className="py-4 px-5 rounded-2xl">
-                  <Text className="text-white font-semibold">Продать</Text>
+                  <Text className="text-white font-semibold">Открыть чек</Text>
                 </LinearGradient>
               </TouchableOpacity>
             </View>
           </Pressable>
-          <SellCheckModal modalCheck={modalCheck} setModalCheck={setModalCheck} />
         </Pressable>
       </KeyboardAvoidingView>
     </Modal>

@@ -24,10 +24,10 @@ import ModalChooseAddVariant from "../../components/AddVariant/modalChooseAddVar
 import Animated, { useSharedValue, withTiming, useAnimatedStyle, withRepeat, withSequence } from "react-native-reanimated";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import ModalForSellWithOutCustomer from "./modals/WithOutCustomer";
+import SellCheckModal from "./modals/sellCheckModal";
 
 export default function SellScreen({ navigation }) {
   const { sellCart, sellPlaces, sellCustomers, sellCurrencies, selectedSellPlace, setSelectedSellPlace, setSellCart } = useContext(sellContext);
-  console.log("sellCart: ", sellCart);
   const { getSavedPlace, savedPlace } = useContext(workPlaceContext);
 
   const [modalVisible, setModalVisible] = useState(false);
@@ -171,7 +171,6 @@ export default function SellScreen({ navigation }) {
                   dropdownItemStyles={styles.dropdownItemStyles}
                   defaultOption={data.basePlace}
                   setSelected={(place) => {
-                    console.log("place: ", place);
                     setSelectedSellPlace({
                       ...selectedSellPlace,
                       selectedPlace: place,
@@ -195,7 +194,6 @@ export default function SellScreen({ navigation }) {
                   dropdownItemStyles={styles.dropdownItemStyles}
                   defaultOption={data.baseCurrency}
                   setSelected={(currency) => {
-                    console.log("currency: ", currency);
                     totalPrice(currency);
                     setSelectedSellPlace({
                       ...selectedSellPlace,

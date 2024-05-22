@@ -19,6 +19,7 @@ import SellScreen from "../screens/sell";
 import SellCart from "../screens/sell/sellCart";
 import SellScan from "../screens/sell/scanQr";
 import Scanner from "../components/scanner/Scanner";
+import SellCheck from "../screens/sell/sellCheck";
 
 const Stack = createNativeStackNavigator();
 
@@ -76,8 +77,7 @@ export default function AppNavigation() {
         <Stack.Screen name="sell" component={SellScreen} />
         <Stack.Screen name="sell-cart" component={SellCart} />
         <Stack.Screen name="sell-scan" component={SellScan} />
-
-        {/* <Drawer.Screen name="scanner" component={Scanner} /> */}
+        <Stack.Screen name="sell-check" component={SellCheck} />
       </Stack.Navigator>
     </NavigationContainer>
   );

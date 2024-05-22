@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect } from "react";
+import React, { createContext, useState, useEffect, useReducer } from "react";
 import { LOGIN, TOKEN } from "../constants";
 import api from "../api/axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -8,10 +8,26 @@ const ENDPOINTS = {
   PLACES: "/company/v1/places/",
   PLACE_CURRENCY: "/company/v1/places/",
   CUSTOMERS: "/customers/v1/customers/",
+  SELLS: "/realization/v1/sells/",
 };
 export const sellContext = createContext();
 
+const INIT_STATE = {
+  sellSendWithOutCustomer: null,
+};
+
+function reducer(state, action) {
+  switch (action.type) {
+    case ENDPOINTS.SELLS:
+      return { ...state, sellSendWithOutCustomer: action.payload };
+    default:
+      return state;
+  }
+}
+
 const SellContextProvider = ({ children }) => {
+  const [state, dispatch] = useReducer(reducer, INIT_STATE);
+
   const [isLoading, setIsLoading] = useState(false);
   const [sellPlaces, setSellPlaces] = useState(null);
   const [sellCurrencies, setSellCurrencies] = useState(null);
@@ -92,6 +108,20 @@ const SellContextProvider = ({ children }) => {
     }
   };
 
+  async function sendProductsWithOutCustomer(data) {
+    try {
+      setIsLoading(true);
+      let res = await api.post(ENDPOINTS.SELLS, data);
+      dispatch({
+        type: ENDPOINTS.SELLS,
+        payload: res,
+      });
+      setIsLoading(false);
+    } catch (error) {
+      console.log("error: ", error);
+    }
+  }
+
   return (
     <sellContext.Provider
       value={{
@@ -102,6 +132,7 @@ const SellContextProvider = ({ children }) => {
         sellCustomers,
         selectedSellPlace,
         sellCart,
+        sellSendWithOutCustomer: state.sellSendWithOutCustomer,
         setSellCart,
         setSelectedSellPlace,
         getSellPlaces,
@@ -110,6 +141,7 @@ const SellContextProvider = ({ children }) => {
         setProductStates,
         loadCart,
         saveCart,
+        sendProductsWithOutCustomer,
       }}
     >
       {children}

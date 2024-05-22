@@ -1,20 +1,34 @@
 import { LinearGradient } from "expo-linear-gradient";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { KeyboardAvoidingView, Modal, Platform, Pressable, StatusBar, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { SelectList } from "react-native-dropdown-select-list";
 import Icon from "react-native-vector-icons/Ionicons";
 import SellConfirmModal from "./confirm";
+import { sellContext } from "../../../contexts/sellContext";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import SellCheckModal from "./sellCheckModal";
 
 export default function ModalForSellWithOutCustomer(props) {
   const { modalVisible, setModalVisible, data, selectedSellPlace, setSelectedSellPlace, totalPrice, sellCart } = props;
 
+  const { sendProductsWithOutCustomer, setSellCart } = useContext(sellContext);
+
   const [modalConfirm, setModalConfirm] = useState(false);
+  const [modalCheck, setModalCheck] = useState(false);
 
   const [cashAmount, setCashAmount] = useState("");
   const [totalAmount, setTotalAmount] = useState(totalPrice());
   const [changeAmount, setChangeAmount] = useState(0);
   const [disabled, setDisabled] = useState(true);
   const [disabledStyle, setDisabledStyle] = useState(null);
+
+  useEffect(() => {
+    if (disabled) {
+      setDisabledStyle({ opacity: 0.5 });
+    } else {
+      setDisabledStyle({ opacity: 1 });
+    }
+  }, [disabled]);
 
   const handleTextChange = (text) => {
     let newText = text.replace(/,/g, ".");
@@ -30,8 +44,7 @@ export default function ModalForSellWithOutCustomer(props) {
 
   const calculateChange = (amount) => {
     const cash = parseFloat(amount) || 0;
-    const total = parseFloat(totalAmount) || 0;
-    console.log("total: ", total);
+    const total = parseFloat(totalAmount) || parseFloat(totalPrice());
     const change = cash > total ? (cash - total).toFixed(2) : 0;
     cash < total ? setDisabled(true) : setDisabled(false);
     setChangeAmount(change);
@@ -41,26 +54,35 @@ export default function ModalForSellWithOutCustomer(props) {
     key: selectedSellPlace.selectedCurency,
     value: selectedSellPlace.selectedCurency?.name || selectedSellPlace.selectedCurency?.currency?.name,
   };
-  console.log("defaultCurrency: ", defaultCurrency);
 
-  useEffect(() => {
-    if (disabled) {
-      setDisabledStyle({ opacity: 0.5 });
-    } else {
-      setDisabledStyle({ opacity: 1 });
-    }
-  }, [disabled]);
-
-  const handleClick = () => {
+  const handleClick = async () => {
     const products = sellCart.map((item) => {
-      return { product: item.product.id, quantity: item.newQuantity, size: item.size.id };
+      return { product: item.product.id, quantity: item.newQuantity, size: item.size.id, place: selectedSellPlace.selectedPlace[0] };
     });
-    console.log("products: ", products);
-    setModalConfirm(false);
-    setModalVisible(false);
-    setChangeAmount(0);
-    setTotalAmount(0);
-    setCashAmount("");
+    const total = parseFloat(totalAmount) || 0;
+    const body = {
+      place: selectedSellPlace.selectedPlace[0],
+      payment: [{ currency: selectedSellPlace.selectedCurency.id, amount: total }],
+      sell_products: products,
+      change_currency: selectedSellPlace.selectedCurency.id,
+    };
+    setModalCheck(true);
+
+    // try {
+    //   sendProductsWithOutCustomer(body);
+    //   console.log("body: ", body);
+    //   setModalConfirm(false);
+    //   setModalVisible(false);
+    //   setChangeAmount(0);
+    //   setTotalAmount(0);
+    //   setCashAmount("");
+    //   setSellCart([]);
+    //   showMessage({
+    //     message: `Продажа произведена успешно!`,
+    //     type: "success",
+    //   });
+    //   await AsyncStorage.removeItem("sellCart");
+    // } catch (error) {}
   };
 
   return (
@@ -139,7 +161,13 @@ export default function ModalForSellWithOutCustomer(props) {
                 </LinearGradient>
               </TouchableOpacity>
             </View>
-            <SellConfirmModal modalVisible={modalConfirm} setModalVisible={setModalConfirm} handleClick={handleClick} />
+            <SellConfirmModal
+              modalCheck={modalCheck}
+              setModalCheck={setModalCheck}
+              modalVisible={modalConfirm}
+              setModalVisible={setModalConfirm}
+              handleClick={handleClick}
+            />
           </Pressable>
         </Pressable>
       </KeyboardAvoidingView>
