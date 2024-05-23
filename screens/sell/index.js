@@ -32,6 +32,7 @@ export default function SellScreen({ navigation }) {
 
   const [modalVisible, setModalVisible] = useState(false);
   const [withOutCustomerModal, setWithOutCustomerModal] = useState(false);
+
   const [refreshing, setRefreshing] = useState(false);
 
   const onRefresh = useCallback(() => {

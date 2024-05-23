@@ -7,9 +7,14 @@ import SellConfirmModal from "./confirm";
 import { sellContext } from "../../../contexts/sellContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import SellCheckModal from "./sellCheckModal";
+import { showMessage } from "react-native-flash-message";
+import { useNavigation } from "@react-navigation/native";
 
 export default function ModalForSellWithOutCustomer(props) {
   const { modalVisible, setModalVisible, data, selectedSellPlace, setSelectedSellPlace, totalPrice, sellCart } = props;
+  console.log("sellCart: ", sellCart);
+
+  const navigation = useNavigation();
 
   const { sendProductsWithOutCustomer, setSellCart } = useContext(sellContext);
 
@@ -67,22 +72,32 @@ export default function ModalForSellWithOutCustomer(props) {
       change_currency: selectedSellPlace.selectedCurency.id,
     };
     setModalCheck(true);
+    try {
+      // sendProductsWithOutCustomer(body);
+    } catch (error) {
+      console.log("error: ", error);
+    }
+  };
+  const handleCloseTheSell = async () => {
+    setModalCheck(false);
+    setModalConfirm(false);
+    setModalVisible(false);
+    setChangeAmount(0);
+    setTotalAmount(0);
+    setCashAmount("");
+    // setSellCart([]);
+    // await AsyncStorage.removeItem("sellCart");
+    showMessage({
+      message: `Продажа произведена успешно!`,
+      type: "success",
+    });
+  };
 
-    // try {
-    //   sendProductsWithOutCustomer(body);
-    //   console.log("body: ", body);
-    //   setModalConfirm(false);
-    //   setModalVisible(false);
-    //   setChangeAmount(0);
-    //   setTotalAmount(0);
-    //   setCashAmount("");
-    //   setSellCart([]);
-    //   showMessage({
-    //     message: `Продажа произведена успешно!`,
-    //     type: "success",
-    //   });
-    //   await AsyncStorage.removeItem("sellCart");
-    // } catch (error) {}
+  const showCheck = () => {
+    setModalCheck(false);
+    setModalConfirm(false);
+    setModalVisible(false);
+    navigation.navigate("sell-check");
   };
 
   return (
@@ -162,11 +177,13 @@ export default function ModalForSellWithOutCustomer(props) {
               </TouchableOpacity>
             </View>
             <SellConfirmModal
-              modalCheck={modalCheck}
               setModalCheck={setModalCheck}
+              modalCheck={modalCheck}
               modalVisible={modalConfirm}
               setModalVisible={setModalConfirm}
               handleClick={handleClick}
+              handleCloseTheSell={handleCloseTheSell}
+              showCheck={showCheck}
             />
           </Pressable>
         </Pressable>

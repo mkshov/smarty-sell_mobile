@@ -6,7 +6,7 @@ import Icon from "react-native-vector-icons/Ionicons";
 import SellCheckModal from "./sellCheckModal";
 
 export default function SellConfirmModal(props) {
-  const { modalVisible, setModalVisible, handleClick, modalCheck, setModalCheck } = props;
+  const { modalVisible, setModalVisible, handleClick, setModalCheck, modalCheck, handleCloseTheSell, showCheck } = props;
 
   return (
     <Modal
@@ -38,9 +38,9 @@ export default function SellConfirmModal(props) {
               </TouchableOpacity>
             </View>
           </Pressable>
-          <SellCheckModal modalCheck={modalCheck} setModalCheck={setModalCheck} />
         </Pressable>
       </KeyboardAvoidingView>
+      <SellCheckModal modalCheck={modalCheck} setModalCheck={setModalCheck} handleCloseTheSell={handleCloseTheSell} showCheck={showCheck} />
     </Modal>
   );
 }

@@ -1,12 +1,14 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useNavigation } from "@react-navigation/native";
 import { LinearGradient } from "expo-linear-gradient";
 import React, { useEffect, useState } from "react";
 import { KeyboardAvoidingView, Modal, Platform, Pressable, StatusBar, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { SelectList } from "react-native-dropdown-select-list";
+import { showMessage } from "react-native-flash-message";
 import Icon from "react-native-vector-icons/Ionicons";
 
 export default function SellCheckModal(props) {
-  const { modalCheck, setModalCheck } = props;
-  console.log("modalCheck: ", modalCheck);
+  const { modalCheck, setModalCheck, handleCloseTheSell, showCheck } = props;
 
   return (
     <Modal
@@ -26,12 +28,12 @@ export default function SellCheckModal(props) {
             <View className="w-full h-[1px] bg-[#cd5298] my-3"></View>
             <Text className="font-semibold text-[#CD5297]">У вас есть возможность посмотреть чек. Открыть странцицу страницу чека? </Text>
             <View className="flex-row justify-end gap-5 mt-2">
-              <TouchableOpacity onPress={() => setModalCheck(!modalCheck)}>
+              <TouchableOpacity onPress={handleCloseTheSell}>
                 <LinearGradient colors={["#ED83C1", "#8469A4"]} className="py-4 px-5 rounded-2xl">
                   <Text className="text-white font-semibold">Завершить продажу</Text>
                 </LinearGradient>
               </TouchableOpacity>
-              <TouchableOpacity>
+              <TouchableOpacity onPress={showCheck}>
                 <LinearGradient colors={["#ED83C1", "#8469A4"]} className="py-4 px-5 rounded-2xl">
                   <Text className="text-white font-semibold">Открыть чек</Text>
                 </LinearGradient>
