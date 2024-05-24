@@ -9,6 +9,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import SellCheckModal from "./sellCheckModal";
 import { showMessage } from "react-native-flash-message";
 import { useNavigation } from "@react-navigation/native";
+import { err } from "react-native-svg";
 
 export default function ModalForSellWithOutCustomer(props) {
   const { modalVisible, setModalVisible, data, selectedSellPlace, setSelectedSellPlace, totalPrice, sellCart } = props;
@@ -16,14 +17,13 @@ export default function ModalForSellWithOutCustomer(props) {
 
   const navigation = useNavigation();
 
-  const { sendProductsWithOutCustomer, setSellCart } = useContext(sellContext);
-
-  const [modalConfirm, setModalConfirm] = useState(false);
-  const [modalCheck, setModalCheck] = useState(false);
+  const { sendProductsWithOutCustomer, setSellCart, changeAmount, setChangeAmount, error, modalCheck, setModalCheck, modalConfirm, setModalConfirm } =
+    useContext(sellContext);
+  console.log("error sale: ", error);
 
   const [cashAmount, setCashAmount] = useState("");
   const [totalAmount, setTotalAmount] = useState(totalPrice());
-  const [changeAmount, setChangeAmount] = useState(0);
+
   const [disabled, setDisabled] = useState(true);
   const [disabledStyle, setDisabledStyle] = useState(null);
 
@@ -34,6 +34,18 @@ export default function ModalForSellWithOutCustomer(props) {
       setDisabledStyle({ opacity: 1 });
     }
   }, [disabled]);
+
+  // useEffect(() => {
+  //   if (error) {
+  //     if (error.errors[0].code === "change_greater_than_balance") {
+  //       showMessage({
+  //         message: `Сумма сдачи превышает сумму на балансе кошелька!`,
+  //         type: "danger",
+  //       });
+  //       setModalCheck(false);
+  //     }
+  //   }
+  // }, [error]);
 
   const handleTextChange = (text) => {
     let newText = text.replace(/,/g, ".");
@@ -64,19 +76,14 @@ export default function ModalForSellWithOutCustomer(props) {
     const products = sellCart.map((item) => {
       return { product: item.product.id, quantity: item.newQuantity, size: item.size.id, place: selectedSellPlace.selectedPlace[0] };
     });
-    const total = parseFloat(totalAmount) || 0;
+    const total = parseFloat(cashAmount) || 0;
     const body = {
       place: selectedSellPlace.selectedPlace[0],
       payment: [{ currency: selectedSellPlace.selectedCurency.id, amount: total }],
       sell_products: products,
       change_currency: selectedSellPlace.selectedCurency.id,
     };
-    setModalCheck(true);
-    try {
-      // sendProductsWithOutCustomer(body);
-    } catch (error) {
-      console.log("error: ", error);
-    }
+    sendProductsWithOutCustomer(body);
   };
   const handleCloseTheSell = async () => {
     setModalCheck(false);
@@ -85,8 +92,8 @@ export default function ModalForSellWithOutCustomer(props) {
     setChangeAmount(0);
     setTotalAmount(0);
     setCashAmount("");
-    // setSellCart([]);
-    // await AsyncStorage.removeItem("sellCart");
+    setSellCart([]);
+    await AsyncStorage.removeItem("sellCart");
     showMessage({
       message: `Продажа произведена успешно!`,
       type: "success",

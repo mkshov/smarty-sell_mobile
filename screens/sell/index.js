@@ -27,11 +27,20 @@ import ModalForSellWithOutCustomer from "./modals/WithOutCustomer";
 import SellCheckModal from "./modals/sellCheckModal";
 
 export default function SellScreen({ navigation }) {
-  const { sellCart, sellPlaces, sellCustomers, sellCurrencies, selectedSellPlace, setSelectedSellPlace, setSellCart } = useContext(sellContext);
+  const {
+    sellCart,
+    sellPlaces,
+    sellCustomers,
+    sellCurrencies,
+    selectedSellPlace,
+    setSelectedSellPlace,
+    setSellCart,
+    withOutCustomerModal,
+    setWithOutCustomerModal,
+  } = useContext(sellContext);
   const { getSavedPlace, savedPlace } = useContext(workPlaceContext);
 
   const [modalVisible, setModalVisible] = useState(false);
-  const [withOutCustomerModal, setWithOutCustomerModal] = useState(false);
 
   const [refreshing, setRefreshing] = useState(false);
 

@@ -39,6 +39,11 @@ const SellContextProvider = ({ children }) => {
   });
   const [sellCart, setSellCart] = useState([]);
   const [productStates, setProductStates] = useState([]);
+  const [changeAmount, setChangeAmount] = useState(0);
+  const [error, setError] = useState(null);
+  const [modalCheck, setModalCheck] = useState(false);
+  const [modalConfirm, setModalConfirm] = useState(false);
+  const [withOutCustomerModal, setWithOutCustomerModal] = useState(false);
 
   const getSellPlaces = async (params) => {
     setIsLoading(true);
@@ -117,8 +122,20 @@ const SellContextProvider = ({ children }) => {
         payload: res,
       });
       setIsLoading(false);
+      setModalCheck(true);
     } catch (error) {
       console.log("error: ", error);
+      // setError(error.response.data);
+      setModalCheck(false);
+      setModalConfirm(false);
+      setWithOutCustomerModal(false);
+      if (error.response.data.errors[0].code === "change_greater_than_balance") {
+        showMessage({
+          message: `Сумма сдачи превышает сумму на балансе кошелька!`,
+          type: "danger",
+          duration: 3000,
+        });
+      }
     }
   }
 
@@ -132,8 +149,15 @@ const SellContextProvider = ({ children }) => {
         sellCustomers,
         selectedSellPlace,
         sellCart,
+        changeAmount,
         sellSendWithOutCustomer: state.sellSendWithOutCustomer,
+        error,
+        modalCheck,
+        modalConfirm,
+        withOutCustomerModal,
         setSellCart,
+        setError,
+        setChangeAmount,
         setSelectedSellPlace,
         getSellPlaces,
         getSellCurrencies,
@@ -142,6 +166,9 @@ const SellContextProvider = ({ children }) => {
         loadCart,
         saveCart,
         sendProductsWithOutCustomer,
+        setModalCheck,
+        setModalConfirm,
+        setWithOutCustomerModal,
       }}
     >
       {children}

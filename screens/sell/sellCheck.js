@@ -28,6 +28,10 @@ import SellCheckModal from "./modals/sellCheckModal";
 
 export default function SellCheck({ navigation }) {
   const [refreshing, setRefreshing] = useState(false);
+  const { sellSendWithOutCustomer, sellCart, changeAmount, setChangeAmount } = useContext(sellContext);
+  console.log("changeAmount: ", changeAmount);
+  console.log("sellCart: ", sellCart);
+  console.log("sellSendWithOutCustomer: ", sellSendWithOutCustomer);
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
@@ -36,6 +40,7 @@ export default function SellCheck({ navigation }) {
       setRefreshing(false);
     }, 500);
   }, []);
+
   return (
     <SafeAreaProvider>
       <LinearGradient colors={["#8469A4FF", "#ED83C1FF", "#7E8BCD"]}>
