@@ -77,7 +77,7 @@ export default function AppNavigation() {
         <Stack.Screen name="sell" component={SellScreen} />
         <Stack.Screen name="sell-cart" component={SellCart} />
         <Stack.Screen name="sell-scan" component={SellScan} />
-        <Stack.Screen name="sell-check" component={SellCheck} />
+        <Stack.Screen options={{ gestureEnabled: false }} name="sell-check" component={SellCheck} />
       </Stack.Navigator>
     </NavigationContainer>
   );

@@ -19,6 +19,7 @@ export default function ModalForSellWithOutCustomer(props) {
 
   const { sendProductsWithOutCustomer, setSellCart, changeAmount, setChangeAmount, error, modalCheck, setModalCheck, modalConfirm, setModalConfirm } =
     useContext(sellContext);
+  console.log("changeAmount: ", changeAmount);
   console.log("error sale: ", error);
 
   const [cashAmount, setCashAmount] = useState("");

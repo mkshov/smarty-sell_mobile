@@ -119,7 +119,7 @@ const SellContextProvider = ({ children }) => {
       let res = await api.post(ENDPOINTS.SELLS, data);
       dispatch({
         type: ENDPOINTS.SELLS,
-        payload: res,
+        payload: res.data,
       });
       setIsLoading(false);
       setModalCheck(true);
