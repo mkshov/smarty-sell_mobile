@@ -13,20 +13,19 @@ import { err } from "react-native-svg";
 
 export default function ModalForSellWithOutCustomer(props) {
   const { modalVisible, setModalVisible, data, selectedSellPlace, setSelectedSellPlace, totalPrice, sellCart } = props;
-  console.log("sellCart: ", sellCart);
 
   const navigation = useNavigation();
 
   const { sendProductsWithOutCustomer, setSellCart, changeAmount, setChangeAmount, error, modalCheck, setModalCheck, modalConfirm, setModalConfirm } =
     useContext(sellContext);
-  console.log("changeAmount: ", changeAmount);
-  console.log("error sale: ", error);
 
   const [cashAmount, setCashAmount] = useState("");
   const [totalAmount, setTotalAmount] = useState(totalPrice());
 
   const [disabled, setDisabled] = useState(true);
+  console.log("disabled: ", disabled);
   const [disabledStyle, setDisabledStyle] = useState(null);
+  const isSellDisabled = sellCart.length === 0 || totalPrice === 0;
 
   useEffect(() => {
     if (disabled) {
@@ -35,6 +34,12 @@ export default function ModalForSellWithOutCustomer(props) {
       setDisabledStyle({ opacity: 1 });
     }
   }, [disabled]);
+
+  // useEffect(() => {
+  //   if (isSellDisabled) {
+  //     setDisabled(true);
+  //   }
+  // }, []);
 
   // useEffect(() => {
   //   if (error) {
@@ -64,7 +69,8 @@ export default function ModalForSellWithOutCustomer(props) {
     const cash = parseFloat(amount) || 0;
     const total = parseFloat(totalAmount) || parseFloat(totalPrice());
     const change = cash > total ? (cash - total).toFixed(2) : 0;
-    cash < total ? setDisabled(true) : setDisabled(false);
+    cash < total || total === 0 ? setDisabled(true) : setDisabled(false);
+    console.log("cash < totall: ", cash < total || total === 0);
     setChangeAmount(change);
   };
 
@@ -85,6 +91,9 @@ export default function ModalForSellWithOutCustomer(props) {
       change_currency: selectedSellPlace.selectedCurency.id,
     };
     sendProductsWithOutCustomer(body);
+    setChangeAmount(0);
+    setTotalAmount(0);
+    setCashAmount("");
   };
   const handleCloseTheSell = async () => {
     setModalCheck(false);
