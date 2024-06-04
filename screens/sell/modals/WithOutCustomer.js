@@ -23,7 +23,6 @@ export default function ModalForSellWithOutCustomer(props) {
   const [totalAmount, setTotalAmount] = useState(totalPrice());
 
   const [disabled, setDisabled] = useState(true);
-  console.log("disabled: ", disabled);
   const [disabledStyle, setDisabledStyle] = useState(null);
   const isSellDisabled = sellCart.length === 0 || totalPrice === 0;
 
@@ -70,7 +69,6 @@ export default function ModalForSellWithOutCustomer(props) {
     const total = parseFloat(totalAmount) || parseFloat(totalPrice());
     const change = cash > total ? (cash - total).toFixed(2) : 0;
     cash < total || total === 0 ? setDisabled(true) : setDisabled(false);
-    console.log("cash < totall: ", cash < total || total === 0);
     setChangeAmount(change);
   };
 
@@ -145,7 +143,6 @@ export default function ModalForSellWithOutCustomer(props) {
                 dropdownItemStyles={styles.dropdownItemStyles}
                 defaultOption={defaultCurrency}
                 setSelected={(currency) => {
-                  console.log("currency: ", currency);
                   totalPrice(currency);
                   setSelectedSellPlace({
                     ...selectedSellPlace,

@@ -7,7 +7,10 @@ const useTotalPrice = (sellCart, selectedSellPlace) => {
       return sellCart
         .reduce((sum, item) => {
           if (item.product.price_rule) {
-            return sum + item.product.price_rule.price * item.newQuantity * (currency.rate || 1);
+            const rate = currency.rate || 1;
+            const priceInSelectedCurrency = item.product.price_rule.price * rate;
+            const discountedPrice = priceInSelectedCurrency - (priceInSelectedCurrency * (selectedSellPlace.selectedCustomer?.discount || 0)) / 100;
+            return sum + discountedPrice * (item.newQuantity || 0);
           }
           return sum;
         }, 0)

@@ -7,7 +7,6 @@ import { sellContext } from "../../contexts/sellContext";
 export default function ModalScannedProduct(props) {
   const { modalVisible, setModalVisible, handleNavigate, newScan, type } = props;
   const { scannedProduct } = useContext(transferContext);
-  console.log("scannedProduct: ", scannedProduct);
   const { selectedSellPlace } = useContext(sellContext);
 
   return (

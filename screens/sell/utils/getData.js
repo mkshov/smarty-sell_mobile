@@ -8,7 +8,7 @@ const getData = ({ sellPlaces, sellCurrencies, sellCustomers, savedPlace }) => (
     value: currency.currency.name,
   })),
   customers: sellCustomers?.map((customer) => ({
-    key: customer.id,
+    key: { id: customer.id, discount: customer.percentage_discount },
     value: `${customer.name} - Скидка ${customer.percentage_discount}%`,
   })),
   basePlace: {

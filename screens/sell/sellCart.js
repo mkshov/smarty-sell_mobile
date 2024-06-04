@@ -13,6 +13,7 @@ import {
   TextInput,
   TouchableOpacity,
   View,
+  ActivityIndicator,
 } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
@@ -25,14 +26,15 @@ import FlashMessage, { showMessage } from "react-native-flash-message";
 
 export default function SellCart({ navigation }) {
   const { sellCart, setSellCart, selectedSellPlace, saveCart, loadCart } = useContext(sellContext);
-  console.log("selectedSellPlace: ", selectedSellPlace);
   const [refreshing, setRefreshing] = useState(false);
-
-  console.log("sellCart: ", sellCart);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     loadCart();
-  }, []);
+    if (selectedSellPlace && selectedSellPlace.selectedCurency) {
+      setLoading(false);
+    }
+  }, [selectedSellPlace]);
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
@@ -41,8 +43,22 @@ export default function SellCart({ navigation }) {
     }, 2000);
   }, []);
 
-  const handleQuantityChange = (index, newQuantity, action) => {
-    console.log("action: ", action);
+  const convertPrice = (price, rate) => {
+    return price * rate;
+  };
+
+  const calculateDiscountedPrice = (price, discount = 0) => {
+    return price - (price * discount) / 100;
+  };
+
+  const totalChangePrice = (item) => {
+    const rate = selectedSellPlace.selectedCurency.rate;
+    const priceInSelectedCurrency = convertPrice(item.product.price_rule.price, rate);
+    const discountedPrice = calculateDiscountedPrice(priceInSelectedCurrency, selectedSellPlace.selectedCustomer?.discount || 0);
+    return (item.newQuantity || 0) * discountedPrice;
+  };
+
+  const handleQuantityChange = (index, newQuantity, action, item) => {
     const quantity = parseInt(newQuantity, 10) || 0;
     const updatedCart = [...sellCart];
     const stockQuantity = updatedCart[index].quantity;
@@ -53,6 +69,19 @@ export default function SellCart({ navigation }) {
 
     if (quantity <= stockQuantity) {
       updatedCart[index].newQuantity = quantity;
+      // updatedCart[index].discountPrice = parseInt(
+      //   calculateDiscountedPrice(
+      //     convertPrice(item.product.price_rule.price, selectedSellPlace.selectedCurency.rate),
+      //     selectedSellPlace.selectedCustomer?.discount
+      //   ).toFixed(2)
+
+      // );
+      console.log(
+        calculateDiscountedPrice(
+          convertPrice(item.product.price_rule.price, selectedSellPlace.selectedCurency.rate),
+          selectedSellPlace.selectedCustomer?.discount
+        ).toFixed(2)
+      );
       setSellCart(updatedCart);
     } else {
       showMessage({
@@ -61,21 +90,16 @@ export default function SellCart({ navigation }) {
       });
     }
   };
+
   const handleDeleteProduct = async (productId) => {
     const updatedCart = sellCart.filter((item) => item.id !== productId);
     setSellCart(updatedCart);
     await AsyncStorage.setItem("sellCart", JSON.stringify(updatedCart));
   };
 
-  const totalChangePrice = (item) => {
-    return (item.newQuantity || 0) * item.product.price_rule.price;
-  };
-
   const checkEmptyInputs = () => {
     for (let item of sellCart) {
-      console.log("item: ", item);
       if (item.newQuantity === 0) {
-        console.log(false);
         showMessage({
           message: "Пожалуйста, заполните все поля количества",
           type: "danger",
@@ -91,6 +115,17 @@ export default function SellCart({ navigation }) {
       saveCart();
     }
   };
+
+  if (loading) {
+    return (
+      <SafeAreaProvider>
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#ED83C1FF" />
+          <Text>Загрузка...</Text>
+        </View>
+      </SafeAreaProvider>
+    );
+  }
 
   return (
     <SafeAreaProvider>
@@ -149,21 +184,43 @@ export default function SellCart({ navigation }) {
                         <Text>Цена</Text>
                         <Text className="text-base font-semibold mt-1">
                           {item.product.price_rule
-                            ? `${item.product.price_rule.price.toFixed(2)} USD`
-                            : // ? `${item.product.price_rule.price.toFixed(2)} ${selectedSellPlace.selectedCurency?.name}`
-                              "price_rule = null"}
+                            ? `${convertPrice(item.product.price_rule.price, selectedSellPlace.selectedCurency.rate).toFixed(2)} ${
+                                selectedSellPlace.selectedCurency.name || selectedSellPlace.selectedCurency.currency.name
+                              }`
+                            : "price_rule = null"}
+                        </Text>
+                      </View>
+                      <View>
+                        <Text>Скидка покупателя</Text>
+                        <Text className="text-base font-semibold mt-1">
+                          {selectedSellPlace.selectedCustomer ? `${selectedSellPlace.selectedCustomer?.discount}%` : "0%"}
+                        </Text>
+                      </View>
+                    </View>
+                    <View className="flex-row mt-10">
+                      <View className="w-1/2">
+                        <Text>Цена со скидкой</Text>
+                        <Text className="text-base font-semibold mt-1">
+                          {item.product.price_rule
+                            ? `${calculateDiscountedPrice(
+                                convertPrice(item.product.price_rule.price, selectedSellPlace.selectedCurency.rate),
+                                selectedSellPlace.selectedCustomer?.discount
+                              ).toFixed(2)} ${selectedSellPlace.selectedCurency.name || selectedSellPlace.selectedCurency.currency.name}`
+                            : "price_rule = null"}
                         </Text>
                       </View>
                       <View>
                         <Text>Итого</Text>
                         <Text className="text-base font-semibold mt-1">
                           {item.product.price_rule
-                            ? `${totalChangePrice(item).toFixed(2)} USD`
-                            : // ? `${totalChangePrice(item).toFixed(2)} ${selectedSellPlace.selectedCurency?.name}`
-                              "price_rule = null"}
+                            ? `${totalChangePrice(item).toFixed(2)} ${
+                                selectedSellPlace.selectedCurency.name || selectedSellPlace.selectedCurency.currency.name
+                              }`
+                            : "price_rule = null"}
                         </Text>
                       </View>
                     </View>
+
                     <View className="flex-row mt-10">
                       <View className="w-1/2">
                         <Text>Размер</Text>
@@ -182,11 +239,11 @@ export default function SellCart({ navigation }) {
                           />
                           <TouchableOpacity
                             className="ml-3 border-2 border-[#CD5297] rounded-full"
-                            onPress={() => handleQuantityChange(index, (item.newQuantity || 0) - 1, "minus")}
+                            onPress={() => handleQuantityChange(index, (item.newQuantity || 0) - 1, "minus", item)}
                           >
                             <AddIcon name="minus" size={22} color={"#CD5297"} />
                           </TouchableOpacity>
-                          <TouchableOpacity className="ml-3" onPress={() => handleQuantityChange(index, (item.newQuantity || 0) + 1, "plus")}>
+                          <TouchableOpacity className="ml-3" onPress={() => handleQuantityChange(index, (item.newQuantity || 0) + 1, "plus", item)}>
                             <AddIcon name="pluscircleo" size={26} color={"#CD5297"} />
                           </TouchableOpacity>
                         </View>
@@ -214,5 +271,10 @@ const styles = StyleSheet.create({
   AndroidSafeArea: {
     paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,
     height: "100%",
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
   },
 });

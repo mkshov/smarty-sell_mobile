@@ -30,7 +30,6 @@ import { showMessage } from "react-native-flash-message";
 export default function SellCheck({ navigation }) {
   const [refreshing, setRefreshing] = useState(false);
   const { sellSendWithOutCustomer, sellCart, selectedSellPlace, setSellCart } = useContext(sellContext);
-  console.log("sellSendWithOutCustomer: ", sellSendWithOutCustomer);
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);

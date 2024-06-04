@@ -1,9 +1,12 @@
-import React from "react";
+import React, { useContext } from "react";
 import { View, Text, StyleSheet, Platform } from "react-native";
 import { SelectList } from "react-native-dropdown-select-list";
 import Icon from "react-native-vector-icons/Ionicons";
+import { sellContext } from "../../../contexts/sellContext";
 
-export default function SelectDropdown({ title, data, defaultOption, onSelect, placeholder = "Выбрать", zIndex }) {
+export default function SelectDropdown({ title, data, defaultOption, onSelect, placeholder = "Выбрать", zIndex, type }) {
+  const { setSelectedSellPlace } = useContext(sellContext);
+
   const styles = StyleSheet.create({
     container: {
       marginTop: 20,
@@ -62,6 +65,7 @@ export default function SelectDropdown({ title, data, defaultOption, onSelect, p
         dropdownStyles={styles.dropdownStyles}
         boxStyles={styles.boxStyles}
         inputStyles={styles.inputStyles}
+        searchPlaceholder="Поиск"
         closeicon={<Icon name="close" color="white" size={25} />}
         searchicon={<Icon name="search" color="white" size={20} style={{ marginRight: 10 }} />}
         arrowicon={<Icon name="arrow-down" color="white" size={20} />}
@@ -69,7 +73,7 @@ export default function SelectDropdown({ title, data, defaultOption, onSelect, p
         defaultOption={defaultOption}
         setSelected={onSelect}
         placeholder={placeholder}
-        search={false}
+        search={type === "customer" ? true : false}
         data={data}
       />
     </View>

@@ -32,6 +32,8 @@ export default function SellScreen({ navigation }) {
     setWithOutCustomerModal,
   } = useContext(sellContext);
 
+  console.log("sellCart: ", sellCart);
+  console.log("selectedSellPlace: ", selectedSellPlace);
   const { getSavedPlace, savedPlace } = useContext(workPlaceContext);
 
   const [modalVisible, setModalVisible] = useState(false);
@@ -135,6 +137,7 @@ export default function SellScreen({ navigation }) {
                 title="Покупатель"
                 data={data.customers}
                 placeholder="Выбрать покупателя..."
+                type="customer"
                 onSelect={(customer) =>
                   setSelectedSellPlace({
                     ...selectedSellPlace,

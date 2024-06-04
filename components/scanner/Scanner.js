@@ -38,8 +38,6 @@ export default function Scanner({ actionType, actionTitle, cartPath }) {
       barcode: data,
       place: actionType === "transfer" ? transfer.from_place.id : selectedSellPlace.selectedPlace[0],
     };
-    console.log("selectedSellPlace: ", selectedSellPlace);
-    console.log("dataSend: ", dataSend);
     let res = await scanInPlace(dataSend);
     if (res.barcode && data.length >= 12) {
       setModalVisible(!modalVisible);
@@ -78,7 +76,7 @@ export default function Scanner({ actionType, actionTitle, cartPath }) {
         Alert.alert("У продукта нет цены, такой продукт невозможно добавить в корзину!");
       } else {
         if (!isProductExist) {
-          const newScannedProducts = [...sellCart, { ...scannedProduct, newQuantity: 1 }];
+          const newScannedProducts = [...sellCart, { ...scannedProduct, newQuantity: 1, discountPrice: scannedProduct.product.price_rule.price }];
           setSellCart(newScannedProducts);
           await AsyncStorage.setItem("sellCart", JSON.stringify(newScannedProducts));
           Alert.alert("Продукт успешно добавлен в корзину!");
