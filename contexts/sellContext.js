@@ -36,6 +36,7 @@ const SellContextProvider = ({ children }) => {
     selectedPlace: null,
     selectedCurency: null,
     selectedCustomer: null,
+    withOutCustomer: false,
   });
   const [sellCart, setSellCart] = useState([]);
   const [productStates, setProductStates] = useState([]);

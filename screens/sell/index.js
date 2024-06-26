@@ -18,6 +18,7 @@ import getData from "./utils/getData";
 import SelectDropdown from "./components/SelectDropdown";
 import AddProductButton from "./components/AddProductButton";
 import GoToCartButton from "./components/GoToCartButton";
+import ModalForSellWithCustomer from "./modals/WithCustomer";
 
 export default function SellScreen({ navigation }) {
   const {
@@ -32,7 +33,6 @@ export default function SellScreen({ navigation }) {
     setWithOutCustomerModal,
   } = useContext(sellContext);
 
-  console.log("sellCart: ", sellCart);
   console.log("selectedSellPlace: ", selectedSellPlace);
   const { getSavedPlace, savedPlace } = useContext(workPlaceContext);
 
@@ -142,6 +142,7 @@ export default function SellScreen({ navigation }) {
                   setSelectedSellPlace({
                     ...selectedSellPlace,
                     selectedCustomer: customer,
+                    withOutCustomer: true,
                   })
                 }
               />
@@ -162,15 +163,27 @@ export default function SellScreen({ navigation }) {
               setModalVisible={setModalVisible}
               modalVisible={modalVisible}
             />
-            <ModalForSellWithOutCustomer
-              data={data}
-              sellCart={sellCart}
-              setSelectedSellPlace={setSelectedSellPlace}
-              selectedSellPlace={selectedSellPlace}
-              modalVisible={withOutCustomerModal}
-              totalPrice={totalPrice}
-              setModalVisible={setWithOutCustomerModal}
-            />
+            {selectedSellPlace.withOutCustomer ? (
+              <ModalForSellWithCustomer
+                data={data}
+                sellCart={sellCart}
+                setSelectedSellPlace={setSelectedSellPlace}
+                selectedSellPlace={selectedSellPlace}
+                modalVisible={withOutCustomerModal}
+                totalPrice={totalPrice}
+                setModalVisible={setWithOutCustomerModal}
+              />
+            ) : (
+              <ModalForSellWithOutCustomer
+                data={data}
+                sellCart={sellCart}
+                setSelectedSellPlace={setSelectedSellPlace}
+                selectedSellPlace={selectedSellPlace}
+                modalVisible={withOutCustomerModal}
+                totalPrice={totalPrice}
+                setModalVisible={setWithOutCustomerModal}
+              />
+            )}
           </ScrollView>
         </SafeAreaView>
       </LinearGradient>

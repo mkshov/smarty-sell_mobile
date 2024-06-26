@@ -15,7 +15,7 @@ export default function SelectDropdown({ title, data, defaultOption, onSelect, p
 
   const handleClear = () => {
     clearStates();
-    setSelectedSellPlace((prev) => ({ ...prev, selectedCustomer: null }));
+    setSelectedSellPlace((prev) => ({ ...prev, selectedCustomer: null, withOutCustomer: false }));
   };
 
   const styles = StyleSheet.create({
