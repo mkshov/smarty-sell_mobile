@@ -1,12 +1,15 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState, useCallback, useMemo } from "react";
 import { Platform, StyleSheet, TextInput, Text, View, TouchableOpacity, ScrollView } from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
+import { sellContext } from "../../../contexts/sellContext";
+import debounce from "lodash.debounce";
 
 export default function MySelect({ data, defaultOption, onSelect, title }) {
-  console.log("data: ", data);
+  const { getSellCustomers } = useContext(sellContext);
   const [open, setOpen] = useState(false);
   const [inputValue, setInputValue] = useState(defaultOption ? defaultOption.value : "");
   const [filteredData, setFilteredData] = useState(data ? data : []);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (data) {
@@ -22,10 +25,30 @@ export default function MySelect({ data, defaultOption, onSelect, title }) {
     }
   };
 
+  // Используем useMemo, чтобы создать дебаунс-функцию один раз
+  const handleTextDebounce = useMemo(
+    () =>
+      debounce(async (text) => {
+        setOpen(true);
+        setInputValue(text);
+        setLoading(true);
+        let res = await getSellCustomers(text);
+        let searchCustomers = res.map((item) => ({
+          key: {
+            id: item.id,
+            discount: item.percentage_discount,
+          },
+          value: `${item.name} - Скидка ${item.percentage_discount}%`,
+        }));
+        setFilteredData(searchCustomers);
+        setLoading(false);
+      }, 500),
+    [getSellCustomers]
+  );
+
   const handleInputChange = (text) => {
-    setOpen(true);
-    setInputValue(text);
-    setFilteredData(data.filter((item) => item.value.toLowerCase().includes(text.toLowerCase())));
+    setInputValue(text); // Обновляем текст немедленно
+    handleTextDebounce(text); // Обрабатываем текст с дебаунсом
   };
 
   const handleClearInput = () => {
@@ -61,11 +84,21 @@ export default function MySelect({ data, defaultOption, onSelect, title }) {
       {open && (
         <View style={styles.dropdownStyles}>
           <ScrollView>
-            {filteredData.map((item, index) => (
-              <TouchableOpacity key={index} onPress={() => handleSelect(item)} style={styles.dropdownItemStyles}>
-                <Text style={styles.dropdownTextStyles}>{item.value}</Text>
+            {loading ? (
+              <Text>Загрузка...</Text>
+            ) : (
+              filteredData.map((item, index) => (
+                <TouchableOpacity key={index} onPress={() => handleSelect(item)} style={styles.dropdownItemStyles}>
+                  <Text style={styles.dropdownTextStyles}>{item.value}</Text>
+                </TouchableOpacity>
+              ))
+            )}
+
+            {!loading && !filteredData.length && (
+              <TouchableOpacity>
+                <Text>Создать покупателя "{inputValue}"</Text>
               </TouchableOpacity>
-            ))}
+            )}
           </ScrollView>
         </View>
       )}

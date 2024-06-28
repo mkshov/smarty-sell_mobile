@@ -74,10 +74,10 @@ const SellContextProvider = ({ children }) => {
       console.log("error: ", error);
     }
   };
-  const getSellCustomers = async () => {
+  const getSellCustomers = async (search = "") => {
     setIsLoading(true);
     try {
-      const { data } = await api.get(ENDPOINTS.CUSTOMERS, { is_active: true });
+      const { data } = await api.get(`${ENDPOINTS.CUSTOMERS}?is_active=true&search=${search}`);
       setIsLoading(false);
       setSellCustomers(data.results);
 

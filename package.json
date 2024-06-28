@@ -24,6 +24,7 @@
     "expo-linear-gradient": "~13.0.2",
     "expo-status-bar": "~1.12.1",
     "jwt-decode": "^4.0.0",
+    "lodash.debounce": "^4.0.8",
     "moti": "^0.28.1",
     "native-base": "^3.4.28",
     "nativewind": "^2.0.11",

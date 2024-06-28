@@ -25,9 +25,9 @@ export default function HomePage({ navigation }) {
           limit: 100,
         };
         navigation.navigate(path);
-        await getSellPlaces(params);
-        await getSellCurrencies(savedPlace.id);
-        await getSellCustomers();
+        getSellPlaces(params);
+        getSellCurrencies(savedPlace.id);
+        getSellCustomers();
       } else {
         getSavedPlace();
       }
