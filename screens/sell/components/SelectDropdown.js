@@ -89,6 +89,7 @@ export default function SelectDropdown({ title, data, defaultOption, onSelect, p
         search={type === "customer" ? true : false}
         data={data}
         notFoundText="Покупатель не найден :("
+        
       />
       {type === "customer" && (
         <TouchableOpacity onPress={handleClear} className="rounded-lg absolute right-14 top-[34px]">

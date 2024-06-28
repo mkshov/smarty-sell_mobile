@@ -19,6 +19,7 @@ import SelectDropdown from "./components/SelectDropdown";
 import AddProductButton from "./components/AddProductButton";
 import GoToCartButton from "./components/GoToCartButton";
 import ModalForSellWithCustomer from "./modals/WithCustomer";
+import MySelect from "./components/MySelect";
 
 export default function SellScreen({ navigation }) {
   const {
@@ -121,7 +122,7 @@ export default function SellScreen({ navigation }) {
                 }
               />
               <SelectDropdown
-                zIndex={2}
+                zIndex={21}
                 title="Валюта"
                 data={data.currencies}
                 defaultOption={data.baseCurrency}
@@ -132,24 +133,22 @@ export default function SellScreen({ navigation }) {
                   });
                 }}
               />
-              <SelectDropdown
-                zIndex={1}
+              <MySelect
                 title="Покупатель"
                 data={data.customers}
-                placeholder="Выбрать покупателя..."
-                type="customer"
-                onSelect={(customer) =>
+                onSelect={(customer) => {
+                  console.log("customer: ", customer);
                   setSelectedSellPlace({
                     ...selectedSellPlace,
                     selectedCustomer: customer,
                     withOutCustomer: true,
-                  })
-                }
+                  });
+                }}
               />
               <AddProductButton modalVisible={modalVisible} setModalVisible={setModalVisible} sellCart={sellCart} totalQuantity={totalQuantity} />
               <GoToCartButton navigation={navigation} style={style} />
             </View>
-            <View>
+            <View className="mb-2 relative -z-10">
               <Text style={styles.totalPriceText}>
                 Итого: {totalPrice()} {selectedSellPlace.selectedCurency?.name || selectedSellPlace.selectedCurency?.currency?.name}
               </Text>

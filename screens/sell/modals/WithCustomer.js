@@ -13,6 +13,7 @@ import {
   TextInput,
   TouchableOpacity,
   View,
+  useWindowDimensions,
 } from "react-native";
 import { SelectList } from "react-native-dropdown-select-list";
 import Icon from "react-native-vector-icons/Ionicons";
@@ -28,7 +29,10 @@ import SellCheckbox from "../components/CheckBox";
 export default function ModalForSellWithCustomer(props) {
   const { modalVisible, setModalVisible, data, selectedSellPlace, setSelectedSellPlace, totalPrice, sellCart } = props;
 
+  const windowWidth = useWindowDimensions().width;
   const navigation = useNavigation();
+
+  console.log("windowWidth: ", windowWidth);
 
   const { sendProductsWithOutCustomer, setSellCart, changeAmount, setChangeAmount, error, modalCheck, setModalCheck, modalConfirm, setModalConfirm } =
     useContext(sellContext);
@@ -44,8 +48,11 @@ export default function ModalForSellWithCustomer(props) {
     cash: true,
     fromTheBalance: false,
     inDebt: false,
-    book: false,
+    reserve: false,
   });
+  let isReserve = isChecked.cash || isChecked.fromTheBalance || isChecked.inDebt;
+
+  const [balanceSheet, setBalanceSheet] = useState(false);
 
   const [paymentInTwoCurrnecies, setPaymentInTwoCurrencies] = useState(false);
 
@@ -84,7 +91,12 @@ export default function ModalForSellWithCustomer(props) {
 
   const handleClick = async () => {
     const products = sellCart.map((item) => {
-      return { product: item.product.id, quantity: item.newQuantity, size: item.size.id, place: selectedSellPlace.selectedPlace[0] };
+      return {
+        product: item.product.id,
+        quantity: item.newQuantity,
+        size: item.size.id,
+        place: selectedSellPlace.selectedPlace[0],
+      };
     });
     const total = parseFloat(cashAmount) || 0;
     const body = {
@@ -136,7 +148,7 @@ export default function ModalForSellWithCustomer(props) {
           <SafeAreaView>
             <KeyboardAvoidingView behavior="padding">
               <Pressable activeOpacity={1} className="bg-white w-full h-full rounded-2xl p-7">
-                <ScrollView>
+                <ScrollView showsVerticalScrollIndicator={false}>
                   <Text className="text-xl font-bold text-[#CD5297] text-center">Оформление продажи</Text>
                   <View className="mt-5">
                     <Text className="font-bold text-base text-[#CD5297] mb-2">Баланс покупателя</Text>
@@ -166,7 +178,7 @@ export default function ModalForSellWithCustomer(props) {
                         data={data.currencies}
                       />
                       <View className="w-3 h-[2px] bg-gray-200 mx-1"></View>
-                      <Text className="font-bold text-lg text-[#CD5297] w-[150]">0</Text>
+                      <Text className={`font-bold text-lg text-[#CD5297] w-[150] ${windowWidth <= 385 && "w-[100] text-sm"}`}>0</Text>
                     </View>
                   </View>
                   <View className="w-full h-[2px] bg-gray-200 my-2 relative z-[-1]"></View>
@@ -184,14 +196,14 @@ export default function ModalForSellWithCustomer(props) {
                       <View className="w-3 h-[2px] bg-gray-200 mx-1"></View>
 
                       <SelectList
-                        dropdownTextStyles={styles.dropdownTextStyles}
-                        dropdownStyles={styles.dropdownStyles}
-                        boxStyles={styles.boxStyles}
+                        dropdownTextStyles={[styles.dropdownTextStyles, windowWidth <= 385 && { fontSize: 14 }]}
+                        dropdownStyles={[styles.dropdownStyles, windowWidth <= 385 && { width: 100 }]}
+                        boxStyles={[styles.boxStyles, windowWidth <= 385 && { width: 100 }]}
                         inputStyles={{ color: "white" }}
                         closeicon={<Icon name="close" color="white" size={25} />}
                         searchicon={<Icon name="search" color="white" size={20} style={{ marginRight: 10 }} />}
                         arrowicon={<Icon name="arrow-down" color="white" size={20} />}
-                        dropdownItemStyles={styles.dropdownItemStyles}
+                        dropdownItemStyles={[styles.dropdownItemStyles, windowWidth <= 385 && { marginHorizontal: 10 }]}
                         defaultOption={defaultCurrency}
                         setSelected={(currency) => {
                           totalPrice(currency);
@@ -209,8 +221,7 @@ export default function ModalForSellWithCustomer(props) {
                       />
                     </View>
                   </View>
-                  <View className="w-full h-[2px] bg-gray-200 my-2 relative z-[-1]"></View>
-
+                  <View className="w-full h-[2px] bg-gray-200 my-2 relative z-[-2]"></View>
                   <View className="relative z-[-2]">
                     <Text className="font-bold text-base text-[#CD5297] mb-2">К оплате</Text>
                     <View className="flex-row items-center justify-between">
@@ -239,20 +250,34 @@ export default function ModalForSellWithCustomer(props) {
                         data={data.currencies}
                       />
                       <View className="w-3 h-[2px] bg-gray-200 mx-1"></View>
-                      <Text className="font-bold text-lg text-[#CD5297] w-[150]">
+                      <Text className={`font-bold text-lg text-[#CD5297] w-[150] ${windowWidth <= 385 && "w-[100] text-sm"}`}>
                         {totalPrice()} {selectedSellPlace.selectedCurency?.name || selectedSellPlace.selectedCurency?.currency?.name}
                       </Text>
                     </View>
-                    <View className="flex-row gap-x-12 mt-5 z-[-1]">
+                    <View className={`flex-row gap-x-12 mt-5 z-[-1] ${windowWidth <= 385 && " gap-x-5"}`}>
                       <View className="gap-y-4">
                         <View className="flex-row items-center">
                           <SellCheckbox
-                            onChange={() => setChecked((prev) => ({ inDebt: false, fromTheBalance: false, cash: true, book: false }))}
+                            onChange={() =>
+                              setChecked((prev) => ({
+                                inDebt: false,
+                                fromTheBalance: false,
+                                cash: true,
+                                reserve: false,
+                              }))
+                            }
                             checked={isChecked.cash}
                           />
                           <TouchableOpacity
                             className="ml-2"
-                            onPress={() => setChecked((prev) => ({ inDebt: false, fromTheBalance: false, cash: true, book: false }))}
+                            onPress={() =>
+                              setChecked((prev) => ({
+                                inDebt: false,
+                                fromTheBalance: false,
+                                cash: true,
+                                reserve: false,
+                              }))
+                            }
                           >
                             <Text className="font-bold text-[#CD5297]">Наличными</Text>
                           </TouchableOpacity>
@@ -260,11 +285,25 @@ export default function ModalForSellWithCustomer(props) {
                         <View className="flex-row items-center">
                           <SellCheckbox
                             checked={isChecked.fromTheBalance}
-                            onChange={() => setChecked((prev) => ({ inDebt: false, fromTheBalance: true, cash: false, book: false }))}
+                            onChange={() =>
+                              setChecked((prev) => ({
+                                inDebt: false,
+                                fromTheBalance: true,
+                                cash: false,
+                                reserve: false,
+                              }))
+                            }
                           />
                           <TouchableOpacity
                             className="ml-2"
-                            onPress={() => setChecked((prev) => ({ inDebt: false, fromTheBalance: true, cash: false, book: false }))}
+                            onPress={() =>
+                              setChecked((prev) => ({
+                                inDebt: false,
+                                fromTheBalance: true,
+                                cash: false,
+                                reserve: false,
+                              }))
+                            }
                           >
                             <Text className="font-bold text-[#CD5297]">С баланса</Text>
                           </TouchableOpacity>
@@ -274,23 +313,51 @@ export default function ModalForSellWithCustomer(props) {
                         <View className="flex-row items-center">
                           <SellCheckbox
                             checked={isChecked.inDebt}
-                            onChange={() => setChecked((prev) => ({ inDebt: true, fromTheBalance: false, cash: false, book: false }))}
+                            onChange={() =>
+                              setChecked((prev) => ({
+                                inDebt: true,
+                                fromTheBalance: false,
+                                cash: false,
+                                reserve: false,
+                              }))
+                            }
                           />
                           <TouchableOpacity
                             className="ml-2"
-                            onPress={() => setChecked((prev) => ({ inDebt: true, fromTheBalance: false, cash: false, book: false }))}
+                            onPress={() =>
+                              setChecked((prev) => ({
+                                inDebt: true,
+                                fromTheBalance: false,
+                                cash: false,
+                                reserve: false,
+                              }))
+                            }
                           >
                             <Text className="font-bold text-[#CD5297]">В долг</Text>
                           </TouchableOpacity>
                         </View>
                         <View className="flex-row items-center">
                           <SellCheckbox
-                            checked={isChecked.book}
-                            onChange={() => setChecked((prev) => ({ inDebt: false, fromTheBalance: false, cash: false, book: true }))}
+                            checked={isChecked.reserve}
+                            onChange={() =>
+                              setChecked((prev) => ({
+                                inDebt: false,
+                                fromTheBalance: false,
+                                cash: false,
+                                reserve: true,
+                              }))
+                            }
                           />
                           <TouchableOpacity
                             className="ml-2"
-                            onPress={() => setChecked((prev) => ({ inDebt: false, fromTheBalance: false, cash: false, book: true }))}
+                            onPress={() =>
+                              setChecked((prev) => ({
+                                inDebt: false,
+                                fromTheBalance: false,
+                                cash: false,
+                                reserve: true,
+                              }))
+                            }
                           >
                             <Text className="font-bold text-[#CD5297]">Забронировать</Text>
                           </TouchableOpacity>
@@ -298,21 +365,70 @@ export default function ModalForSellWithCustomer(props) {
                       </View>
                     </View>
                   </View>
-
                   <View className="w-full h-[2px] bg-gray-200 my-2 z-[-3]"></View>
 
-                  <View className="my-2 z-[-3]">
-                    <View className="flex-row items-center">
-                      <SellCheckbox onChange={() => setPaymentInTwoCurrencies((prev) => !prev)} checked={paymentInTwoCurrnecies} />
-                      <TouchableOpacity onPress={() => setPaymentInTwoCurrencies((prev) => !prev)}>
-                        <Text className="font-bold text-[#CD5297] ml-2">Оплата двумя валютами</Text>
-                      </TouchableOpacity>
-                    </View>
+                  {isReserve && (
+                    <>
+                      <View className="my-2 z-[-3]">
+                        <View className="flex-row items-center">
+                          <SellCheckbox onChange={() => setPaymentInTwoCurrencies((prev) => !prev)} checked={paymentInTwoCurrnecies} />
+                          <TouchableOpacity onPress={() => setPaymentInTwoCurrencies((prev) => !prev)}>
+                            <Text className="font-bold text-[#CD5297] ml-2">Оплата двумя валютами</Text>
+                          </TouchableOpacity>
+                        </View>
 
-                    {paymentInTwoCurrnecies && (
-                      <View>
-                        <Text className="font-bold text-base text-[#CD5297] my-2">Дополнительная валюта</Text>
-                        <View className="flex-row items-center justify-between">
+                        {paymentInTwoCurrnecies && (
+                          <View>
+                            <Text className="font-bold text-base text-[#CD5297] my-2">Дополнительная валюта</Text>
+                            <View className="flex-row items-center justify-between">
+                              <TextInput
+                                onChangeText={handleTextChange}
+                                value={cashAmount}
+                                keyboardType="numeric"
+                                placeholder="Введите сумму..."
+                                placeholderTextColor="white"
+                                style={styles.inputStyles}
+                              />
+                              <View className="w-3 h-[2px] bg-gray-200 mx-1"></View>
+                              <SelectList
+                                dropdownTextStyles={[styles.dropdownTextStyles, windowWidth <= 385 && { fontSize: 14 }]}
+                                dropdownStyles={[styles.dropdownStyles, windowWidth <= 385 && { width: 100 }]}
+                                boxStyles={[styles.boxStyles, windowWidth <= 385 && { width: 100 }]}
+                                inputStyles={{ color: "white" }}
+                                closeicon={<Icon name="close" color="white" size={25} />}
+                                searchicon={<Icon name="search" color="white" size={20} style={{ marginRight: 10 }} />}
+                                arrowicon={<Icon name="arrow-down" color="white" size={20} />}
+                                dropdownItemStyles={[
+                                  styles.dropdownItemStyles,
+                                  windowWidth <= 385 && {
+                                    marginHorizontal: 10,
+                                  },
+                                ]}
+                                defaultOption={defaultCurrency}
+                                setSelected={(currency) => {
+                                  totalPrice(currency);
+                                  setSelectedSellPlace({
+                                    ...selectedSellPlace,
+                                    selectedCurency: currency,
+                                  });
+                                  const newTotal = totalPrice(currency);
+                                  setTotalAmount(newTotal);
+                                  calculateChange(cashAmount, newTotal);
+                                }}
+                                placeholder={"Выбрать валюту"}
+                                search={false}
+                                data={data.currencies}
+                              />
+                            </View>
+                          </View>
+                        )}
+                      </View>
+
+                      <View className="w-full h-[2px] bg-gray-200 my-2 z-[-4]"></View>
+
+                      <View className="mb-1 z-[-5]">
+                        <Text className="font-bold text-base text-[#CD5297] mb-2">Основная валюта</Text>
+                        <View className="flex-row items-center justify-between ">
                           <TextInput
                             onChangeText={handleTextChange}
                             value={cashAmount}
@@ -322,9 +438,93 @@ export default function ModalForSellWithCustomer(props) {
                             style={styles.inputStyles}
                           />
                           <View className="w-3 h-[2px] bg-gray-200 mx-1"></View>
+                          <Text className={`font-bold text-lg text-[#CD5297] w-[150] ${windowWidth <= 385 && "w-[100] text-sm"}`}>
+                            {selectedSellPlace.selectedCurency?.name || selectedSellPlace.selectedCurency?.currency?.name}
+                          </Text>
+                        </View>
+                      </View>
+
+                      {isChecked.fromTheBalance && (
+                        <View>
+                          <View className="w-full h-[2px] bg-gray-200 my-2 z-[-4]"></View>
+                          <Text className="font-bold text-base text-[#CD5297] mb-2">Сдача в баланс</Text>
+                          <View className="flex-row items-center justify-between">
+                            <SelectList
+                              dropdownTextStyles={styles.dropdownTextStyles}
+                              dropdownStyles={styles.dropdownStyles}
+                              boxStyles={styles.boxStyles}
+                              inputStyles={{ color: "white" }}
+                              closeicon={<Icon name="close" color="white" size={25} />}
+                              searchicon={<Icon name="search" color="white" size={20} style={{ marginRight: 10 }} />}
+                              arrowicon={<Icon name="arrow-down" color="white" size={20} />}
+                              dropdownItemStyles={styles.dropdownItemStyles}
+                              defaultOption={defaultCurrency}
+                              setSelected={(currency) => {
+                                totalPrice(currency);
+                                setSelectedSellPlace({
+                                  ...selectedSellPlace,
+                                  selectedCurency: currency,
+                                });
+                                const newTotal = totalPrice(currency);
+                                setTotalAmount(newTotal);
+                                calculateChange(cashAmount, newTotal);
+                              }}
+                              placeholder={"Выбрать валюту"}
+                              search={false}
+                              data={data.currencies}
+                            />
+                            <View className="w-3 h-[2px] bg-gray-200 mx-1"></View>
+                            <Text className={`font-bold text-lg text-[#CD5297] w-[150] ${windowWidth <= 385 && "w-[100] text-sm"}`}>0</Text>
+                          </View>
+                        </View>
+                      )}
+
+                      {isChecked.inDebt && (
+                        <View>
+                          <View className="w-full h-[2px] bg-gray-200 my-2 z-[-4]"></View>
+                          <Text className="font-bold text-base text-[#CD5297] mb-2">Сумма долга</Text>
+                          <View className="flex-row items-center justify-between">
+                            <SelectList
+                              dropdownTextStyles={styles.dropdownTextStyles}
+                              dropdownStyles={styles.dropdownStyles}
+                              boxStyles={styles.boxStyles}
+                              inputStyles={{ color: "white" }}
+                              closeicon={<Icon name="close" color="white" size={25} />}
+                              searchicon={<Icon name="search" color="white" size={20} style={{ marginRight: 10 }} />}
+                              arrowicon={<Icon name="arrow-down" color="white" size={20} />}
+                              dropdownItemStyles={styles.dropdownItemStyles}
+                              defaultOption={defaultCurrency}
+                              setSelected={(currency) => {
+                                totalPrice(currency);
+                                setSelectedSellPlace({
+                                  ...selectedSellPlace,
+                                  selectedCurency: currency,
+                                });
+                                const newTotal = totalPrice(currency);
+                                setTotalAmount(newTotal);
+                                calculateChange(cashAmount, newTotal);
+                              }}
+                              placeholder={"Выбрать валюту"}
+                              search={false}
+                              data={data.currencies}
+                            />
+                            <View className="w-3 h-[2px] bg-gray-200 mx-1"></View>
+                            <Text className={`font-bold text-lg text-[#CD5297] w-[150] ${windowWidth <= 385 && "w-[100] text-sm"}`}>0</Text>
+                          </View>
+                        </View>
+                      )}
+
+                      <View className="w-full h-[2px] bg-gray-200 my-2 z-[-4]"></View>
+                    </>
+                  )}
+                  {isChecked.cash && (
+                    <>
+                      <View className="">
+                        <Text className="font-bold text-base text-[#CD5297] mb-2">Сдача</Text>
+                        <View className="flex-row items-center justify-between">
                           <SelectList
                             dropdownTextStyles={styles.dropdownTextStyles}
-                            dropdownStyles={styles.dropdownStyles}
+                            dropdownStyles={[styles.dropdownStyles, styles.dropdownChangeStyle]}
                             boxStyles={styles.boxStyles}
                             inputStyles={{ color: "white" }}
                             closeicon={<Icon name="close" color="white" size={25} />}
@@ -346,64 +546,40 @@ export default function ModalForSellWithCustomer(props) {
                             search={false}
                             data={data.currencies}
                           />
+                          <View className="w-3 h-[2px] bg-gray-200 mx-1"></View>
+                          <Text className={`font-bold text-lg text-[#CD5297] w-[150] ${windowWidth <= 385 && "w-[100] text-sm"}`}>0</Text>
                         </View>
                       </View>
-                    )}
-                  </View>
 
-                  <View className="w-full h-[2px] bg-gray-200 my-2 z-[-4]"></View>
+                      <View className="flex-row items-center my-2">
+                        <SellCheckbox onChange={() => setBalanceSheet((prev) => !prev)} checked={balanceSheet} />
+                        <Text className="ml-2 font-bold text-[#CD5297]">Добавить сдачу в баланс</Text>
+                      </View>
 
-                  <View className="mb-1 z-[-5]">
-                    <Text className="font-bold text-base text-[#CD5297] mb-2">Основная валюта</Text>
-                    <View className="flex-row items-center justify-between ">
-                      <TextInput
-                        onChangeText={handleTextChange}
-                        value={cashAmount}
-                        keyboardType="numeric"
-                        placeholder="Введите сумму..."
-                        placeholderTextColor="white"
-                        style={styles.inputStyles}
-                      />
-                      <View className="w-3 h-[2px] bg-gray-200 mx-1"></View>
-                      <Text className="font-bold text-lg text-[#CD5297] w-[150]">
-                        {selectedSellPlace.selectedCurency?.name || selectedSellPlace.selectedCurency?.currency?.name}
-                      </Text>
+                      <View className="w-full h-[2px] bg-gray-200 my-2 z-[-4]"></View>
+                    </>
+                  )}
+
+                  {isChecked.reserve && (
+                    <View className="mb-1 z-[-5]">
+                      <Text className="font-bold text-base text-[#CD5297] mb-2">Предоплата</Text>
+                      <View className="flex-row items-center justify-between ">
+                        <TextInput
+                          onChangeText={handleTextChange}
+                          value={cashAmount}
+                          keyboardType="numeric"
+                          placeholder="Введите сумму..."
+                          placeholderTextColor="white"
+                          style={styles.inputStyles}
+                        />
+                        <View className="w-3 h-[2px] bg-gray-200 mx-1"></View>
+                        <Text className={`font-bold text-lg text-[#CD5297] w-[150] ${windowWidth <= 385 && "w-[100] text-sm"}`}>
+                          {selectedSellPlace.selectedCurency?.name || selectedSellPlace.selectedCurency?.currency?.name}
+                        </Text>
+                      </View>
+                      <View className="w-full h-[2px] bg-gray-200 mb-4 mt-2 z-[-4]"></View>
                     </View>
-                  </View>
-
-                  <View className="w-full h-[2px] bg-gray-200 my-2 z-[-4]"></View>
-
-                  <View className="">
-                    <Text className="font-bold text-base text-[#CD5297] mb-2">Сдача</Text>
-                    <View className="flex-row items-center justify-between">
-                      <SelectList
-                        dropdownTextStyles={styles.dropdownTextStyles}
-                        dropdownStyles={[styles.dropdownStyles, styles.dropdownChangeStyle]}
-                        boxStyles={styles.boxStyles}
-                        inputStyles={{ color: "white" }}
-                        closeicon={<Icon name="close" color="white" size={25} />}
-                        searchicon={<Icon name="search" color="white" size={20} style={{ marginRight: 10 }} />}
-                        arrowicon={<Icon name="arrow-down" color="white" size={20} />}
-                        dropdownItemStyles={styles.dropdownItemStyles}
-                        defaultOption={defaultCurrency}
-                        setSelected={(currency) => {
-                          totalPrice(currency);
-                          setSelectedSellPlace({
-                            ...selectedSellPlace,
-                            selectedCurency: currency,
-                          });
-                          const newTotal = totalPrice(currency);
-                          setTotalAmount(newTotal);
-                          calculateChange(cashAmount, newTotal);
-                        }}
-                        placeholder={"Выбрать валюту"}
-                        search={false}
-                        data={data.currencies}
-                      />
-                      <View className="w-3 h-[2px] bg-gray-200 mx-1"></View>
-                      <Text className="font-bold text-lg text-[#CD5297] w-[150]">0</Text>
-                    </View>
-                  </View>
+                  )}
 
                   <View className="flex-row justify-between items-center mt-8 z-[-1]">
                     <TouchableOpacity onPress={() => setModalVisible(!modalVisible)}>
@@ -446,6 +622,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#ED83C1",
     borderRadius: 20,
     justifyContent: "center",
+    alignItems: "center",
     marginVertical: 3,
     marginHorizontal: 20,
   },
