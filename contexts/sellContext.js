@@ -140,6 +140,11 @@ const SellContextProvider = ({ children }) => {
     }
   }
 
+  async function createUser(name) {
+    let res = await api.post(`${ENDPOINTS.CUSTOMERS}`, name);
+    return res;
+  }
+
   return (
     <sellContext.Provider
       value={{
@@ -170,6 +175,7 @@ const SellContextProvider = ({ children }) => {
         setModalCheck,
         setModalConfirm,
         setWithOutCustomerModal,
+        createUser,
       }}
     >
       {children}

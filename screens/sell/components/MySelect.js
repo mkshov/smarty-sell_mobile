@@ -3,9 +3,10 @@ import { Platform, StyleSheet, TextInput, Text, View, TouchableOpacity, ScrollVi
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { sellContext } from "../../../contexts/sellContext";
 import debounce from "lodash.debounce";
+import { showMessage } from "react-native-flash-message";
 
 export default function MySelect({ data, defaultOption, onSelect, title }) {
-  const { getSellCustomers } = useContext(sellContext);
+  const { getSellCustomers, createUser, setSelectedSellPlace } = useContext(sellContext);
   const [open, setOpen] = useState(false);
   const [inputValue, setInputValue] = useState(defaultOption ? defaultOption.value : "");
   const [filteredData, setFilteredData] = useState(data ? data : []);
@@ -25,7 +26,6 @@ export default function MySelect({ data, defaultOption, onSelect, title }) {
     }
   };
 
-  // Используем useMemo, чтобы создать дебаунс-функцию один раз
   const handleTextDebounce = useMemo(
     () =>
       debounce(async (text) => {
@@ -42,19 +42,33 @@ export default function MySelect({ data, defaultOption, onSelect, title }) {
         }));
         setFilteredData(searchCustomers);
         setLoading(false);
-      }, 500),
+      }, 600),
     [getSellCustomers]
   );
 
   const handleInputChange = (text) => {
-    setInputValue(text); // Обновляем текст немедленно
-    handleTextDebounce(text); // Обрабатываем текст с дебаунсом
+    setInputValue(text);
+    handleTextDebounce(text);
   };
 
   const handleClearInput = () => {
     setInputValue("");
     onSelect(null);
+    setSelectedSellPlace((prev) => ({ ...prev, withOutCustomer: false }));
     setOpen((prev) => !prev);
+  };
+
+  const handleCreateUser = async () => {
+    const newUser = {
+      name: inputValue,
+    };
+
+    await createUser(newUser);
+    showMessage({
+      message: `Пользователь - ${inputValue} успешно создан!`,
+      type: "success",
+    });
+    handleClearInput();
   };
 
   return (
@@ -85,7 +99,7 @@ export default function MySelect({ data, defaultOption, onSelect, title }) {
         <View style={styles.dropdownStyles}>
           <ScrollView>
             {loading ? (
-              <Text>Загрузка...</Text>
+              <Text style={styles.loadingText}>Загрузка...</Text>
             ) : (
               filteredData.map((item, index) => (
                 <TouchableOpacity key={index} onPress={() => handleSelect(item)} style={styles.dropdownItemStyles}>
@@ -95,9 +109,12 @@ export default function MySelect({ data, defaultOption, onSelect, title }) {
             )}
 
             {!loading && !filteredData.length && (
-              <TouchableOpacity>
-                <Text>Создать покупателя "{inputValue}"</Text>
-              </TouchableOpacity>
+              <View>
+                <Text style={styles.userNotDefined}>Пользователь не найден :(</Text>
+                <TouchableOpacity onPress={handleCreateUser} style={styles.dropdownItemStyles}>
+                  <Text style={styles.dropdownTextStyles}>Создать покупателя "{inputValue}"</Text>
+                </TouchableOpacity>
+              </View>
             )}
           </ScrollView>
         </View>
@@ -167,5 +184,15 @@ const styles = StyleSheet.create({
     marginVertical: 3,
     marginHorizontal: 20,
     paddingLeft: 20,
+  },
+  loadingText: {
+    fontWeight: "600",
+    marginLeft: 20,
+    marginVertical: 3,
+  },
+  userNotDefined: {
+    marginHorizontal: 25,
+    marginVertical: 3,
+    fontWeight: "500",
   },
 });

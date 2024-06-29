@@ -25,6 +25,8 @@ import { showMessage } from "react-native-flash-message";
 import { useNavigation } from "@react-navigation/native";
 import { err } from "react-native-svg";
 import SellCheckbox from "../components/CheckBox";
+import CustomerBalance from "./components/CustomerBalance";
+import AdditionalServices from "./components/AdditionalServices";
 
 export default function ModalForSellWithCustomer(props) {
   const { modalVisible, setModalVisible, data, selectedSellPlace, setSelectedSellPlace, totalPrice, sellCart } = props;
@@ -150,77 +152,9 @@ export default function ModalForSellWithCustomer(props) {
               <Pressable activeOpacity={1} className="bg-white w-full h-full rounded-2xl p-7">
                 <ScrollView showsVerticalScrollIndicator={false}>
                   <Text className="text-xl font-bold text-[#CD5297] text-center">Оформление продажи</Text>
-                  <View className="mt-5">
-                    <Text className="font-bold text-base text-[#CD5297] mb-2">Баланс покупателя</Text>
-                    <View className="flex-row items-center justify-between">
-                      <SelectList
-                        dropdownTextStyles={styles.dropdownTextStyles}
-                        dropdownStyles={styles.dropdownStyles}
-                        boxStyles={styles.boxStyles}
-                        inputStyles={{ color: "white" }}
-                        closeicon={<Icon name="close" color="white" size={25} />}
-                        searchicon={<Icon name="search" color="white" size={20} style={{ marginRight: 10 }} />}
-                        arrowicon={<Icon name="arrow-down" color="white" size={20} />}
-                        dropdownItemStyles={styles.dropdownItemStyles}
-                        defaultOption={defaultCurrency}
-                        setSelected={(currency) => {
-                          totalPrice(currency);
-                          setSelectedSellPlace({
-                            ...selectedSellPlace,
-                            selectedCurency: currency,
-                          });
-                          const newTotal = totalPrice(currency);
-                          setTotalAmount(newTotal);
-                          calculateChange(cashAmount, newTotal);
-                        }}
-                        placeholder={"Выбрать валюту"}
-                        search={false}
-                        data={data.currencies}
-                      />
-                      <View className="w-3 h-[2px] bg-gray-200 mx-1"></View>
-                      <Text className={`font-bold text-lg text-[#CD5297] w-[150] ${windowWidth <= 385 && "w-[100] text-sm"}`}>0</Text>
-                    </View>
-                  </View>
+                  <CustomerBalance defaultCurrency={defaultCurrency} data={data} />
                   <View className="w-full h-[2px] bg-gray-200 my-2 relative z-[-1]"></View>
-                  <View className="relative z-[-1]">
-                    <Text className="font-bold text-base text-[#CD5297] mb-2">Дополнительные услуги</Text>
-                    <View className="flex-row items-center justify-between">
-                      <TextInput
-                        onChangeText={handleTextChange}
-                        value={cashAmount}
-                        keyboardType="numeric"
-                        placeholder="Введите сумму..."
-                        placeholderTextColor="white"
-                        style={styles.inputStyles}
-                      />
-                      <View className="w-3 h-[2px] bg-gray-200 mx-1"></View>
-
-                      <SelectList
-                        dropdownTextStyles={[styles.dropdownTextStyles, windowWidth <= 385 && { fontSize: 14 }]}
-                        dropdownStyles={[styles.dropdownStyles, windowWidth <= 385 && { width: 100 }]}
-                        boxStyles={[styles.boxStyles, windowWidth <= 385 && { width: 100 }]}
-                        inputStyles={{ color: "white" }}
-                        closeicon={<Icon name="close" color="white" size={25} />}
-                        searchicon={<Icon name="search" color="white" size={20} style={{ marginRight: 10 }} />}
-                        arrowicon={<Icon name="arrow-down" color="white" size={20} />}
-                        dropdownItemStyles={[styles.dropdownItemStyles, windowWidth <= 385 && { marginHorizontal: 10 }]}
-                        defaultOption={defaultCurrency}
-                        setSelected={(currency) => {
-                          totalPrice(currency);
-                          setSelectedSellPlace({
-                            ...selectedSellPlace,
-                            selectedCurency: currency,
-                          });
-                          const newTotal = totalPrice(currency);
-                          setTotalAmount(newTotal);
-                          calculateChange(cashAmount, newTotal);
-                        }}
-                        placeholder={"Выбрать валюту"}
-                        search={false}
-                        data={data.currencies}
-                      />
-                    </View>
-                  </View>
+                  <AdditionalServices data={data} defaultCurrency={defaultCurrency} />
                   <View className="w-full h-[2px] bg-gray-200 my-2 relative z-[-2]"></View>
                   <View className="relative z-[-2]">
                     <Text className="font-bold text-base text-[#CD5297] mb-2">К оплате</Text>
