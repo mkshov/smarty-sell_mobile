@@ -59,7 +59,12 @@ export default function SellCart({ navigation }) {
   };
 
   const handleQuantityChange = (index, newQuantity, action, item) => {
-    const quantity = parseInt(newQuantity, 10) || 0;
+    const quantity = newQuantity ? parseInt(newQuantity, 10) : 0;
+
+    if (isNaN(quantity)) {
+      return;
+    }
+
     const updatedCart = [...sellCart];
     const stockQuantity = updatedCart[index].quantity;
 
@@ -69,19 +74,7 @@ export default function SellCart({ navigation }) {
 
     if (quantity <= stockQuantity) {
       updatedCart[index].newQuantity = quantity;
-      // updatedCart[index].discountPrice = parseInt(
-      //   calculateDiscountedPrice(
-      //     convertPrice(item.product.price_rule.price, selectedSellPlace.selectedCurency.rate),
-      //     selectedSellPlace.selectedCustomer?.discount
-      //   ).toFixed(2)
 
-      // );
-      console.log(
-        calculateDiscountedPrice(
-          convertPrice(item.product.price_rule.price, selectedSellPlace.selectedCurency.rate),
-          selectedSellPlace.selectedCustomer?.discount
-        ).toFixed(2)
-      );
       setSellCart(updatedCart);
     } else {
       showMessage({

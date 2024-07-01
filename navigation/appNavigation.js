@@ -67,8 +67,8 @@ export default function AppNavigation() {
 
         // drawerContent={(props) => <CustomDrawer {...props} />}
       >
-        <Stack.Screen name="login" options={{ headerShown: false, swipeEnabled: false }} component={LoginScreen} />
         <Stack.Screen name="work-places" options={{ headerShown: false, swipeEnabled: false }} component={ChooseWorkPlace} />
+        <Stack.Screen name="login" options={{ headerShown: false, swipeEnabled: false }} component={LoginScreen} />
         <Stack.Screen name="/" options={{ headerShown: false }} component={HomePage} />
         <Stack.Screen name="create-transfers" options={{ title: "Создать отгрузку" }} component={CreateShipment} />
         <Stack.Screen name="add-product-for-transfer" component={AddProductForTransfer} />

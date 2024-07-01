@@ -8,13 +8,21 @@ export default function AdditionalServices({ data, defaultCurrency }) {
   const windowWidth = useWindowDimensions().width;
 
   const [cash, setCash] = useState("");
+  console.log("cash: ", cash);
 
   function handleTextChange(text) {
-    setCash(text);
+    let newText = text.replace(/,/g, ".");
+
+    const parts = newText.split(".");
+    if (parts.length > 2) {
+      newText = parts[0] + "." + parts.slice(1).join("");
+    }
+
+    setCash(newText);
   }
 
   return (
-    <View className="relative z-[-1]">
+    <View className="relative z-[11]">
       <Text className="font-bold text-base text-[#CD5297] mb-2">Дополнительные услуги</Text>
       <View className="flex-row items-center justify-between">
         <TextInput

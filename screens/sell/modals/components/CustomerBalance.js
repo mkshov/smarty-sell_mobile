@@ -8,17 +8,17 @@ export default function CustomerBalance({ defaultCurrency, data }) {
   const windowWidth = useWindowDimensions().width;
 
   return (
-    <View className="mt-5">
+    <View className="relative z-[5]">
       <Text className="font-bold text-base text-[#CD5297] mb-2">Баланс покупателя</Text>
       <View className="flex-row items-center justify-between">
         <SelectList
           dropdownTextStyles={styles.dropdownTextStyles}
-          dropdownStyles={styles.dropdownStyles}
+          dropdownStyles={[styles.dropdownStyles, styles.dropdownChangeStyle]}
           boxStyles={styles.boxStyles}
           inputStyles={{ color: "white" }}
           closeicon={<Icon name="close" color="white" size={25} />}
           searchicon={<Icon name="search" color="white" size={20} style={{ marginRight: 10 }} />}
-          arrowicon={<Icon name="arrow-down" color="white" size={20} />}
+          arrowicon={<Icon name="arrow-up" color="white" size={20} />}
           dropdownItemStyles={styles.dropdownItemStyles}
           defaultOption={defaultCurrency}
           setSelected={(currency) => {

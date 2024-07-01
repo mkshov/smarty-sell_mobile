@@ -4,15 +4,15 @@ import Ionicons from "react-native-vector-icons/Ionicons";
 export default function SellCheckbox({ onChange, checked }) {
   return (
     <Pressable style={[styles.checkboxBase, checked && styles.checkboxChecked]} onPress={onChange}>
-      {checked && <Ionicons name="checkmark" size={18} color="white" />}
+      {checked && <Ionicons name="checkmark" size={20} color="white" />}
     </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
   checkboxBase: {
-    width: 20,
-    height: 20,
+    width: 25,
+    height: 25,
     justifyContent: "center",
     alignItems: "center",
     borderRadius: 4,
