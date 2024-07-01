@@ -8,24 +8,12 @@ import { SelectList } from "react-native-dropdown-select-list";
 import { sellContext } from "../../../../contexts/sellContext";
 import CustomerBalance from "./CustomerBalance";
 
-export default function NotReserve({ data, defaultCurrency, isChecked }) {
+export default function NotReserve({ data, defaultCurrency, isChecked, handleChange, cashAmount }) {
   const windowWidth = useWindowDimensions().width;
 
   const { selectedSellPlace } = useContext(sellContext);
 
   const [paymentInTwoCurrnecies, setPaymentInTwoCurrencies] = useState(false);
-  const [cashAmount, setCashAmount] = useState("");
-
-  function handleTextChange(text) {
-    let newText = text.replace(/,/g, ".");
-
-    const parts = newText.split(".");
-    if (parts.length > 2) {
-      newText = parts[0] + "." + parts.slice(1).join("");
-    }
-
-    setCashAmount(newText);
-  }
 
   return (
     <>
@@ -82,7 +70,7 @@ export default function NotReserve({ data, defaultCurrency, isChecked }) {
         <Text className="font-bold text-base text-[#CD5297] mb-2">Основная валюта</Text>
         <View className="flex-row items-center justify-between ">
           <TextInput
-            onChangeText={handleTextChange}
+            onChangeText={handleChange}
             value={cashAmount}
             keyboardType="numeric"
             placeholder="Введите сумму..."

@@ -4,21 +4,18 @@ import { SelectList } from "react-native-dropdown-select-list";
 import Icon from "react-native-vector-icons/Ionicons";
 import { styles } from "../styles";
 
-export default function AdditionalServices({ data, defaultCurrency }) {
+export default function AdditionalServices({ data, defaultCurrency, onChange }) {
   const windowWidth = useWindowDimensions().width;
-
   const [cash, setCash] = useState("");
-  console.log("cash: ", cash);
 
   function handleTextChange(text) {
     let newText = text.replace(/,/g, ".");
-
     const parts = newText.split(".");
     if (parts.length > 2) {
       newText = parts[0] + "." + parts.slice(1).join("");
     }
-
     setCash(newText);
+    onChange(parseFloat(newText) || 0); // Notify parent about the change
   }
 
   return (
@@ -45,9 +42,7 @@ export default function AdditionalServices({ data, defaultCurrency }) {
           arrowicon={<Icon name="arrow-down" color="white" size={20} />}
           dropdownItemStyles={[styles.dropdownItemStyles, windowWidth <= 385 && { marginHorizontal: 10 }]}
           defaultOption={defaultCurrency}
-          setSelected={(currency) => {
-            console.log("currency: ", currency);
-          }}
+          setSelected={(currency) => {}}
           search={false}
           data={data.currencies}
         />

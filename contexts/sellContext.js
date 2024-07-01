@@ -37,6 +37,7 @@ const SellContextProvider = ({ children }) => {
     selectedCurency: null,
     selectedCustomer: null,
     withOutCustomer: false,
+    customer: null,
   });
   const [sellCart, setSellCart] = useState([]);
   const [productStates, setProductStates] = useState([]);
@@ -45,6 +46,7 @@ const SellContextProvider = ({ children }) => {
   const [modalCheck, setModalCheck] = useState(false);
   const [modalConfirm, setModalConfirm] = useState(false);
   const [withOutCustomerModal, setWithOutCustomerModal] = useState(false);
+  const [baseCurrency, setBaseCurrency] = useState(null);
 
   const getSellPlaces = async (params) => {
     setIsLoading(true);
@@ -89,10 +91,24 @@ const SellContextProvider = ({ children }) => {
     }
   };
 
+  const getCustomer = async (id) => {
+    setIsLoading(true);
+    try {
+      const { data } = await api.get(`${ENDPOINTS.CUSTOMERS}${id}/`);
+      setIsLoading(false);
+      setSelectedSellPlace((prev) => ({ ...prev, customer: data }));
+
+      return data;
+    } catch (error) {
+      setIsLoading(false);
+
+      console.log("error: ", error);
+    }
+  };
+
   const loadCart = async () => {
     try {
       const cartData = await AsyncStorage.getItem("sellCart");
-      console.log("cartData: ", JSON.parse(cartData));
       if (cartData !== null) {
         setSellCart(JSON.parse(cartData));
       }
@@ -176,6 +192,7 @@ const SellContextProvider = ({ children }) => {
         setModalConfirm,
         setWithOutCustomerModal,
         createUser,
+        getCustomer,
       }}
     >
       {children}

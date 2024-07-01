@@ -32,9 +32,9 @@ export default function SellScreen({ navigation }) {
     setSellCart,
     withOutCustomerModal,
     setWithOutCustomerModal,
+    getCustomer,
   } = useContext(sellContext);
 
-  console.log("selectedSellPlace: ", selectedSellPlace);
   const { getSavedPlace, savedPlace } = useContext(workPlaceContext);
 
   const [modalVisible, setModalVisible] = useState(false);
@@ -110,7 +110,7 @@ export default function SellScreen({ navigation }) {
           >
             <View>
               <SelectDropdown
-                zIndex={3}
+                zIndex={22}
                 title="Продать товар из другой точки"
                 data={data.places}
                 defaultOption={data.basePlace}
@@ -127,17 +127,20 @@ export default function SellScreen({ navigation }) {
                 data={data.currencies}
                 defaultOption={data.baseCurrency}
                 onSelect={(currency) => {
-                  setSelectedSellPlace({
-                    ...selectedSellPlace,
+                  "currency: ", currency;
+                  setSelectedSellPlace((prevState) => ({
+                    ...prevState,
                     selectedCurency: currency,
-                  });
+                  }));
                 }}
               />
               <MySelect
                 title="Покупатель"
                 data={data.customers}
                 onSelect={(customer) => {
-                  console.log("customer: ", customer);
+                  if (customer) {
+                    getCustomer(customer.id);
+                  }
                   setSelectedSellPlace({
                     ...selectedSellPlace,
                     selectedCustomer: customer,

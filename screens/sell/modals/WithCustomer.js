@@ -29,21 +29,21 @@ import CustomerBalance from "./components/CustomerBalance";
 import AdditionalServices from "./components/AdditionalServices";
 import ToPay from "./components/ToPay";
 import NotReserve from "./components/NotReserve";
+import SellChangeWithCustomer from "./components/Change";
+import SellWithCustomerReserve from "./components/Reserve";
 
 export default function ModalForSellWithCustomer(props) {
   const { modalVisible, setModalVisible, data, selectedSellPlace, setSelectedSellPlace, totalPrice, sellCart } = props;
-  console.log("selectedSellPlace: ", selectedSellPlace);
 
   const windowWidth = useWindowDimensions().width;
   const navigation = useNavigation();
-
-  console.log("windowWidth: ", windowWidth);
 
   const { sendProductsWithOutCustomer, setSellCart, changeAmount, setChangeAmount, error, modalCheck, setModalCheck, modalConfirm, setModalConfirm } =
     useContext(sellContext);
 
   const [cashAmount, setCashAmount] = useState("");
   const [totalAmount, setTotalAmount] = useState(totalPrice());
+  const [additionalAmount, setAdditionalAmount] = useState(0);
 
   const [disabled, setDisabled] = useState(true);
   const [disabledStyle, setDisabledStyle] = useState(null);
@@ -55,8 +55,6 @@ export default function ModalForSellWithCustomer(props) {
     inDebt: false,
     reserve: false,
   });
-
-  const [balanceSheet, setBalanceSheet] = useState(false);
 
   useEffect(() => {
     if (disabled) {
@@ -72,7 +70,7 @@ export default function ModalForSellWithCustomer(props) {
     };
   }, []);
 
-  const handleTextChange = (text) => {
+  const handleCashCashChange = (text) => {
     let newText = text.replace(/,/g, ".");
 
     const parts = newText.split(".");
@@ -86,9 +84,10 @@ export default function ModalForSellWithCustomer(props) {
 
   const calculateChange = (amount) => {
     const cash = parseFloat(amount) || 0;
-    const total = parseFloat(totalAmount) || parseFloat(totalPrice());
+    const total = parseFloat(totalAmount) + additionalAmount;
     const change = cash > total ? (cash - total).toFixed(2) : 0;
     cash < total || total === 0 ? setDisabled(true) : setDisabled(false);
+    console.log("change: ", change);
     setChangeAmount(change);
   };
 
@@ -158,77 +157,30 @@ export default function ModalForSellWithCustomer(props) {
               <Pressable activeOpacity={1} className="bg-white w-full h-full rounded-2xl p-7">
                 <ScrollView showsVerticalScrollIndicator={false}>
                   <Text className="text-xl font-bold text-[#CD5297] text-center">Оформление продажи</Text>
-                  <ToPay data={data} defaultCurrency={defaultCurrency} setChecked={setChecked} isChecked={isChecked} />
+                  <ToPay
+                    data={data}
+                    defaultCurrency={defaultCurrency}
+                    setChecked={setChecked}
+                    calculateChange={calculateChange}
+                    isChecked={isChecked}
+                    setTotalAmount={setTotalAmount}
+                  />
 
-                  <AdditionalServices data={data} defaultCurrency={defaultCurrency} />
+                  <AdditionalServices data={data} defaultCurrency={defaultCurrency} onChange={setAdditionalAmount} />
                   <View className="w-full h-[2px] bg-gray-200 my-2 relative z-[-2]"></View>
 
-                  {!isChecked.reserve && <NotReserve data={data} defaultCurrency={defaultCurrency} isChecked={isChecked} />}
-                  {isChecked.cash && (
-                    <>
-                      <View className="relative z-[12]">
-                        <Text className="font-bold text-base text-[#CD5297] mb-2">Сдача</Text>
-                        <View className="flex-row items-center justify-between">
-                          <SelectList
-                            dropdownTextStyles={styles.dropdownTextStyles}
-                            dropdownStyles={[styles.dropdownStyles, styles.dropdownChangeStyle]}
-                            boxStyles={styles.boxStyles}
-                            inputStyles={{ color: "white" }}
-                            closeicon={<Icon name="close" color="white" size={25} />}
-                            searchicon={<Icon name="search" color="white" size={20} style={{ marginRight: 10 }} />}
-                            arrowicon={<Icon name="arrow-up" color="white" size={20} />}
-                            dropdownItemStyles={styles.dropdownItemStyles}
-                            defaultOption={defaultCurrency}
-                            setSelected={(currency) => {
-                              totalPrice(currency);
-                              setSelectedSellPlace({
-                                ...selectedSellPlace,
-                                selectedCurency: currency,
-                              });
-                              const newTotal = totalPrice(currency);
-                              setTotalAmount(newTotal);
-                              calculateChange(cashAmount, newTotal);
-                            }}
-                            placeholder={"Выбрать валюту"}
-                            search={false}
-                            data={data.currencies}
-                          />
-                          <View className="w-3 h-[2px] bg-gray-200 mx-1"></View>
-                          <Text className={`font-bold text-lg text-[#CD5297] w-[150] ${windowWidth <= 385 && "w-[100] text-sm"}`}>0</Text>
-                        </View>
-                      </View>
-
-                      <View className="flex-row items-center my-2">
-                        <SellCheckbox onChange={() => setBalanceSheet((prev) => !prev)} checked={balanceSheet} />
-                        <Text onPress={() => setBalanceSheet((prev) => !prev)} className="ml-2 font-bold text-[#CD5297]">
-                          Добавить сдачу в баланс
-                        </Text>
-                      </View>
-
-                      <View className="w-full h-[2px] bg-gray-200 my-2 z-[-4]"></View>
-                    </>
+                  {!isChecked.reserve && (
+                    <NotReserve
+                      handleChange={handleCashCashChange}
+                      cashAmount={cashAmount}
+                      data={data}
+                      defaultCurrency={defaultCurrency}
+                      isChecked={isChecked}
+                    />
                   )}
+                  {isChecked.cash && <SellChangeWithCustomer data={data} defaultCurrency={defaultCurrency} />}
 
-                  {isChecked.reserve && (
-                    <View className="mb-1 z-[-5]">
-                      <Text className="font-bold text-base text-[#CD5297] mb-2">Предоплата</Text>
-                      <View className="flex-row items-center justify-between ">
-                        <TextInput
-                          onChangeText={handleTextChange}
-                          value={cashAmount}
-                          keyboardType="numeric"
-                          placeholder="Введите сумму..."
-                          placeholderTextColor="white"
-                          style={styles.inputStyles}
-                        />
-                        <View className="w-3 h-[2px] bg-gray-200 mx-1"></View>
-                        <Text className={`font-bold text-lg text-[#CD5297] w-[150] ${windowWidth <= 385 && "w-[100] text-sm"}`}>
-                          {selectedSellPlace.selectedCurency?.name || selectedSellPlace.selectedCurency?.currency?.name}
-                        </Text>
-                      </View>
-                      <View className="w-full h-[2px] bg-gray-200 mb-4 mt-2 z-[-4]"></View>
-                    </View>
-                  )}
+                  {isChecked.reserve && <SellWithCustomerReserve />}
 
                   <View className="flex-row justify-between items-center mt-3 z-[-1]">
                     <TouchableOpacity onPress={() => setModalVisible(!modalVisible)}>

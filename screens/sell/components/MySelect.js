@@ -89,9 +89,13 @@ export default function MySelect({ data, defaultOption, onSelect, title }) {
             textContentType="none"
           />
           {open ? (
-            <Ionicons onPress={handleClearInput} style={styles.arrowDown} name="close" size={20} color={"white"} />
+            <TouchableOpacity onPress={handleClearInput} style={styles.arrowDown}>
+              <Ionicons name="close" size={20} color={"white"} />
+            </TouchableOpacity>
           ) : (
-            <Ionicons style={styles.arrowDown} name="arrow-down" size={20} color={"white"} />
+            <TouchableOpacity onPress={() => setOpen((prev) => !prev)} style={styles.arrowDown}>
+              <Ionicons name="arrow-down" size={20} color={"white"} />
+            </TouchableOpacity>
           )}
         </View>
       </TouchableOpacity>
@@ -134,9 +138,13 @@ const styles = StyleSheet.create({
   },
   arrowDown: {
     position: "absolute",
-    right: 15,
-    bottom: 15,
+    right: 5,
+    bottom: 5,
     backgroundColor: "#ED83C1",
+    width: 40,
+    height: 40,
+    alignItems: "center",
+    justifyContent: "center",
   },
   title: {
     color: "white",
