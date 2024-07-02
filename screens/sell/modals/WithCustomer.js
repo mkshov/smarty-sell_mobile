@@ -84,10 +84,9 @@ export default function ModalForSellWithCustomer(props) {
 
   const calculateChange = (amount) => {
     const cash = parseFloat(amount) || 0;
-    const total = parseFloat(totalAmount) + additionalAmount;
+    const total = parseFloat(totalAmount);
     const change = cash > total ? (cash - total).toFixed(2) : 0;
     cash < total || total === 0 ? setDisabled(true) : setDisabled(false);
-    console.log("change: ", change);
     setChangeAmount(change);
   };
 
@@ -97,22 +96,6 @@ export default function ModalForSellWithCustomer(props) {
   };
 
   const handleClick = async () => {
-    const products = sellCart.map((item) => {
-      return {
-        product: item.product.id,
-        quantity: item.newQuantity,
-        size: item.size.id,
-        place: selectedSellPlace.selectedPlace[0],
-      };
-    });
-    const total = parseFloat(cashAmount) || 0;
-    const body = {
-      place: selectedSellPlace.selectedPlace[0],
-      payment: [{ currency: selectedSellPlace.selectedCurency.id, amount: total }],
-      sell_products: products,
-      change_currency: selectedSellPlace.selectedCurency.id,
-    };
-    sendProductsWithOutCustomer(body);
     setChangeAmount(0);
     setTotalAmount(0);
     setCashAmount("");
@@ -164,9 +147,10 @@ export default function ModalForSellWithCustomer(props) {
                     calculateChange={calculateChange}
                     isChecked={isChecked}
                     setTotalAmount={setTotalAmount}
+                    totalAmount={totalAmount}
                   />
 
-                  <AdditionalServices data={data} defaultCurrency={defaultCurrency} onChange={setAdditionalAmount} />
+                  <AdditionalServices data={data} defaultCurrency={defaultCurrency} onChange={setAdditionalAmount} setTotalAmount={setTotalAmount} />
                   <View className="w-full h-[2px] bg-gray-200 my-2 relative z-[-2]"></View>
 
                   {!isChecked.reserve && (

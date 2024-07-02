@@ -1,5 +1,16 @@
 import React, { useCallback, useContext, useEffect, useState } from "react";
-import { SafeAreaView, ScrollView, RefreshControl, TouchableOpacity, View, Text, StyleSheet, Platform, StatusBar } from "react-native";
+import {
+  SafeAreaView,
+  ScrollView,
+  RefreshControl,
+  TouchableOpacity,
+  View,
+  Text,
+  StyleSheet,
+  Platform,
+  StatusBar,
+  ActivityIndicator,
+} from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
 import Icon from "react-native-vector-icons/Ionicons";
@@ -19,7 +30,9 @@ import SelectDropdown from "./components/SelectDropdown";
 import AddProductButton from "./components/AddProductButton";
 import GoToCartButton from "./components/GoToCartButton";
 import ModalForSellWithCustomer from "./modals/WithCustomer";
-import MySelect from "./components/MySelect";
+import MySelect from "./components/WithSearchSelect";
+import WithOutSearchSelect from "./components/WithOutSearchSelect";
+import WithSearchSelect from "./components/WithSearchSelect";
 
 export default function SellScreen({ navigation }) {
   const {
@@ -39,6 +52,7 @@ export default function SellScreen({ navigation }) {
 
   const [modalVisible, setModalVisible] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  const [data, setData] = useState(null);
 
   const totalPrice = useTotalPrice(sellCart, selectedSellPlace);
   const totalQuantity = useTotalQuantity(sellCart);
@@ -91,7 +105,30 @@ export default function SellScreen({ navigation }) {
     return () => clearInterval(intervalId);
   }, []);
 
-  const data = getData({ sellPlaces, sellCurrencies, sellCustomers, savedPlace });
+  useEffect(() => {
+    if (sellCurrencies) {
+      setData(getData({ sellPlaces, sellCurrencies, sellCustomers, savedPlace }));
+    }
+  }, [sellCurrencies]);
+
+  useEffect(() => {
+    if (data) {
+      setSelectedSellPlace((prev) => ({ ...prev, selectedCurency: data.baseCurrency.key, selectedPlace: data.basePlace.key }));
+    }
+  }, [data]);
+
+  if (!data)
+    return (
+      <SafeAreaProvider>
+        <LinearGradient colors={["#8469A4FF", "#ED83C1FF"]}>
+          <SafeAreaView style={[styles.AndroidSafeArea, { justifyContent: "center" }]}>
+            <ActivityIndicator size="large" color="white" />
+          </SafeAreaView>
+        </LinearGradient>
+      </SafeAreaProvider>
+    );
+
+  console.log("data: ", data.baseCurrency);
 
   return (
     <SafeAreaProvider>
@@ -121,20 +158,22 @@ export default function SellScreen({ navigation }) {
                   })
                 }
               />
-              <SelectDropdown
-                zIndex={21}
+
+              <WithOutSearchSelect
+                zIndex={10}
                 title="Валюта"
                 data={data.currencies}
                 defaultOption={data.baseCurrency}
                 onSelect={(currency) => {
-                  "currency: ", currency;
                   setSelectedSellPlace((prevState) => ({
                     ...prevState,
-                    selectedCurency: currency,
+                    selectedCurency: currency.key,
                   }));
                 }}
               />
-              <MySelect
+
+              <WithSearchSelect
+                zIndex={9}
                 title="Покупатель"
                 data={data.customers}
                 onSelect={(customer) => {
@@ -147,6 +186,8 @@ export default function SellScreen({ navigation }) {
                     withOutCustomer: true,
                   });
                 }}
+                search
+                placeholder="Выбрать покупателя..."
               />
               <AddProductButton modalVisible={modalVisible} setModalVisible={setModalVisible} sellCart={sellCart} totalQuantity={totalQuantity} />
               <GoToCartButton navigation={navigation} style={style} />

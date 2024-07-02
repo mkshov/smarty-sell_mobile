@@ -36,7 +36,7 @@ export default function Scanner({ actionType, actionTitle, cartPath }) {
     setText(data);
     const dataSend = {
       barcode: data,
-      place: actionType === "transfer" ? transfer.from_place.id : selectedSellPlace.selectedPlace[0],
+      place: actionType === "transfer" ? transfer.from_place.id : selectedSellPlace.selectedPlace.id,
     };
     let res = await scanInPlace(dataSend);
     if (res.barcode && data.length >= 12) {

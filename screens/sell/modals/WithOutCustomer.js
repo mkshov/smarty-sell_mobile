@@ -79,11 +79,11 @@ export default function ModalForSellWithOutCustomer(props) {
 
   const handleClick = async () => {
     const products = sellCart.map((item) => {
-      return { product: item.product.id, quantity: item.newQuantity, size: item.size.id, place: selectedSellPlace.selectedPlace[0] };
+      return { product: item.product.id, quantity: item.newQuantity, size: item.size.id, place: selectedSellPlace.selectedPlace.id };
     });
     const total = parseFloat(cashAmount) || 0;
     const body = {
-      place: selectedSellPlace.selectedPlace[0],
+      place: selectedSellPlace.selectedPlace.id,
       payment: [{ currency: selectedSellPlace.selectedCurency.id, amount: total }],
       sell_products: products,
       change_currency: selectedSellPlace.selectedCurency.id,

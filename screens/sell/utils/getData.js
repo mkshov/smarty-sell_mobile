@@ -1,6 +1,6 @@
 const getData = ({ sellPlaces, sellCurrencies, sellCustomers, savedPlace }) => ({
   places: sellPlaces?.map((place) => ({
-    key: [place.type.id, place.name],
+    key: { id: place.type.id, name: place.name },
     value: place.name,
   })),
   currencies: sellCurrencies?.map((currency) => ({
@@ -12,11 +12,15 @@ const getData = ({ sellPlaces, sellCurrencies, sellCustomers, savedPlace }) => (
     value: `${customer.name} - Скидка ${customer.percentage_discount}%`,
   })),
   basePlace: {
-    key: savedPlace?.type.id,
+    key: { id: savedPlace?.type.id, name: savedPlace?.name },
     value: savedPlace?.name,
   },
   baseCurrency: {
-    key: sellCurrencies?.find((currency) => currency.is_base_currency),
+    key: {
+      id: sellCurrencies?.find((currency) => currency.is_base_currency).currency.id,
+      name: sellCurrencies?.find((currency) => currency.is_base_currency).currency.name,
+      rate: sellCurrencies?.find((currency) => currency.is_base_currency).rate,
+    },
     value: sellCurrencies?.find((currency) => currency.is_base_currency).currency.name,
   },
 });

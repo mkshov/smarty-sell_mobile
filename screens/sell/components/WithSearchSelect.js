@@ -1,11 +1,12 @@
 import React, { useContext, useEffect, useState, useCallback, useMemo } from "react";
-import { Platform, StyleSheet, TextInput, Text, View, TouchableOpacity, ScrollView } from "react-native";
+import { Platform, StyleSheet, TextInput, Text, View, TouchableOpacity, ScrollView, Pressable } from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { sellContext } from "../../../contexts/sellContext";
 import debounce from "lodash.debounce";
 import { showMessage } from "react-native-flash-message";
+import { Touchable } from "react-native";
 
-export default function MySelect({ data, defaultOption, onSelect, title }) {
+export default function WithSearchSelect({ data, defaultOption, onSelect, title, placeholder, zIndex }) {
   const { getSellCustomers, createUser, setSelectedSellPlace } = useContext(sellContext);
   const [open, setOpen] = useState(false);
   const [inputValue, setInputValue] = useState(defaultOption ? defaultOption.value : "");
@@ -18,7 +19,7 @@ export default function MySelect({ data, defaultOption, onSelect, title }) {
     }
   }, [data]);
 
-  const handleSelect = (option) => {
+  const handleSearchSelect = (option) => {
     setInputValue(option.value);
     setOpen(false);
     if (onSelect) {
@@ -72,7 +73,7 @@ export default function MySelect({ data, defaultOption, onSelect, title }) {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { zIndex: zIndex }]}>
       <Text style={styles.title}>{title}</Text>
       <TouchableOpacity onPress={() => setOpen((prev) => !prev)}>
         <View style={styles.selectBox}>
@@ -83,7 +84,7 @@ export default function MySelect({ data, defaultOption, onSelect, title }) {
             contextMenuHidden={true}
             placeholderTextColor="white"
             style={styles.boxStyles}
-            placeholder="Выбрать покупателя..."
+            placeholder={placeholder}
             autoComplete="off"
             importantForAutofill="no"
             textContentType="none"
@@ -106,7 +107,7 @@ export default function MySelect({ data, defaultOption, onSelect, title }) {
               <Text style={styles.loadingText}>Загрузка...</Text>
             ) : (
               filteredData.map((item, index) => (
-                <TouchableOpacity key={index} onPress={() => handleSelect(item)} style={styles.dropdownItemStyles}>
+                <TouchableOpacity key={index} onPress={() => handleSearchSelect(item)} style={styles.dropdownItemStyles}>
                   <Text style={styles.dropdownTextStyles}>{item.value}</Text>
                 </TouchableOpacity>
               ))
@@ -131,7 +132,6 @@ const styles = StyleSheet.create({
   container: {
     marginTop: 20,
     position: "relative",
-    zIndex: 20,
   },
   selectBox: {
     position: "relative",
@@ -173,7 +173,8 @@ const styles = StyleSheet.create({
   boxStyles: {
     backgroundColor: "#ED83C1",
     height: 50,
-    alignItems: "center",
+    // alignItems: "center",
+    justifyContent: "center",
     borderWidth: 0,
     elevation: Platform.OS === "android" ? 5 : 0,
     shadowColor: "white",
@@ -202,5 +203,8 @@ const styles = StyleSheet.create({
     marginHorizontal: 25,
     marginVertical: 3,
     fontWeight: "500",
+  },
+  selectedValue: {
+    color: "white",
   },
 });

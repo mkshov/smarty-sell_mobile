@@ -8,12 +8,11 @@ import { SelectList } from "react-native-dropdown-select-list";
 import { sellContext } from "../../../../contexts/sellContext";
 import useTotalPrice from "../../hooks/useTotalPrice";
 
-export default function ToPay({ data, defaultCurrency, setChecked, isChecked, calculateChange, setTotalAmount, cashAmount }) {
+export default function ToPay({ data, defaultCurrency, setChecked, isChecked, calculateChange, setTotalAmount, totalAmount, cashAmount }) {
+  console.log("totalAmount: ", totalAmount);
   const windowWidth = useWindowDimensions().width;
 
   const { selectedSellPlace, sellCart, setSelectedSellPlace } = useContext(sellContext);
-
-  console.log("selectedSellPlace: ", selectedSellPlace);
 
   const totalPrice = useTotalPrice(sellCart, selectedSellPlace);
 
@@ -46,7 +45,7 @@ export default function ToPay({ data, defaultCurrency, setChecked, isChecked, ca
         />
         <View className="w-3 h-[2px] bg-gray-200 mx-1"></View>
         <Text className={`font-bold text-lg text-[#CD5297] w-[150] ${windowWidth <= 385 && "w-[100] text-sm"}`}>
-          {totalPrice()} {selectedSellPlace.selectedCurency?.name || selectedSellPlace.selectedCurency?.currency?.name}
+          {totalAmount} {selectedSellPlace.selectedCurency?.name || selectedSellPlace.selectedCurency?.currency?.name}
         </Text>
       </View>
       <Text className="font-bold text-base text-[#CD5297] mt-3 mb-2 relative z-[-1]">Способ оплаты</Text>
