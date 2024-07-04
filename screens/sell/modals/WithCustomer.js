@@ -150,7 +150,13 @@ export default function ModalForSellWithCustomer(props) {
                     totalAmount={totalAmount}
                   />
 
-                  <AdditionalServices data={data} defaultCurrency={defaultCurrency} onChange={setAdditionalAmount} setTotalAmount={setTotalAmount} />
+                  <AdditionalServices
+                    defaultCurrency={defaultCurrency}
+                    data={data}
+                    onChange={setAdditionalAmount}
+                    setTotalAmount={setTotalAmount}
+                    totalAmount={totalAmount}
+                  />
                   <View className="w-full h-[2px] bg-gray-200 my-2 relative z-[-2]"></View>
 
                   {!isChecked.reserve && (

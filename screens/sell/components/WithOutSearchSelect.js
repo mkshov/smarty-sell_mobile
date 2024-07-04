@@ -1,12 +1,14 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Platform, StyleSheet, Text, View, TouchableOpacity, ScrollView, Pressable } from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
+import { sellContext } from "../../../contexts/sellContext";
 
-export default function WithOutSearchSelect({ data, defaultOption, title, zIndex, onSelect }) {
+export default function WithOutSearchSelect({ data, defaultOption, title, zIndex, onSelect, width, mt = 0 }) {
+  const { selectedSellPlace, setSelectedSellPlace } = useContext(sellContext);
+
   const [open, setOpen] = useState(false);
 
   const [selected, setSelected] = useState(defaultOption);
-  console.log("selected: ", selected);
 
   function handleSelect(selectedValue) {
     setSelected(selectedValue);
@@ -17,10 +19,30 @@ export default function WithOutSearchSelect({ data, defaultOption, title, zIndex
     }
   }
 
+  useEffect(() => {
+    console.log("changed");
+    if (selectedSellPlace.selectedCurency && selectedSellPlace.selectedCurency.id !== defaultOption.key.id) {
+      const newDefaultOption = {
+        key: { ...selectedSellPlace.selectedCurency },
+        value: selectedSellPlace.selectedCurency.name,
+      };
+      setSelected(newDefaultOption);
+    }
+  }, [selectedSellPlace.selectedCurency]);
+
+  // useEffect(() => {
+  //   if (selectedSellPlace.selectedCurency.id !== defaultOption.key.id) {
+  //     defaultOption = {
+  //       key: { ...selectedSellPlace.selectedCurency },
+  //       value: selectedSellPlace.name,
+  //     };
+  //   }
+  // }, [selectedSellPlace.selectedCurency]);
+
   return (
-    <View style={[styles.container, { zIndex: zIndex }]}>
-      <Text style={styles.title}>{title}</Text>
-      <TouchableOpacity style={styles.selectBox}>
+    <View style={[styles.container, { zIndex: zIndex, marginTop: mt }]}>
+      {title && <Text style={styles.title}>{title}</Text>}
+      <TouchableOpacity style={[styles.selectBox, { width: width }]}>
         <Pressable onPress={() => setOpen((prev) => !prev)} style={styles.boxStyles}>
           <Text style={styles.selectedValue}>{selected?.value}</Text>
         </Pressable>
@@ -46,7 +68,6 @@ export default function WithOutSearchSelect({ data, defaultOption, title, zIndex
 
 const styles = StyleSheet.create({
   container: {
-    marginTop: 20,
     position: "relative",
   },
   selectBox: {

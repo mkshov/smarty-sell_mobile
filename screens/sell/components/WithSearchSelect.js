@@ -10,12 +10,15 @@ export default function WithSearchSelect({ data, defaultOption, onSelect, title,
   const { getSellCustomers, createUser, setSelectedSellPlace } = useContext(sellContext);
   const [open, setOpen] = useState(false);
   const [inputValue, setInputValue] = useState(defaultOption ? defaultOption.value : "");
-  const [filteredData, setFilteredData] = useState(data ? data : []);
+  const [filteredData, setFilteredData] = useState([]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (data) {
       setFilteredData(data);
+      setLoading(false);
+    } else {
+      setLoading(true);
     }
   }, [data]);
 

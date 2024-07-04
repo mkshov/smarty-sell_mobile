@@ -9,7 +9,6 @@ import { sellContext } from "../../../../contexts/sellContext";
 import useTotalPrice from "../../hooks/useTotalPrice";
 
 export default function ToPay({ data, defaultCurrency, setChecked, isChecked, calculateChange, setTotalAmount, totalAmount, cashAmount }) {
-  console.log("totalAmount: ", totalAmount);
   const windowWidth = useWindowDimensions().width;
 
   const { selectedSellPlace, sellCart, setSelectedSellPlace } = useContext(sellContext);

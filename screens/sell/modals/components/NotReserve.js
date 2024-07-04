@@ -15,6 +15,17 @@ export default function NotReserve({ data, defaultCurrency, isChecked, handleCha
 
   const [paymentInTwoCurrnecies, setPaymentInTwoCurrencies] = useState(false);
 
+  const [cash, setCash] = useState("");
+
+  function handleTextChange(text) {
+    let newText = text.replace(/,/g, ".");
+    const parts = newText.split(".");
+    if (parts.length > 2) {
+      newText = parts[0] + "." + parts.slice(1).join("");
+    }
+    setCash(newText);
+  }
+
   return (
     <>
       <View className="my-2 relative z-[10]">
@@ -31,7 +42,7 @@ export default function NotReserve({ data, defaultCurrency, isChecked, handleCha
             <View className="flex-row items-center justify-between">
               <TextInput
                 onChangeText={handleTextChange}
-                value={cashAmount}
+                value={cash}
                 keyboardType="numeric"
                 placeholder="Введите сумму..."
                 placeholderTextColor="white"

@@ -17,12 +17,12 @@ import Icon from "react-native-vector-icons/Ionicons";
 import Octicons from "react-native-vector-icons/Octicons";
 import { sellContext } from "../../contexts/sellContext";
 import { workPlaceContext } from "../../contexts/workPlaceContext";
-import { SelectList } from "react-native-dropdown-select-list";
+
 import ModalChooseAddVariant from "../../components/AddVariant/modalChooseAddVariant";
 import Animated, { useSharedValue, withTiming, useAnimatedStyle, withSequence, withRepeat } from "react-native-reanimated";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import ModalForSellWithOutCustomer from "./modals/WithOutCustomer";
-import SellCheckModal from "./modals/sellCheckModal";
+
 import useTotalPrice from "./hooks/useTotalPrice";
 import useTotalQuantity from "./hooks/useTotalQuantity";
 import getData from "./utils/getData";
@@ -30,7 +30,7 @@ import SelectDropdown from "./components/SelectDropdown";
 import AddProductButton from "./components/AddProductButton";
 import GoToCartButton from "./components/GoToCartButton";
 import ModalForSellWithCustomer from "./modals/WithCustomer";
-import MySelect from "./components/WithSearchSelect";
+
 import WithOutSearchSelect from "./components/WithOutSearchSelect";
 import WithSearchSelect from "./components/WithSearchSelect";
 
@@ -106,10 +106,10 @@ export default function SellScreen({ navigation }) {
   }, []);
 
   useEffect(() => {
-    if (sellCurrencies) {
+    if (sellCurrencies && sellCustomers) {
       setData(getData({ sellPlaces, sellCurrencies, sellCustomers, savedPlace }));
     }
-  }, [sellCurrencies]);
+  }, [sellCurrencies, sellCustomers]);
 
   useEffect(() => {
     if (data) {
@@ -127,8 +127,6 @@ export default function SellScreen({ navigation }) {
         </LinearGradient>
       </SafeAreaProvider>
     );
-
-  console.log("data: ", data.baseCurrency);
 
   return (
     <SafeAreaProvider>
@@ -159,16 +157,17 @@ export default function SellScreen({ navigation }) {
                 }
               />
 
-              <WithOutSearchSelect
-                zIndex={10}
+              <SelectDropdown
+                zIndex={22}
                 title="Валюта"
                 data={data.currencies}
                 defaultOption={data.baseCurrency}
                 onSelect={(currency) => {
-                  setSelectedSellPlace((prevState) => ({
-                    ...prevState,
-                    selectedCurency: currency.key,
-                  }));
+                  totalPrice(currency);
+                  setSelectedSellPlace({
+                    ...selectedSellPlace,
+                    selectedCurency: currency,
+                  });
                 }}
               />
 
