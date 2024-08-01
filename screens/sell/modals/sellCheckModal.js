@@ -1,11 +1,6 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useNavigation } from "@react-navigation/native";
 import { LinearGradient } from "expo-linear-gradient";
-import React, { useEffect, useState } from "react";
-import { KeyboardAvoidingView, Modal, Platform, Pressable, StatusBar, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
-import { SelectList } from "react-native-dropdown-select-list";
-import { showMessage } from "react-native-flash-message";
-import Icon from "react-native-vector-icons/Ionicons";
+import React from "react";
+import { KeyboardAvoidingView, Modal, Pressable, Text, TouchableOpacity, View } from "react-native";
 
 export default function SellCheckModal(props) {
   const { modalCheck, setModalCheck, handleCloseTheSell, showCheck } = props;

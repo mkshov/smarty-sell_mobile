@@ -14,12 +14,11 @@ import {
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
 import Icon from "react-native-vector-icons/Ionicons";
-import Octicons from "react-native-vector-icons/Octicons";
 import { sellContext } from "../../contexts/sellContext";
 import { workPlaceContext } from "../../contexts/workPlaceContext";
 
 import ModalChooseAddVariant from "../../components/AddVariant/modalChooseAddVariant";
-import Animated, { useSharedValue, withTiming, useAnimatedStyle, withSequence, withRepeat } from "react-native-reanimated";
+import { useSharedValue, withTiming, useAnimatedStyle, withSequence, withRepeat } from "react-native-reanimated";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import ModalForSellWithOutCustomer from "./modals/WithOutCustomer";
 
@@ -31,7 +30,6 @@ import AddProductButton from "./components/AddProductButton";
 import GoToCartButton from "./components/GoToCartButton";
 import ModalForSellWithCustomer from "./modals/WithCustomer";
 
-import WithOutSearchSelect from "./components/WithOutSearchSelect";
 import WithSearchSelect from "./components/WithSearchSelect";
 
 export default function SellScreen({ navigation }) {

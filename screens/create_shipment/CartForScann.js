@@ -5,7 +5,6 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import Icon from "react-native-vector-icons/Ionicons";
 import AddIcon from "react-native-vector-icons/AntDesign";
 import { LinearGradient } from "expo-linear-gradient";
-import FlashMessage, { showMessage } from "react-native-flash-message";
 
 export default function CartForScann({ route, navigation }) {
   const { transfer, scannedProducts, setScannedProducts, getTransfer, getTransferProducts, addProductToTransfer, getAmountInPlace } =
@@ -134,7 +133,6 @@ export default function CartForScann({ route, navigation }) {
               </View>
             ))}
           </ScrollView>
-          <FlashMessage />
         </SafeAreaView>
       </SafeAreaProvider>
     </ImageBackground>

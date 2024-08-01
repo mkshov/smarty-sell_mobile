@@ -20,7 +20,6 @@ export default function WithOutSearchSelect({ data, defaultOption, title, zIndex
   }
 
   useEffect(() => {
-    console.log("changed");
     if (selectedSellPlace.selectedCurency && selectedSellPlace.selectedCurency.id !== defaultOption.key.id) {
       const newDefaultOption = {
         key: { ...selectedSellPlace.selectedCurency },

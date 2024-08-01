@@ -1,7 +1,6 @@
-import React, { createContext, useState, useEffect } from "react";
-import { LOGIN, TOKEN } from "../constants";
+import React, { createContext, useState } from "react";
 import api from "../api/axios";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { showMessage } from "react-native-flash-message";
 
 export const transferContext = createContext();
 
@@ -100,6 +99,12 @@ const TransferContextProvider = ({ children }) => {
       return response.data;
     } catch (error) {
       console.log("error: ", error);
+      if (error.response.status >= 500) {
+        showMessage({
+          message: `Ошибка на стороне сервера. Статус ошибки ${error.response.status}`,
+          type: "danger",
+        });
+      }
       setScannedProduct(null);
       setIsLoading(false);
       setError(error.response.data);

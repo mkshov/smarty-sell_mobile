@@ -6,10 +6,8 @@ import Icon from "react-native-vector-icons/Ionicons";
 import SellConfirmModal from "./confirm";
 import { sellContext } from "../../../contexts/sellContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import SellCheckModal from "./sellCheckModal";
 import { showMessage } from "react-native-flash-message";
 import { useNavigation } from "@react-navigation/native";
-import { err } from "react-native-svg";
 
 export default function ModalForSellWithOutCustomer(props) {
   const { modalVisible, setModalVisible, data, selectedSellPlace, setSelectedSellPlace, totalPrice, sellCart } = props;
@@ -33,24 +31,6 @@ export default function ModalForSellWithOutCustomer(props) {
       setDisabledStyle({ opacity: 1 });
     }
   }, [disabled]);
-
-  // useEffect(() => {
-  //   if (isSellDisabled) {
-  //     setDisabled(true);
-  //   }
-  // }, []);
-
-  // useEffect(() => {
-  //   if (error) {
-  //     if (error.errors[0].code === "change_greater_than_balance") {
-  //       showMessage({
-  //         message: `Сумма сдачи превышает сумму на балансе кошелька!`,
-  //         type: "danger",
-  //       });
-  //       setModalCheck(false);
-  //     }
-  //   }
-  // }, [error]);
 
   const handleTextChange = (text) => {
     let newText = text.replace(/,/g, ".");

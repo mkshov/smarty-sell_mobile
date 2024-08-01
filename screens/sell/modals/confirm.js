@@ -1,8 +1,6 @@
 import { LinearGradient } from "expo-linear-gradient";
-import React, { useEffect, useState } from "react";
-import { KeyboardAvoidingView, Modal, Platform, Pressable, StatusBar, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
-import { SelectList } from "react-native-dropdown-select-list";
-import Icon from "react-native-vector-icons/Ionicons";
+import React from "react";
+import { KeyboardAvoidingView, Modal, Pressable, Text, TouchableOpacity, View } from "react-native";
 import SellCheckModal from "./sellCheckModal";
 
 export default function SellConfirmModal(props) {

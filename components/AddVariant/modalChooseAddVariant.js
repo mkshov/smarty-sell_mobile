@@ -1,6 +1,6 @@
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
-import { Modal, Pressable, Text, TouchableOpacity, TouchableWithoutFeedback } from "react-native";
+import { Modal, Pressable, Text, TouchableOpacity } from "react-native";
 
 export default function ModalChooseAddVariant(props) {
   const { modalVisible, setModalVisible, handleNavigate, scanPath } = props;

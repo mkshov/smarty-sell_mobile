@@ -1,4 +1,4 @@
-import { View, Text, ImageBackground, Image, TouchableOpacity, StyleSheet, Switch } from "react-native";
+import { View, Text, ImageBackground, TouchableOpacity, StyleSheet, Switch } from "react-native";
 import { DrawerContentScrollView, DrawerItemList } from "@react-navigation/drawer";
 
 import Ionicons from "react-native-vector-icons/Ionicons";

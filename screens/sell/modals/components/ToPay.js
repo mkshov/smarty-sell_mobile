@@ -8,7 +8,16 @@ import { SelectList } from "react-native-dropdown-select-list";
 import { sellContext } from "../../../../contexts/sellContext";
 import useTotalPrice from "../../hooks/useTotalPrice";
 
-export default function ToPay({ data, defaultCurrency, setChecked, isChecked, calculateChange, setTotalAmount, totalAmount, cashAmount }) {
+export default function ToPay({
+  data,
+  defaultCurrency,
+  setChecked,
+  isChecked,
+  handleConvertAdditionalCurrency,
+  setTotalAmount,
+  totalAmount,
+  cashAmount,
+}) {
   const windowWidth = useWindowDimensions().width;
 
   const { selectedSellPlace, sellCart, setSelectedSellPlace } = useContext(sellContext);
@@ -37,7 +46,7 @@ export default function ToPay({ data, defaultCurrency, setChecked, isChecked, ca
             });
             const newTotal = totalPrice(currency);
             setTotalAmount(newTotal);
-            calculateChange(cashAmount, newTotal);
+            handleConvertAdditionalCurrency(cashAmount, newTotal);
           }}
           search={false}
           data={data.currencies}

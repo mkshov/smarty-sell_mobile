@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect } from "react";
+import React, { createContext, useState } from "react";
 import { LOGIN, TOKEN } from "../constants";
 import api from "../api/axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";

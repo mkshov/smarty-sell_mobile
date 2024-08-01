@@ -1,4 +1,4 @@
-import React, { useContext, useRef, useState } from "react";
+import React, { useContext, useState } from "react";
 import { View, Text, StyleSheet, Platform, TouchableOpacity } from "react-native";
 import { SelectList } from "react-native-dropdown-select-list";
 import Icon from "react-native-vector-icons/Ionicons";
@@ -89,7 +89,6 @@ export default function SelectDropdown({ title, data, defaultOption, onSelect, p
         search={type === "customer" ? true : false}
         data={data}
         notFoundText="Покупатель не найден :("
-        
       />
       {type === "customer" && (
         <TouchableOpacity onPress={handleClear} className="rounded-lg absolute right-14 top-[34px]">

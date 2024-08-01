@@ -1,5 +1,4 @@
-import React, { createContext, useState, useEffect, useReducer } from "react";
-import { LOGIN, TOKEN } from "../constants";
+import React, { createContext, useState, useReducer } from "react";
 import api from "../api/axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { showMessage } from "react-native-flash-message";

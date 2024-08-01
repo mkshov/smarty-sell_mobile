@@ -1,10 +1,9 @@
-import React, { useContext, useEffect, useState, useCallback, useMemo } from "react";
-import { Platform, StyleSheet, TextInput, Text, View, TouchableOpacity, ScrollView, Pressable } from "react-native";
+import React, { useContext, useEffect, useState, useMemo } from "react";
+import { Platform, StyleSheet, TextInput, Text, View, TouchableOpacity, ScrollView } from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { sellContext } from "../../../contexts/sellContext";
 import debounce from "lodash.debounce";
 import { showMessage } from "react-native-flash-message";
-import { Touchable } from "react-native";
 
 export default function WithSearchSelect({ data, defaultOption, onSelect, title, placeholder, zIndex }) {
   const { getSellCustomers, createUser, setSelectedSellPlace } = useContext(sellContext);

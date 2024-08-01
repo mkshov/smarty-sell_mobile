@@ -1,6 +1,6 @@
 import { LinearGradient } from "expo-linear-gradient";
 import React, { useContext } from "react";
-import { Modal, Pressable, Text, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
+import { Modal, Pressable, Text, TouchableOpacity, View } from "react-native";
 import { transferContext } from "../../contexts/transferContext";
 import { sellContext } from "../../contexts/sellContext";
 

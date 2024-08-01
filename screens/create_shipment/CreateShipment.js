@@ -1,24 +1,11 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import React, { useCallback, useContext, useEffect, useState } from "react";
-import {
-  Image,
-  ImageBackground,
-  Modal,
-  Platform,
-  RefreshControl,
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import React, { useContext, useEffect, useState } from "react";
+import { Platform, RefreshControl, SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import DateIcon from "../../assets/icons/date";
 import Icon from "react-native-vector-icons/Ionicons";
 
-import ModalTransfers, { ModalForTransfer } from "./components/choosePlaceForTransfer";
+import ModalTransfers from "./components/choosePlaceForTransfer";
 import { workPlaceContext } from "../../contexts/workPlaceContext";
 import { STORAGE } from "../../constants";
 import { transferContext } from "../../contexts/transferContext";

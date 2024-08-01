@@ -1,7 +1,5 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import React, { useCallback, useContext, useEffect, useState } from "react";
-import { Image, Platform, SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { STORAGE, TOKEN } from "../constants";
+import React, { useContext } from "react";
+import { Platform, SafeAreaView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { transferContext } from "../contexts/transferContext";
 import { workPlaceContext } from "../contexts/workPlaceContext";

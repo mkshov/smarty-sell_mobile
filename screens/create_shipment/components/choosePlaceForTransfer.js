@@ -1,7 +1,7 @@
 import Checkbox from "expo-checkbox";
 import { LinearGradient } from "expo-linear-gradient";
 import React, { useContext, useEffect, useState } from "react";
-import { Alert, Modal, Pressable, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
+import { Alert, Modal, Pressable, Text, TouchableOpacity, View } from "react-native";
 import { SelectList } from "react-native-dropdown-select-list";
 import { transferContext } from "../../../contexts/transferContext";
 

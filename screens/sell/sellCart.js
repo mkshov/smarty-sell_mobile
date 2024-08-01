@@ -1,7 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { useCallback, useContext, useEffect, useState } from "react";
 import {
-  Alert,
   KeyboardAvoidingView,
   Platform,
   RefreshControl,
@@ -17,12 +16,10 @@ import {
 } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
-import { workPlaceContext } from "../../contexts/workPlaceContext";
 import { sellContext } from "../../contexts/sellContext";
-import { transferContext } from "../../contexts/transferContext";
 import Icon from "react-native-vector-icons/Ionicons";
 import AddIcon from "react-native-vector-icons/AntDesign";
-import FlashMessage, { showMessage } from "react-native-flash-message";
+import { showMessage } from "react-native-flash-message";
 
 export default function SellCart({ navigation }) {
   const { sellCart, setSellCart, selectedSellPlace, saveCart, loadCart } = useContext(sellContext);

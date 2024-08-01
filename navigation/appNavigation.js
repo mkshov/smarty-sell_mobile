@@ -1,53 +1,24 @@
 import React, { useContext, useEffect, useState } from "react";
-import { NavigationContainer, useNavigation } from "@react-navigation/native";
+import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import LoginScreen from "../screens/LoginScreen";
 import ChooseWorkPlace from "../screens/ChooseWorkPlace";
 import HomePage from "../screens/HomePage";
 import CreateShipment from "../screens/create_shipment/CreateShipment";
-import { authContext } from "../contexts/authContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { TOKEN } from "../constants";
 import AddProductForTransfer from "../screens/create_shipment/AddProductForTransfer";
 import ScanQrForAddProduct from "../screens/create_shipment/ScanQr";
 import CartForScann from "../screens/create_shipment/CartForScann";
-import { DrawerToggleButton, createDrawerNavigator } from "@react-navigation/drawer";
-import CustomDrawer from "../components/Drawer";
 import { workPlaceContext } from "../contexts/workPlaceContext";
-import Icon from "react-native-vector-icons/Feather";
 import SellScreen from "../screens/sell";
 import SellCart from "../screens/sell/sellCart";
 import SellScan from "../screens/sell/scanQr";
-import Scanner from "../components/scanner/Scanner";
 import SellCheck from "../screens/sell/sellCheck";
 
 const Stack = createNativeStackNavigator();
 
 export default function AppNavigation() {
-  const Drawer = createDrawerNavigator();
-  const { savedPlace } = useContext(workPlaceContext);
-  const [user, setUser] = useState(null);
-  const [initialRoute, setInitialRoute] = useState("login");
-
-  const restoreUser = async () => {
-    try {
-      const storedUser = await AsyncStorage.getItem(TOKEN);
-      if (storedUser) {
-        setUser(JSON.parse(storedUser));
-        setInitialRoute("/");
-      } else {
-        setUser(null);
-        setInitialRoute("login");
-      }
-    } catch (error) {
-      console.error("Error retrieving user from AsyncStorage:", error);
-    }
-  };
-
-  useEffect(() => {
-    restoreUser();
-  }, [savedPlace, user]);
-
   return (
     <NavigationContainer>
       <Stack.Navigator

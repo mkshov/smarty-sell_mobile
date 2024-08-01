@@ -10,40 +10,36 @@ import {
   StatusBar,
   StyleSheet,
   Text,
-  TextInput,
   TouchableOpacity,
   View,
-  useWindowDimensions,
 } from "react-native";
-import { SelectList } from "react-native-dropdown-select-list";
-import Icon from "react-native-vector-icons/Ionicons";
 import SellConfirmModal from "./confirm";
 import { sellContext } from "../../../contexts/sellContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import SellCheckModal from "./sellCheckModal";
 import { showMessage } from "react-native-flash-message";
 import { useNavigation } from "@react-navigation/native";
-import { err } from "react-native-svg";
-import SellCheckbox from "../components/CheckBox";
-import CustomerBalance from "./components/CustomerBalance";
 import AdditionalServices from "./components/AdditionalServices";
 import ToPay from "./components/ToPay";
 import NotReserve from "./components/NotReserve";
-import SellChangeWithCustomer from "./components/Change";
 import SellWithCustomerReserve from "./components/Reserve";
 
 export default function ModalForSellWithCustomer(props) {
   const { modalVisible, setModalVisible, data, selectedSellPlace, setSelectedSellPlace, totalPrice, sellCart } = props;
 
-  const windowWidth = useWindowDimensions().width;
   const navigation = useNavigation();
 
-  const { sendProductsWithOutCustomer, setSellCart, changeAmount, setChangeAmount, error, modalCheck, setModalCheck, modalConfirm, setModalConfirm } =
-    useContext(sellContext);
+  const { setSellCart, setChangeAmount, modalCheck, setModalCheck, modalConfirm, setModalConfirm, sellCurrencies } = useContext(sellContext);
 
-  const [cashAmount, setCashAmount] = useState("");
+  const [mainCurrencyCash, setMainCurrencyCash] = useState("");
+  const [additionalCurrencyCash, setAdditionalCurrencyCash] = useState("0");
+  const [additionalCurrencies, setAdditionalCurrencies] = useState({
+    currencies: [],
+    selectedCurrency: null,
+  });
+
+  const [paymentInTwoCurrencies, setPaymentInTwoCurrencies] = useState(false);
+
   const [totalAmount, setTotalAmount] = useState(totalPrice());
-  const [additionalAmount, setAdditionalAmount] = useState(0);
 
   const [disabled, setDisabled] = useState(true);
   const [disabledStyle, setDisabledStyle] = useState(null);
@@ -70,35 +66,82 @@ export default function ModalForSellWithCustomer(props) {
     };
   }, []);
 
-  const handleCashCashChange = (text) => {
-    let newText = text.replace(/,/g, ".");
+  useEffect(() => {
+    if (paymentInTwoCurrencies) {
+      handleConvertAdditionalCurrency(mainCurrencyCash);
+    }
+  }, [paymentInTwoCurrencies, additionalCurrencies.selectedCurrency]);
 
-    const parts = newText.split(".");
+  useEffect(() => {
+    if (additionalCurrencyCash && paymentInTwoCurrencies) {
+      calculateChange();
+    }
+  }, [additionalCurrencyCash, paymentInTwoCurrencies]);
+
+  useEffect(() => {
+    let withOutSelectedCurrency = data.currencies.filter((currency) => currency.key.id !== selectedSellPlace.selectedCurency.id);
+    setAdditionalCurrencies((prev) => ({ ...prev, currencies: withOutSelectedCurrency }));
+  }, [selectedSellPlace.selectedCurency]);
+
+  const handleChangeMainCurrency = (text) => {
+    let amount = text.replace(/,/g, ".");
+
+    const parts = amount.split(".");
     if (parts.length > 2) {
-      newText = parts[0] + "." + parts.slice(1).join("");
+      amount = parts[0] + "." + parts.slice(1).join("");
     }
 
-    setCashAmount(newText);
-    calculateChange(newText);
+    setMainCurrencyCash(amount);
+    handleConvertAdditionalCurrency(amount);
   };
 
-  const calculateChange = (amount) => {
+  const handleConvertAdditionalCurrency = (amount) => {
     const cash = parseFloat(amount) || 0;
     const total = parseFloat(totalAmount);
+
+    if (!isNaN(cash) && cash < total && additionalCurrencies.selectedCurrency && paymentInTwoCurrencies && cash) {
+      let convertToSelectedCurrency;
+      if (selectedSellPlace.selectedCurency.rate === 1) {
+        convertToSelectedCurrency = Math.floor(total - cash) * additionalCurrencies.selectedCurrency.rate;
+      } else {
+        if (additionalCurrencies.selectedCurrency.rate === 1) {
+          convertToSelectedCurrency = Math.floor(total - cash) / selectedSellPlace.selectedCurency.rate;
+        } else {
+          convertToSelectedCurrency =
+            (Math.floor(total - cash) / selectedSellPlace.selectedCurency.rate) * additionalCurrencies.selectedCurrency.rate;
+        }
+      }
+      setAdditionalCurrencyCash(convertToSelectedCurrency.toFixed(2));
+    } else {
+      setAdditionalCurrencyCash("");
+    }
+
     const change = cash > total ? (cash - total).toFixed(2) : 0;
     cash < total || total === 0 ? setDisabled(true) : setDisabled(false);
     setChangeAmount(change);
   };
 
+  const calculateChange = () => {
+    let change2 =
+      additionalCurrencies.selectedCurrency.rate === 1
+        ? parseFloat(additionalCurrencyCash) * selectedSellPlace.selectedCurency.rate
+        : ((parseFloat(additionalCurrencyCash) / additionalCurrencies.selectedCurrency.rate) * selectedSellPlace.selectedCurency.rate).toFixed(2);
+    let total = parseFloat(mainCurrencyCash) + parseFloat(change2);
+
+    console.log("total >= totalAmount : ", total >= totalAmount, total, totalAmount);
+    total >= totalAmount ? setDisabled(false) : setDisabled(true);
+    setChangeAmount((total - totalAmount).toFixed(2));
+  };
+
   const defaultCurrency = {
     key: selectedSellPlace.selectedCurency,
-    value: selectedSellPlace.selectedCurency?.name || selectedSellPlace.selectedCurency?.currency?.name,
+    value: selectedSellPlace.selectedCurency?.name,
   };
 
   const handleClick = async () => {
     setChangeAmount(0);
     setTotalAmount(0);
-    setCashAmount("");
+    setMainCurrencyCash("");
   };
   const handleCloseTheSell = async () => {
     setModalCheck(false);
@@ -106,7 +149,7 @@ export default function ModalForSellWithCustomer(props) {
     setModalVisible(false);
     setChangeAmount(0);
     setTotalAmount(0);
-    setCashAmount("");
+    setMainCurrencyCash("");
     setSellCart([]);
     await AsyncStorage.removeItem("sellCart");
     showMessage({
@@ -144,31 +187,32 @@ export default function ModalForSellWithCustomer(props) {
                     data={data}
                     defaultCurrency={defaultCurrency}
                     setChecked={setChecked}
-                    calculateChange={calculateChange}
+                    handleConvertAdditionalCurrency={handleConvertAdditionalCurrency}
                     isChecked={isChecked}
                     setTotalAmount={setTotalAmount}
                     totalAmount={totalAmount}
                   />
 
-                  <AdditionalServices
-                    defaultCurrency={defaultCurrency}
-                    data={data}
-                    onChange={setAdditionalAmount}
-                    setTotalAmount={setTotalAmount}
-                    totalAmount={totalAmount}
-                  />
+                  <AdditionalServices defaultCurrency={defaultCurrency} data={data} setTotalAmount={setTotalAmount} totalAmount={totalAmount} />
                   <View className="w-full h-[2px] bg-gray-200 my-2 relative z-[-2]"></View>
 
                   {!isChecked.reserve && (
                     <NotReserve
-                      handleChange={handleCashCashChange}
-                      cashAmount={cashAmount}
+                      handleChangeMainCurrency={handleChangeMainCurrency}
+                      setAdditionalCurrencyCash={setAdditionalCurrencyCash}
+                      setPaymentInTwoCurrencies={setPaymentInTwoCurrencies}
+                      setAdditionalCurrencies={setAdditionalCurrencies}
+                      setTotalAmount={setTotalAmount}
+                      additionalCurrencies={additionalCurrencies}
+                      paymentInTwoCurrencies={paymentInTwoCurrencies}
+                      mainCurrencyCash={mainCurrencyCash}
+                      additionalCurrencyCash={additionalCurrencyCash}
                       data={data}
                       defaultCurrency={defaultCurrency}
                       isChecked={isChecked}
+                      totalAmount={totalAmount}
                     />
                   )}
-                  {isChecked.cash && <SellChangeWithCustomer data={data} defaultCurrency={defaultCurrency} />}
 
                   {isChecked.reserve && <SellWithCustomerReserve />}
 

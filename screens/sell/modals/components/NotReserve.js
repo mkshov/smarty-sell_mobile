@@ -1,48 +1,89 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { styles } from "../styles";
-import { Text, TextInput, TouchableOpacity, useWindowDimensions } from "react-native";
+import { Animated, Text, TextInput, TouchableOpacity, useWindowDimensions } from "react-native";
 import { View } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
 import SellCheckbox from "../../components/CheckBox";
 import { SelectList } from "react-native-dropdown-select-list";
 import { sellContext } from "../../../../contexts/sellContext";
 import CustomerBalance from "./CustomerBalance";
+import SellChangeWithCustomer from "./Change";
 
-export default function NotReserve({ data, defaultCurrency, isChecked, handleChange, cashAmount }) {
+export default function NotReserve({
+  data,
+  defaultCurrency,
+  isChecked,
+  mainCurrencyCash,
+  totalAmount,
+  additionalCurrencyCash,
+  paymentInTwoCurrencies,
+  additionalCurrencies,
+  handleChangeMainCurrency,
+  setAdditionalCurrencyCash,
+  setPaymentInTwoCurrencies,
+  setAdditionalCurrencies,
+}) {
   const windowWidth = useWindowDimensions().width;
+  console.log("additionalCurrencyCash: ", additionalCurrencyCash);
 
-  const { selectedSellPlace } = useContext(sellContext);
+  const { selectedSellPlace, sellCurrencies } = useContext(sellContext);
 
-  const [paymentInTwoCurrnecies, setPaymentInTwoCurrencies] = useState(false);
+  const [isDisabled, setIsDisabled] = useState(false);
 
-  const [cash, setCash] = useState("");
+  useEffect(() => {
+    let mainCurrency = parseFloat(mainCurrencyCash) || 0;
+    if (mainCurrency >= totalAmount) {
+      // setAdditionalCurrencyCash("");
+      console.log("lol");
+      setPaymentInTwoCurrencies(false);
+      setIsDisabled(true);
+    } else {
+      setIsDisabled(false);
+    }
+  }, [mainCurrencyCash]);
 
   function handleTextChange(text) {
-    let newText = text.replace(/,/g, ".");
-    const parts = newText.split(".");
+    let cash = text.replace(/,/g, ".");
+    const parts = cash.split(".");
     if (parts.length > 2) {
-      newText = parts[0] + "." + parts.slice(1).join("");
+      cash = parts[0] + "." + parts.slice(1).join("");
     }
-    setCash(newText);
+    setAdditionalCurrencyCash(cash);
   }
+
+  const opacity = useRef(new Animated.Value(1)).current;
+
+  useEffect(() => {
+    Animated.timing(opacity, {
+      toValue: isDisabled ? 0.4 : 1,
+      duration: 300,
+      useNativeDriver: true,
+    }).start();
+  }, [isDisabled]);
 
   return (
     <>
+      {isChecked.cash && <SellChangeWithCustomer data={data} defaultCurrency={defaultCurrency} />}
       <View className="my-2 relative z-[10]">
-        <View className="flex-row items-center">
-          <SellCheckbox onChange={() => setPaymentInTwoCurrencies((prev) => !prev)} checked={paymentInTwoCurrnecies} />
-          <TouchableOpacity onPress={() => setPaymentInTwoCurrencies((prev) => !prev)}>
+        <Animated.View style={{ flexDirection: "row", alignItems: "center", opacity }}>
+          <SellCheckbox
+            onChange={() => !isDisabled && setPaymentInTwoCurrencies((prev) => !prev)}
+            disabled={isDisabled}
+            checked={paymentInTwoCurrencies}
+          />
+          <TouchableOpacity onPress={() => !isDisabled && setPaymentInTwoCurrencies((prev) => !prev)}>
             <Text className="font-bold text-[#CD5297] ml-2">Оплата двумя валютами</Text>
           </TouchableOpacity>
-        </View>
-
-        {paymentInTwoCurrnecies && (
-          <View className="relative z-[5]">
+        </Animated.View>
+      </View>
+      <View className="mb-1 z-[5]">
+        {paymentInTwoCurrencies && (
+          <View className="relative mb-3">
             <Text className="font-bold text-base text-[#CD5297] my-2">Дополнительная валюта</Text>
             <View className="flex-row items-center justify-between">
               <TextInput
                 onChangeText={handleTextChange}
-                value={cash}
+                value={additionalCurrencyCash}
                 keyboardType="numeric"
                 placeholder="Введите сумму..."
                 placeholderTextColor="white"
@@ -51,38 +92,33 @@ export default function NotReserve({ data, defaultCurrency, isChecked, handleCha
               <View className="w-3 h-[2px] bg-gray-200 mx-1"></View>
               <SelectList
                 dropdownTextStyles={[styles.dropdownTextStyles, windowWidth <= 385 && { fontSize: 14 }]}
-                dropdownStyles={[styles.dropdownStyles, windowWidth <= 385 && { width: 100 }]}
+                dropdownStyles={[styles.dropdownStyles, styles.dropdownChangeStyle, windowWidth <= 385 && { width: 100 }]}
                 boxStyles={[styles.boxStyles, windowWidth <= 385 && { width: 100 }]}
                 inputStyles={{ color: "white" }}
                 closeicon={<Icon name="close" color="white" size={25} />}
                 searchicon={<Icon name="search" color="white" size={20} style={{ marginRight: 10 }} />}
-                arrowicon={<Icon name="arrow-down" color="white" size={20} />}
+                arrowicon={<Icon name="arrow-up" color="white" size={20} />}
                 dropdownItemStyles={[
                   styles.dropdownItemStyles,
                   windowWidth <= 385 && {
                     marginHorizontal: 10,
                   },
                 ]}
-                defaultOption={defaultCurrency}
+                defaultOption={additionalCurrencies.currencies[0]}
                 setSelected={(currency) => {
-                  console.log("currency: ", currency);
+                  setAdditionalCurrencies((prev) => ({ ...prev, selectedCurrency: currency }));
                 }}
                 search={false}
-                data={data.currencies}
+                data={additionalCurrencies.currencies}
               />
             </View>
           </View>
         )}
-      </View>
-
-      <View className="w-full h-[2px] bg-gray-200 my-2 relative z-[-4]"></View>
-
-      <View className="mb-1 z-[-5]">
         <Text className="font-bold text-base text-[#CD5297] mb-2">Основная валюта</Text>
         <View className="flex-row items-center justify-between ">
           <TextInput
-            onChangeText={handleChange}
-            value={cashAmount}
+            onChangeText={handleChangeMainCurrency}
+            value={mainCurrencyCash}
             keyboardType="numeric"
             placeholder="Введите сумму..."
             placeholderTextColor="white"
@@ -126,7 +162,7 @@ export default function NotReserve({ data, defaultCurrency, isChecked, handleCha
       )}
 
       {isChecked.inDebt && (
-        <View>
+        <View className="relative z-10">
           <View className="w-full h-[2px] bg-gray-200 my-2 z-[-4]"></View>
           <Text className="font-bold text-base text-[#CD5297] mb-2">Сумма долга</Text>
           <View className="flex-row items-center justify-between">

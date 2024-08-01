@@ -1,47 +1,62 @@
 import React, { useContext, useEffect, useState } from "react";
 import { Text, TextInput, View, useWindowDimensions } from "react-native";
 import { sellContext } from "../../../../contexts/sellContext";
-import WithOutSearchSelect from "../../components/WithOutSearchSelect";
 import { styles } from "../styles";
+import { SelectList } from "react-native-dropdown-select-list";
+import Icon from "react-native-vector-icons/Ionicons";
 
 export default function AdditionalServices({ data, setTotalAmount, totalAmount, defaultCurrency }) {
-  console.log("totalAmount: ", totalAmount);
   const windowWidth = useWindowDimensions().width;
-  const { selectedSellPlace, setSelectedSellPlace } = useContext(sellContext);
+  const { selectedSellPlace } = useContext(sellContext);
 
   const [cash, setCash] = useState("");
   const [selectedCurrency, setSelectedCurrency] = useState(defaultCurrency);
   const [converted, setConverted] = useState(0);
-  const [previousConverted, setPreviousConverted] = useState(0); // для хранения предыдущего значения
+  const [previousConverted, setPreviousConverted] = useState(0);
 
   useEffect(() => {
-    if (cash) {
-      let convertedValue = convertToUSD(parseFloat(cash), selectedCurrency, data);
-      if (!isNaN(convertedValue)) {
-        setConverted(convertedValue);
-        updateTotalAmount(convertedValue - previousConverted); // обновить на разницу
-        setPreviousConverted(convertedValue); // обновить предыдущее значение
-      }
-    } else {
-      updateTotalAmount(-previousConverted); // уменьшить на предыдущее значение
-      setPreviousConverted(0); // сбросить предыдущее значение
-      setConverted(0); // сбросить конвертированное значение
-    }
+    updateConversion();
   }, [selectedCurrency, cash]);
 
-  function convertToUSD(amount, currency, data) {
-    const selectedCurrencyData = data.currencies.find((cur) => cur.key.id === currency.key.id);
-    const exchangeRate = selectedCurrencyData ? selectedCurrencyData.key.rate : 1;
+  useEffect(() => {
+    updateTotalAmount(0);
+    setPreviousConverted(0);
+    setConverted(0);
+    setCash("");
+  }, [selectedSellPlace.selectedCurency]);
 
-    if (selectedSellPlace.selectedCurency.id === currency.key.id) {
-      return amount;
+  function updateConversion() {
+    if (cash) {
+      const convertedValue = convertToSelectedCurrency(parseFloat(cash), selectedCurrency, selectedSellPlace.selectedCurency);
+      if (!isNaN(convertedValue)) {
+        setConverted(convertedValue);
+        updateTotalAmount(convertedValue - previousConverted);
+        setPreviousConverted(convertedValue);
+      }
     } else {
-      return amount / exchangeRate;
+      updateTotalAmount(-previousConverted);
+      setPreviousConverted(0);
+      setConverted(0);
     }
   }
 
-  function updateTotalAmount(additionalUSD) {
-    setTotalAmount((prevTotal) => (parseFloat(prevTotal) + parseFloat(additionalUSD)).toFixed(2));
+  function convertToSelectedCurrency(amount, currencyFrom, currencyTo) {
+    const currencyFromData = data.currencies.find((cur) => cur.key.id === currencyFrom.id);
+    const currencyToData = data.currencies.find((cur) => cur.key.id === currencyTo.id);
+    const rateFrom = currencyFromData ? currencyFromData.key.rate : 1;
+    const rateTo = currencyToData ? currencyToData.key.rate : 1;
+
+    return (amount / rateFrom) * rateTo;
+  }
+
+  function updateTotalAmount(additionalAmount) {
+    if (isNaN(additionalAmount)) {
+      additionalAmount = 0;
+    }
+    setTotalAmount((prevTotal) => {
+      const newTotal = parseFloat(prevTotal) + parseFloat(additionalAmount);
+      return newTotal.toFixed(2);
+    });
   }
 
   function handleTextChange(text) {
@@ -49,6 +64,12 @@ export default function AdditionalServices({ data, setTotalAmount, totalAmount, 
     const parts = newText.split(".");
     if (parts.length > 2) {
       newText = parts[0] + "." + parts.slice(1).join("");
+    }
+    if (!newText || isNaN(parseFloat(newText))) {
+      newText = "";
+      updateTotalAmount(-previousConverted);
+      setPreviousConverted(0);
+      setConverted(0);
     }
     setCash(newText);
   }
@@ -67,12 +88,20 @@ export default function AdditionalServices({ data, setTotalAmount, totalAmount, 
         />
         <View className="w-3 h-[2px] bg-gray-200 mx-1"></View>
 
-        <WithOutSearchSelect
-          width={150}
+        <SelectList
+          dropdownTextStyles={styles.dropdownTextStyles}
+          dropdownStyles={[styles.dropdownStyles]}
+          boxStyles={styles.boxStyles}
+          inputStyles={{ color: "white" }}
+          closeicon={<Icon name="close" color="white" size={25} />}
+          searchicon={<Icon name="search" color="white" size={20} style={{ marginRight: 10 }} />}
+          arrowicon={<Icon name="arrow-down" color="white" size={20} />}
+          dropdownItemStyles={styles.dropdownItemStyles}
           defaultOption={defaultCurrency}
-          onSelect={(currency) => {
+          setSelected={(currency) => {
             setSelectedCurrency(currency);
           }}
+          placeholder={"Выбрать валюту"}
           search={false}
           data={data.currencies}
         />

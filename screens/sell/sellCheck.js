@@ -1,42 +1,14 @@
-import React, { useCallback, useContext, useEffect, useState } from "react";
-import {
-  Image,
-  Platform,
-  RefreshControl,
-  SafeAreaView,
-  ScrollView,
-  ScrollViewBase,
-  ScrollViewComponent,
-  StatusBar,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import React, { useCallback, useContext, useState } from "react";
+import { Platform, SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
 import Icon from "react-native-vector-icons/Ionicons";
-import Octicons from "react-native-vector-icons/Octicons";
 import { sellContext } from "../../contexts/sellContext";
-import { workPlaceContext } from "../../contexts/workPlaceContext";
-import { SelectList } from "react-native-dropdown-select-list";
-import ModalChooseAddVariant from "../../components/AddVariant/modalChooseAddVariant";
-import Animated, { useSharedValue, withTiming, useAnimatedStyle, withRepeat, withSequence } from "react-native-reanimated";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import ModalForSellWithOutCustomer from "./modals/WithOutCustomer";
-import SellCheckModal from "./modals/sellCheckModal";
 import { showMessage } from "react-native-flash-message";
 
 export default function SellCheck({ navigation }) {
-  const [refreshing, setRefreshing] = useState(false);
   const { sellSendWithOutCustomer, sellCart, selectedSellPlace, setSellCart } = useContext(sellContext);
-
-  const onRefresh = useCallback(() => {
-    setRefreshing(true);
-    setTimeout(() => {
-      setRefreshing(false);
-    }, 500);
-  }, []);
 
   const totalQuantity = sellCart.reduce((sum, curr) => sum + curr.newQuantity, 0);
   const totalPrice = (

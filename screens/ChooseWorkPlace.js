@@ -1,7 +1,6 @@
-import React, { useCallback, useContext, useEffect, useState } from "react";
-import { ImageBackground, Pressable, ScrollView, Text, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
+import React, { useContext, useEffect, useState } from "react";
+import { Pressable, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import Icon from "react-native-vector-icons/Feather";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { LinearGradient } from "expo-linear-gradient";
 import { workPlaceContext } from "../contexts/workPlaceContext";
 

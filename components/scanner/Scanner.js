@@ -3,7 +3,7 @@ import { Text, View, StyleSheet, TouchableOpacity, SafeAreaView, Button, Alert, 
 import { BarCodeScanner } from "expo-barcode-scanner";
 import { LinearGradient } from "expo-linear-gradient";
 import Icon from "react-native-vector-icons/Ionicons";
-import FlashMessage, { showMessage } from "react-native-flash-message";
+import FlashMessage from "react-native-flash-message";
 import { sellContext } from "../../contexts/sellContext";
 import { transferContext } from "../../contexts/transferContext";
 import { useNavigation } from "@react-navigation/native";

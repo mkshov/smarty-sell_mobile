@@ -1,8 +1,7 @@
-import React, { createContext, useState, useEffect, useCallback } from "react";
-import { STORAGE, LOGIN, TOKEN } from "../constants";
+import React, { createContext, useState, useCallback } from "react";
+import { STORAGE, TOKEN } from "../constants";
 import api from "../api/axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useNavigation } from "@react-navigation/native";
 
 export const workPlaceContext = createContext();
 
