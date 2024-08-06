@@ -16,4 +16,17 @@ api.interceptors.request.use(async (config) => {
   return customConfig;
 });
 
+api.interceptors.response.use(
+  function (response) {
+    return response;
+  },
+  function (error) {
+    console.log("error: ", error);
+    // if (error && error.response && error.response.status >= 500) {
+    //   throw new Error("Ошибка сервера");
+    // }
+    return Promise.reject(error);
+  }
+);
+
 export default api;

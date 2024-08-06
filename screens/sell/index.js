@@ -51,6 +51,7 @@ export default function SellScreen({ navigation }) {
   const [modalVisible, setModalVisible] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [data, setData] = useState(null);
+  const [withCustomerModal, setWithCustomerModal] = useState(false);
 
   const totalPrice = useTotalPrice(sellCart, selectedSellPlace);
   const totalQuantity = useTotalQuantity(sellCart);
@@ -114,6 +115,14 @@ export default function SellScreen({ navigation }) {
       setSelectedSellPlace((prev) => ({ ...prev, selectedCurency: data.baseCurrency.key, selectedPlace: data.basePlace.key }));
     }
   }, [data]);
+
+  function handleClick() {
+    if (selectedSellPlace.withOutCustomer) {
+      setWithCustomerModal(!withCustomerModal);
+    } else {
+      setWithOutCustomerModal(!withOutCustomerModal);
+    }
+  }
 
   if (!data)
     return (
@@ -193,7 +202,7 @@ export default function SellScreen({ navigation }) {
               <Text style={styles.totalPriceText}>
                 Итого: {totalPrice()} {selectedSellPlace.selectedCurency?.name || selectedSellPlace.selectedCurency?.currency?.name}
               </Text>
-              <TouchableOpacity style={styles.addProductButton} onPress={() => setWithOutCustomerModal(!withOutCustomerModal)}>
+              <TouchableOpacity style={styles.addProductButton} onPress={handleClick}>
                 <Text style={styles.addProductButtonText}>Оформить продажу</Text>
               </TouchableOpacity>
             </View>
@@ -209,9 +218,9 @@ export default function SellScreen({ navigation }) {
                 sellCart={sellCart}
                 setSelectedSellPlace={setSelectedSellPlace}
                 selectedSellPlace={selectedSellPlace}
-                modalVisible={withOutCustomerModal}
+                modalVisible={withCustomerModal}
                 totalPrice={totalPrice}
-                setModalVisible={setWithOutCustomerModal}
+                setModalVisible={setWithCustomerModal}
               />
             ) : (
               <ModalForSellWithOutCustomer

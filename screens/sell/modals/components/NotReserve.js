@@ -24,11 +24,18 @@ export default function NotReserve({
   setAdditionalCurrencies,
 }) {
   const windowWidth = useWindowDimensions().width;
-  console.log("additionalCurrencyCash: ", additionalCurrencyCash);
 
   const { selectedSellPlace, sellCurrencies } = useContext(sellContext);
 
   const [isDisabled, setIsDisabled] = useState(false);
+  const [displayValue, setDisplayValue] = useState(additionalCurrencyCash.toFixed(2));
+  console.log("additionalCurrencyCash: ", additionalCurrencyCash);
+  console.log("mainCurrencyCash: ", mainCurrencyCash);
+  console.log("displayValue: ", displayValue);
+
+  useEffect(() => {
+    setDisplayValue(additionalCurrencyCash.toFixed(2));
+  }, [mainCurrencyCash]);
 
   useEffect(() => {
     let mainCurrency = parseFloat(mainCurrencyCash) || 0;
@@ -42,13 +49,40 @@ export default function NotReserve({
     }
   }, [mainCurrencyCash]);
 
-  function handleTextChange(text) {
-    let cash = text.replace(/,/g, ".");
-    const parts = cash.split(".");
-    if (parts.length > 2) {
-      cash = parts[0] + "." + parts.slice(1).join("");
+  const handleBlur = () => {
+    if (displayValue === "" || displayValue === "." || displayValue === "-." || displayValue === "-") {
+      setDisplayValue("0.00");
+      setAdditionalCurrencyCash(0);
+    } else {
+      const fullValue = parseFloat(displayValue);
+      setDisplayValue(fullValue);
+      setAdditionalCurrencyCash(fullValue);
     }
-    setAdditionalCurrencyCash(cash);
+  };
+
+  function handleTextChange(text) {
+    // let cash = text.replace(/,/g, ".");
+    // const parts = cash.split(".");
+    // if (parts.length > 2) {
+    //   cash = parts[0] + "." + parts.slice(1).join("");
+    // }
+    // console.log("cash: ", cash);
+    // setAdditionalCurrencyCash(+cash);
+    // setDisplayValue(parseFloat(text).toFixed(2));
+
+    // Обработка ввода и сохранение полного значения
+    if (text === "" || text === "." || text === "-" || text === "-.") {
+      setDisplayValue(text);
+      return;
+    }
+
+    const fullValue = parseFloat(text);
+    if (!isNaN(fullValue)) {
+      setDisplayValue(text);
+      setAdditionalCurrencyCash(fullValue);
+    } else {
+      setDisplayValue(displayValue); // Восстановление предыдущего значения при ошибке
+    }
   }
 
   const opacity = useRef(new Animated.Value(1)).current;
@@ -64,7 +98,7 @@ export default function NotReserve({
   return (
     <>
       {isChecked.cash && <SellChangeWithCustomer data={data} defaultCurrency={defaultCurrency} />}
-      <View className="my-2 relative z-[10]">
+      <View className="my-2 relative z-[5]">
         <Animated.View style={{ flexDirection: "row", alignItems: "center", opacity }}>
           <SellCheckbox
             onChange={() => !isDisabled && setPaymentInTwoCurrencies((prev) => !prev)}
@@ -77,43 +111,45 @@ export default function NotReserve({
         </Animated.View>
       </View>
       <View className="mb-1 z-[5]">
-        {paymentInTwoCurrencies && (
-          <View className="relative mb-3">
-            <Text className="font-bold text-base text-[#CD5297] my-2">Дополнительная валюта</Text>
-            <View className="flex-row items-center justify-between">
-              <TextInput
-                onChangeText={handleTextChange}
-                value={additionalCurrencyCash}
-                keyboardType="numeric"
-                placeholder="Введите сумму..."
-                placeholderTextColor="white"
-                style={styles.inputStyles}
-              />
-              <View className="w-3 h-[2px] bg-gray-200 mx-1"></View>
-              <SelectList
-                dropdownTextStyles={[styles.dropdownTextStyles, windowWidth <= 385 && { fontSize: 14 }]}
-                dropdownStyles={[styles.dropdownStyles, styles.dropdownChangeStyle, windowWidth <= 385 && { width: 100 }]}
-                boxStyles={[styles.boxStyles, windowWidth <= 385 && { width: 100 }]}
-                inputStyles={{ color: "white" }}
-                closeicon={<Icon name="close" color="white" size={25} />}
-                searchicon={<Icon name="search" color="white" size={20} style={{ marginRight: 10 }} />}
-                arrowicon={<Icon name="arrow-up" color="white" size={20} />}
-                dropdownItemStyles={[
-                  styles.dropdownItemStyles,
-                  windowWidth <= 385 && {
-                    marginHorizontal: 10,
-                  },
-                ]}
-                defaultOption={additionalCurrencies.currencies[0]}
-                setSelected={(currency) => {
-                  setAdditionalCurrencies((prev) => ({ ...prev, selectedCurrency: currency }));
-                }}
-                search={false}
-                data={additionalCurrencies.currencies}
-              />
-            </View>
+        {/* {paymentInTwoCurrencies && ( */}
+        <View className={`relative mb-3 ${paymentInTwoCurrencies ? "block" : "hidden"}`}>
+          <Text className="font-bold text-base text-[#CD5297] my-2">Дополнительная валюта</Text>
+          <View className="flex-row items-center justify-between">
+            <TextInput
+              onChangeText={handleTextChange}
+              // defaultValue={additionalCurrencyCash.toFixed(2)}
+              value={displayValue}
+              keyboardType="numeric"
+              placeholder="Введите сумму..."
+              placeholderTextColor="white"
+              style={styles.inputStyles}
+              onBlur={handleBlur}
+            />
+            <View className="w-3 h-[2px] bg-gray-200 mx-1"></View>
+            <SelectList
+              dropdownTextStyles={[styles.dropdownTextStyles, windowWidth <= 385 && { fontSize: 14 }]}
+              dropdownStyles={[styles.dropdownStyles, styles.dropdownChangeStyle, windowWidth <= 385 && { width: 100 }]}
+              boxStyles={[styles.boxStyles, windowWidth <= 385 && { width: 100 }]}
+              inputStyles={{ color: "white" }}
+              closeicon={<Icon name="close" color="white" size={25} />}
+              searchicon={<Icon name="search" color="white" size={20} style={{ marginRight: 10 }} />}
+              arrowicon={<Icon name="arrow-up" color="white" size={20} />}
+              dropdownItemStyles={[
+                styles.dropdownItemStyles,
+                windowWidth <= 385 && {
+                  marginHorizontal: 10,
+                },
+              ]}
+              defaultOption={additionalCurrencies.currencies[0]}
+              setSelected={(currency) => {
+                setAdditionalCurrencies((prev) => ({ ...prev, selectedCurrency: currency }));
+              }}
+              search={false}
+              data={additionalCurrencies.currencies}
+            />
           </View>
-        )}
+        </View>
+        {/* )} */}
         <Text className="font-bold text-base text-[#CD5297] mb-2">Основная валюта</Text>
         <View className="flex-row items-center justify-between ">
           <TextInput
