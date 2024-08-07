@@ -11,16 +11,16 @@
       ]
     ],
     "suppressWarnings": ["BarCodeScanner has been deprecated and will be removed in a future SDK version."],
-    "name": "smarty-sell_mobile",
-    "slug": "smarty-sell_mobile",
+    "name": "Smarty Sell",
+    "slug": "Smarty Sell",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/splash.jpg",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./assets/splash.png",
+      "image": "./assets/login-bg.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#ED83C1"
     },
     "assetBundlePatterns": ["**/*"],
     "ios": {

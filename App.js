@@ -5,6 +5,9 @@ import TransferContextProvider from "./contexts/transferContext";
 import WorkPlaceContextProvider from "./contexts/workPlaceContext";
 import AppNavigation from "./navigation/appNavigation";
 
+import icon from "./assets/splash-image.jpg";
+console.log("icon: ", icon);
+
 import "react-native-reanimated";
 
 export default function App() {
