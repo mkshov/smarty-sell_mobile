@@ -25,7 +25,7 @@ export default function ToPay({
   const totalPrice = useTotalPrice(sellCart, selectedSellPlace);
 
   return (
-    <View className="mt-5 relative z-[12]">
+    <View className="mt-5 relative z-[22]">
       <Text className="font-bold text-base text-[#CD5297] mb-2">К оплате</Text>
       <View className="flex-row items-center justify-between">
         <SelectList

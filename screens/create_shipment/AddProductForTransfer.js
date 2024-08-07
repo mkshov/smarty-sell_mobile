@@ -89,7 +89,7 @@ export default function AddProductForTransfer({ route, navigation }) {
     }
   };
   return (
-    <ImageBackground resizeMode="cover" className="h-full" source={require("../../assets/login-bg.png")}>
+    <LinearGradient colors={["#ED83C1", "#8469A4"]} className="h-full">
       <SafeAreaProvider>
         <SafeAreaView style={styles.AndroidSafeArea}>
           <TouchableOpacity onPress={() => navigation.navigate("create-transfers")} className="flex-row items-center ml-2">
@@ -202,7 +202,7 @@ export default function AddProductForTransfer({ route, navigation }) {
         </SafeAreaView>
         <FlashMessage />
       </SafeAreaProvider>
-    </ImageBackground>
+    </LinearGradient>
   );
 }
 let styles = StyleSheet.create({

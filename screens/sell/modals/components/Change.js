@@ -49,8 +49,6 @@ export default function SellChangeWithCustomer({ data, defaultCurrency }) {
           Добавить сдачу в баланс
         </Text>
       </View>
-
-      <View className="w-full h-[2px] bg-gray-200 my-2 z-[-4]"></View>
     </>
   );
 }

@@ -22,6 +22,7 @@ export default function NotReserve({
   setAdditionalCurrencyCash,
   setPaymentInTwoCurrencies,
   setAdditionalCurrencies,
+  handleConvertAdditionalCurrency,
 }) {
   const windowWidth = useWindowDimensions().width;
 
@@ -29,19 +30,15 @@ export default function NotReserve({
 
   const [isDisabled, setIsDisabled] = useState(false);
   const [displayValue, setDisplayValue] = useState(additionalCurrencyCash.toFixed(2));
-  console.log("additionalCurrencyCash: ", additionalCurrencyCash);
-  console.log("mainCurrencyCash: ", mainCurrencyCash);
-  console.log("displayValue: ", displayValue);
 
   useEffect(() => {
+    handleConvertAdditionalCurrency(mainCurrencyCash);
     setDisplayValue(additionalCurrencyCash.toFixed(2));
-  }, [mainCurrencyCash]);
+  }, [mainCurrencyCash, paymentInTwoCurrencies]);
 
   useEffect(() => {
     let mainCurrency = parseFloat(mainCurrencyCash) || 0;
     if (mainCurrency >= totalAmount) {
-      // setAdditionalCurrencyCash("");
-      console.log("lol");
       setPaymentInTwoCurrencies(false);
       setIsDisabled(true);
     } else {
@@ -49,39 +46,25 @@ export default function NotReserve({
     }
   }, [mainCurrencyCash]);
 
-  const handleBlur = () => {
-    if (displayValue === "" || displayValue === "." || displayValue === "-." || displayValue === "-") {
-      setDisplayValue("0.00");
-      setAdditionalCurrencyCash(0);
-    } else {
-      const fullValue = parseFloat(displayValue);
-      setDisplayValue(fullValue);
-      setAdditionalCurrencyCash(fullValue);
-    }
-  };
-
   function handleTextChange(text) {
-    // let cash = text.replace(/,/g, ".");
-    // const parts = cash.split(".");
-    // if (parts.length > 2) {
-    //   cash = parts[0] + "." + parts.slice(1).join("");
-    // }
-    // console.log("cash: ", cash);
-    // setAdditionalCurrencyCash(+cash);
-    // setDisplayValue(parseFloat(text).toFixed(2));
-
-    // Обработка ввода и сохранение полного значения
-    if (text === "" || text === "." || text === "-" || text === "-.") {
-      setDisplayValue(text);
+    let cash = text.replace(/,/g, ".");
+    const parts = cash.split(".");
+    if (parts.length > 2) {
+      cash = parts[0] + "." + parts.slice(1).join("");
+    }
+    if (cash === "" || cash === "." || cash === "-" || cash === "-.") {
+      setDisplayValue(cash);
+      setAdditionalCurrencyCash(0);
       return;
     }
 
-    const fullValue = parseFloat(text);
+    const fullValue = parseFloat(cash);
+
     if (!isNaN(fullValue)) {
-      setDisplayValue(text);
+      setDisplayValue(cash);
       setAdditionalCurrencyCash(fullValue);
     } else {
-      setDisplayValue(displayValue); // Восстановление предыдущего значения при ошибке
+      setDisplayValue(displayValue);
     }
   }
 
@@ -98,6 +81,10 @@ export default function NotReserve({
   return (
     <>
       {isChecked.cash && <SellChangeWithCustomer data={data} defaultCurrency={defaultCurrency} />}
+
+      {isChecked.fromTheBalance && <CustomerBalance defaultCurrency={defaultCurrency} data={data} />}
+      <View className="w-full h-[2px] bg-gray-200 my-2 relative z-[-4]"></View>
+
       <View className="my-2 relative z-[5]">
         <Animated.View style={{ flexDirection: "row", alignItems: "center", opacity }}>
           <SellCheckbox
@@ -123,7 +110,6 @@ export default function NotReserve({
               placeholder="Введите сумму..."
               placeholderTextColor="white"
               style={styles.inputStyles}
-              onBlur={handleBlur}
             />
             <View className="w-3 h-[2px] bg-gray-200 mx-1"></View>
             <SelectList
@@ -166,36 +152,6 @@ export default function NotReserve({
           </Text>
         </View>
       </View>
-
-      {isChecked.fromTheBalance && (
-        <View>
-          <View className="w-full h-[2px] bg-gray-200 my-2 relative z-[-4]"></View>
-
-          <CustomerBalance defaultCurrency={defaultCurrency} data={data} />
-
-          <Text className="font-bold text-base text-[#CD5297] my-2">Сдача в баланс</Text>
-          <View className="flex-row items-center justify-between  relative z-10">
-            <SelectList
-              dropdownTextStyles={styles.dropdownTextStyles}
-              dropdownStyles={[styles.dropdownStyles, styles.dropdownChangeStyle]}
-              boxStyles={styles.boxStyles}
-              inputStyles={{ color: "white" }}
-              closeicon={<Icon name="close" color="white" size={25} />}
-              searchicon={<Icon name="search" color="white" size={20} style={{ marginRight: 10 }} />}
-              arrowicon={<Icon name="arrow-up" color="white" size={20} />}
-              dropdownItemStyles={styles.dropdownItemStyles}
-              defaultOption={defaultCurrency}
-              setSelected={(currency) => {
-                console.log("currency: ", currency);
-              }}
-              search={false}
-              data={data.currencies}
-            />
-            <View className="w-3 h-[2px] bg-gray-200 mx-1"></View>
-            <Text className={`font-bold text-lg text-[#CD5297] w-[150] ${windowWidth <= 385 && "w-[100] text-sm"}`}>0</Text>
-          </View>
-        </View>
-      )}
 
       {isChecked.inDebt && (
         <View className="relative z-10">

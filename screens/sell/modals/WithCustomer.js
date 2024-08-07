@@ -32,7 +32,7 @@ export default function ModalForSellWithCustomer(props) {
   const { setSellCart, setChangeAmount, modalCheck, setModalCheck, modalConfirm, setModalConfirm, sellCurrencies } = useContext(sellContext);
 
   const [mainCurrencyCash, setMainCurrencyCash] = useState("");
-  const [additionalCurrencyCash, setAdditionalCurrencyCash] = useState(0); // Change to number
+  const [additionalCurrencyCash, setAdditionalCurrencyCash] = useState(0);
   const [additionalCurrencies, setAdditionalCurrencies] = useState({
     currencies: [],
     selectedCurrency: null,
@@ -74,10 +74,10 @@ export default function ModalForSellWithCustomer(props) {
   }, [paymentInTwoCurrencies, additionalCurrencies.selectedCurrency]);
 
   useEffect(() => {
-    if (additionalCurrencyCash && paymentInTwoCurrencies) {
+    if (paymentInTwoCurrencies) {
       calculateChange();
     }
-  }, [additionalCurrencyCash, paymentInTwoCurrencies]);
+  }, [additionalCurrencyCash, paymentInTwoCurrencies, mainCurrencyCash]);
 
   useEffect(() => {
     let withOutSelectedCurrency = data.currencies.filter((currency) => currency.key.id !== selectedSellPlace.selectedCurency.id);
@@ -102,7 +102,6 @@ export default function ModalForSellWithCustomer(props) {
     const total = parseFloat(totalAmount);
 
     if (!isNaN(cash) && cash < total && additionalCurrencies.selectedCurrency && cash) {
-      console.log("additionalCurrencies.selectedCurrency: ", additionalCurrencies.selectedCurrency);
       let convertToSelectedCurrency;
       if (selectedSellPlace.selectedCurency.rate === 1) {
         convertToSelectedCurrency = (total - cash) * additionalCurrencies.selectedCurrency.rate;
@@ -123,14 +122,20 @@ export default function ModalForSellWithCustomer(props) {
 
   const calculateChange = () => {
     let additionalCash = additionalCurrencyCash || 0;
+    let cash = parseFloat(mainCurrencyCash) || 0;
+    let total = 0;
 
-    let change2 =
-      additionalCurrencies.selectedCurrency.rate === 1
-        ? additionalCash * selectedSellPlace.selectedCurency.rate
-        : (additionalCash / additionalCurrencies.selectedCurrency.rate) * selectedSellPlace.selectedCurency.rate;
-    change2 = parseFloat(change2.toFixed(2));
+    if (cash === 0 && paymentInTwoCurrencies && additionalCurrencies.selectedCurrency) {
+      total = (additionalCash / additionalCurrencies.selectedCurrency.rate) * selectedSellPlace.selectedCurency.rate;
+    } else {
+      let change2 =
+        additionalCurrencies.selectedCurrency.rate === 1
+          ? additionalCash * selectedSellPlace.selectedCurency.rate
+          : (additionalCash / additionalCurrencies.selectedCurrency.rate) * selectedSellPlace.selectedCurency.rate;
+      change2 = parseFloat(change2.toFixed(2));
 
-    let total = parseFloat(mainCurrencyCash) + change2;
+      total = cash + change2;
+    }
 
     total = parseFloat(total.toFixed(2));
 
@@ -138,7 +143,6 @@ export default function ModalForSellWithCustomer(props) {
 
     setChangeAmount((total - totalAmount).toFixed(2));
   };
-
   const defaultCurrency = {
     key: selectedSellPlace.selectedCurency,
     value: selectedSellPlace.selectedCurency?.name,
@@ -208,6 +212,7 @@ export default function ModalForSellWithCustomer(props) {
                       setAdditionalCurrencyCash={setAdditionalCurrencyCash}
                       setPaymentInTwoCurrencies={setPaymentInTwoCurrencies}
                       setAdditionalCurrencies={setAdditionalCurrencies}
+                      handleConvertAdditionalCurrency={handleConvertAdditionalCurrency}
                       setTotalAmount={setTotalAmount}
                       additionalCurrencies={additionalCurrencies}
                       paymentInTwoCurrencies={paymentInTwoCurrencies}

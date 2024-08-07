@@ -15,11 +15,11 @@
     "slug": "Smarty Sell",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/splash.jpg",
+    "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./assets/login-bg.png",
-      "resizeMode": "contain",
+      "image": "./assets/splash.png",
+      "resizeMode": "cover",
       "backgroundColor": "#ED83C1"
     },
     "assetBundlePatterns": ["**/*"],

@@ -62,7 +62,7 @@ export default function CartForScann({ route, navigation }) {
   };
 
   return (
-    <ImageBackground resizeMode="cover" className="h-full" source={require("../../assets/login-bg.png")}>
+    <LinearGradient colors={["#ED83C1", "#8469A4"]} className="py-4 px-10 rounded-2xl">
       <SafeAreaProvider>
         <SafeAreaView>
           <TouchableOpacity onPress={() => navigation.navigate("scan-product-transfer")} className="flex-row items-center ml-2">
@@ -135,6 +135,6 @@ export default function CartForScann({ route, navigation }) {
           </ScrollView>
         </SafeAreaView>
       </SafeAreaProvider>
-    </ImageBackground>
+    </LinearGradient>
   );
 }

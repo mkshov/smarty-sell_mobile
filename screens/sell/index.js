@@ -48,6 +48,7 @@ export default function SellScreen({ navigation }) {
 
   const { getSavedPlace, savedPlace } = useContext(workPlaceContext);
 
+  console.log("sellCurrencies: ", sellCurrencies);
   const [modalVisible, setModalVisible] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [data, setData] = useState(null);

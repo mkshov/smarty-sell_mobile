@@ -75,7 +75,7 @@ export default function AdditionalServices({ data, setTotalAmount, totalAmount, 
   }
 
   return (
-    <View className="relative z-[11]">
+    <View className="relative z-[21]">
       <Text className="font-bold text-base text-[#CD5297] mb-2">Дополнительные услуги</Text>
       <View className="flex-row items-center justify-between">
         <TextInput
