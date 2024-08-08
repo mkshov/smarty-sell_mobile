@@ -25,7 +25,7 @@ import NotReserve from "./components/NotReserve";
 import SellWithCustomerReserve from "./components/Reserve";
 
 export default function ModalForSellWithCustomer(props) {
-  const { modalVisible, setModalVisible, data, selectedSellPlace, setSelectedSellPlace, totalPrice, sellCart } = props;
+  const { modalVisible, setModalVisible, data, selectedSellPlace, setSelectedSellPlace, totalPrice, sellCart, defaultCurrency } = props;
 
   const navigation = useNavigation();
 
@@ -143,10 +143,11 @@ export default function ModalForSellWithCustomer(props) {
 
     setChangeAmount((total - totalAmount).toFixed(2));
   };
-  const defaultCurrency = {
-    key: selectedSellPlace.selectedCurency,
-    value: selectedSellPlace.selectedCurency?.name,
-  };
+  // const defaultCurrency = {
+  //   key: selectedSellPlace.selectedCurency,
+  //   value: selectedSellPlace.selectedCurency?.name,
+  // };
+  // console.log("defaultCurrency sdsd: ", defaultCurrency);
 
   const handleClick = async () => {
     setChangeAmount(0);

@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import { styles } from "../styles";
 import { Text, TouchableOpacity, useWindowDimensions } from "react-native";
 import { View } from "react-native";
@@ -24,6 +24,11 @@ export default function ToPay({
 
   const totalPrice = useTotalPrice(sellCart, selectedSellPlace);
 
+  useEffect(() => {
+    const newPrice = totalPrice();
+    setTotalAmount(newPrice);
+  }, [selectedSellPlace.selectedCurency]);
+
   return (
     <View className="mt-5 relative z-[22]">
       <Text className="font-bold text-base text-[#CD5297] mb-2">К оплате</Text>
@@ -39,14 +44,10 @@ export default function ToPay({
           dropdownItemStyles={styles.dropdownItemStyles}
           defaultOption={defaultCurrency}
           setSelected={(currency) => {
-            totalPrice(currency);
             setSelectedSellPlace({
               ...selectedSellPlace,
               selectedCurency: currency,
             });
-            const newTotal = totalPrice(currency);
-            setTotalAmount(newTotal);
-            handleConvertAdditionalCurrency(cashAmount, newTotal);
           }}
           search={false}
           data={data.currencies}

@@ -48,11 +48,14 @@ export default function SellScreen({ navigation }) {
 
   const { getSavedPlace, savedPlace } = useContext(workPlaceContext);
 
-  console.log("sellCurrencies: ", sellCurrencies);
   const [modalVisible, setModalVisible] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [data, setData] = useState(null);
   const [withCustomerModal, setWithCustomerModal] = useState(false);
+
+  const [defaultCurrency, setDefaultCurrency] = useState(null);
+  console.log("defaultCurrency: ", defaultCurrency);
+  const [selectedCurrency, setSelectedCurrency] = useState(null);
 
   const totalPrice = useTotalPrice(sellCart, selectedSellPlace);
   const totalQuantity = useTotalQuantity(sellCart);
@@ -99,6 +102,20 @@ export default function SellScreen({ navigation }) {
   const handlePress = () => {
     offset.value = withSequence(withRepeat(withTiming(OFFSET, { duration: TIME }), 5, true), withTiming(0, { duration: TIME / 2 }));
   };
+
+  useEffect(() => {
+    if (data) {
+      const baseCurrency = sellCurrencies.find((currency) => currency.is_base_currency);
+      if (baseCurrency) {
+        setDefaultCurrency({
+          key: { id: baseCurrency.currency.id, rate: baseCurrency.rate, name: baseCurrency.currency.name },
+          value: baseCurrency.currency.name,
+        });
+        setSelectedCurrency(baseCurrency.currency);
+      }
+      setSelectedSellPlace((prev) => ({ ...prev, selectedCurency: baseCurrency.currency.key, selectedPlace: data.basePlace.key }));
+    }
+  }, [data]);
 
   useEffect(() => {
     const intervalId = setInterval(handlePress, 3000);
@@ -222,6 +239,7 @@ export default function SellScreen({ navigation }) {
                 modalVisible={withCustomerModal}
                 totalPrice={totalPrice}
                 setModalVisible={setWithCustomerModal}
+                defaultCurrency={defaultCurrency}
               />
             ) : (
               <ModalForSellWithOutCustomer

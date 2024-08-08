@@ -32,6 +32,7 @@ export const styles = StyleSheet.create({
     top: 45,
     backgroundColor: "#f5f5f5",
     width: 150,
+    zIndex: 10,
   },
   dropdownChangeStyle: {
     bottom: 55,

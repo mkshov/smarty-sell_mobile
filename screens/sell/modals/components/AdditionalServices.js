@@ -109,6 +109,9 @@ export default function AdditionalServices({ data, setTotalAmount, totalAmount, 
       <Text className="font-bold text-base text-[#CD5297] mt-2">
         Конвертация: {converted.toFixed(2)} {selectedSellPlace.selectedCurency.name}
       </Text>
+      <Text className="font-bold text-base text-[#CD5297] max-w-[200px]">
+        по курсу 1$ = {selectedCurrency.rate} {selectedCurrency.name}
+      </Text>
     </View>
   );
 }
