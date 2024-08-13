@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { styles } from "../styles";
 import { Text, useWindowDimensions } from "react-native";
 import { View } from "react-native";
@@ -7,12 +7,30 @@ import SellCheckbox from "../../components/CheckBox";
 import { SelectList } from "react-native-dropdown-select-list";
 import { sellContext } from "../../../../contexts/sellContext";
 
-export default function SellChangeWithCustomer({ data, defaultCurrency }) {
+export default function SellChangeWithCustomer({ data, mainCurrencyCash, totalAmount, handleChangeMainCurrency, calculateChange }) {
   const windowWidth = useWindowDimensions().width;
 
-  const { changeAmount, selectedSellPlace } = useContext(sellContext);
-
+  const { changeAmount, selectedSellPlace, setChangeAmount } = useContext(sellContext);
   const [balanceSheet, setBalanceSheet] = useState(false);
+  const [selectedCurrency, setSelectedCurrency] = useState(selectedSellPlace.selectedCurency);
+  const [change, setChange] = useState(changeAmount);
+  console.log("changeAmount: ", changeAmount);
+  console.log("change: ", change);
+
+  const convertBalance = () => {
+    const changeInDefaultCurrency = change / selectedSellPlace.selectedCurency.rate;
+    const converted = selectedCurrency.rate * changeInDefaultCurrency;
+    return converted;
+  };
+
+  useEffect(() => {
+    const converted = convertBalance();
+    setChangeAmount(converted);
+  }, [selectedCurrency, change, totalAmount]);
+
+  useEffect(() => {
+    setChange(parseFloat(changeAmount));
+  }, [mainCurrencyCash]);
 
   return (
     <>
@@ -28,9 +46,9 @@ export default function SellChangeWithCustomer({ data, defaultCurrency }) {
             searchicon={<Icon name="search" color="white" size={20} style={{ marginRight: 10 }} />}
             arrowicon={<Icon name="arrow-down" color="white" size={20} />}
             dropdownItemStyles={styles.dropdownItemStyles}
-            defaultOption={defaultCurrency}
+            defaultOption={{ key: selectedSellPlace.selectedCurency, value: selectedSellPlace.selectedCurency.name }}
             setSelected={(currency) => {
-              console.log("currency: ", currency);
+              setSelectedCurrency(currency);
             }}
             placeholder={"Выбрать валюту"}
             search={false}
@@ -38,7 +56,7 @@ export default function SellChangeWithCustomer({ data, defaultCurrency }) {
           />
           <View className="w-3 h-[2px] bg-gray-200 mx-1"></View>
           <Text className={`font-bold text-lg text-[#CD5297] w-[150] ${windowWidth <= 385 && "w-[100] text-sm"} relative z-[-1]`}>
-            {changeAmount} {selectedSellPlace.selectedCurency?.name}
+            {parseFloat(changeAmount).toFixed(2)} {selectedCurrency.name}
           </Text>
         </View>
       </View>

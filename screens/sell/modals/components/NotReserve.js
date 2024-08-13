@@ -23,6 +23,7 @@ export default function NotReserve({
   setPaymentInTwoCurrencies,
   setAdditionalCurrencies,
   handleConvertAdditionalCurrency,
+  calculateChange,
 }) {
   const windowWidth = useWindowDimensions().width;
 
@@ -32,9 +33,9 @@ export default function NotReserve({
   const [displayValue, setDisplayValue] = useState(additionalCurrencyCash.toFixed(2));
 
   useEffect(() => {
-    handleConvertAdditionalCurrency(mainCurrencyCash);
-    setDisplayValue(additionalCurrencyCash.toFixed(2));
-  }, [mainCurrencyCash, paymentInTwoCurrencies]);
+    const res = handleConvertAdditionalCurrency(mainCurrencyCash);
+    setDisplayValue(res.toFixed(2));
+  }, [mainCurrencyCash, paymentInTwoCurrencies, additionalCurrencies.selectedCurrency, totalAmount]);
 
   useEffect(() => {
     let mainCurrency = parseFloat(mainCurrencyCash) || 0;
@@ -80,7 +81,16 @@ export default function NotReserve({
 
   return (
     <>
-      {isChecked.cash && <SellChangeWithCustomer data={data} defaultCurrency={defaultCurrency} />}
+      {isChecked.cash && (
+        <SellChangeWithCustomer
+          data={data}
+          defaultCurrency={defaultCurrency}
+          mainCurrencyCash={mainCurrencyCash}
+          totalAmount={totalAmount}
+          handleChangeMainCurrency={handleChangeMainCurrency}
+          calculateChange={calculateChange}
+        />
+      )}
 
       {isChecked.fromTheBalance && <CustomerBalance defaultCurrency={defaultCurrency} data={data} />}
       <View className="w-full h-[2px] bg-gray-200 my-2 relative z-[-4]"></View>

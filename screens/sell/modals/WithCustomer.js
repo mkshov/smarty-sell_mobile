@@ -74,9 +74,9 @@ export default function ModalForSellWithCustomer(props) {
   }, [paymentInTwoCurrencies, additionalCurrencies.selectedCurrency]);
 
   useEffect(() => {
-    if (paymentInTwoCurrencies) {
-      calculateChange();
-    }
+    // if (paymentInTwoCurrencies) {
+    calculateChange();
+    // }
   }, [additionalCurrencyCash, paymentInTwoCurrencies, mainCurrencyCash]);
 
   useEffect(() => {
@@ -113,35 +113,44 @@ export default function ModalForSellWithCustomer(props) {
         }
       }
       setAdditionalCurrencyCash(convertToSelectedCurrency);
+      return convertToSelectedCurrency;
     }
 
     const change = cash > total ? (cash - total).toFixed(2) : 0;
-    cash < total || total === 0 ? setDisabled(true) : setDisabled(false);
-    setChangeAmount(change);
+    if (cash < total || total === 0) {
+      setDisabled(true);
+      setChangeAmount(0);
+    } else {
+      setDisabled(false);
+      setChangeAmount(change);
+    }
+    return 0;
   };
 
   const calculateChange = () => {
-    let additionalCash = additionalCurrencyCash || 0;
-    let cash = parseFloat(mainCurrencyCash) || 0;
-    let total = 0;
+    let mainCash = parseFloat(mainCurrencyCash) || 0;
+    const total = parseFloat(totalAmount);
 
-    if (cash === 0 && paymentInTwoCurrencies && additionalCurrencies.selectedCurrency) {
-      total = (additionalCash / additionalCurrencies.selectedCurrency.rate) * selectedSellPlace.selectedCurency.rate;
-    } else {
-      let change2 =
+    if (paymentInTwoCurrencies && additionalCurrencies.selectedCurrency) {
+      let additionalCash = additionalCurrencyCash || 0;
+
+      let convertedAdditionalCash =
         additionalCurrencies.selectedCurrency.rate === 1
           ? additionalCash * selectedSellPlace.selectedCurency.rate
           : (additionalCash / additionalCurrencies.selectedCurrency.rate) * selectedSellPlace.selectedCurency.rate;
-      change2 = parseFloat(change2.toFixed(2));
 
-      total = cash + change2;
+      mainCash += parseFloat(convertedAdditionalCash.toFixed(2));
     }
 
-    total = parseFloat(total.toFixed(2));
+    mainCash = parseFloat(mainCash.toFixed(2));
 
-    total >= totalAmount ? setDisabled(false) : setDisabled(true);
-
-    setChangeAmount((total - totalAmount).toFixed(2));
+    if (mainCash >= total) {
+      setChangeAmount((mainCash - total).toFixed(2));
+      setDisabled(false);
+    } else {
+      setChangeAmount(0);
+      setDisabled(true);
+    }
   };
   // const defaultCurrency = {
   //   key: selectedSellPlace.selectedCurency,
@@ -204,12 +213,19 @@ export default function ModalForSellWithCustomer(props) {
                     totalAmount={totalAmount}
                   />
 
-                  <AdditionalServices defaultCurrency={defaultCurrency} data={data} setTotalAmount={setTotalAmount} totalAmount={totalAmount} />
+                  <AdditionalServices
+                    defaultCurrency={defaultCurrency}
+                    data={data}
+                    setTotalAmount={setTotalAmount}
+                    setMainCurrencyCash={setMainCurrencyCash}
+                    setChangeAmount={setChangeAmount}
+                  />
                   <View className="w-full h-[2px] bg-gray-200 my-2 relative z-[-2]"></View>
 
                   {!isChecked.reserve && (
                     <NotReserve
                       handleChangeMainCurrency={handleChangeMainCurrency}
+                      calculateChange={calculateChange}
                       setAdditionalCurrencyCash={setAdditionalCurrencyCash}
                       setPaymentInTwoCurrencies={setPaymentInTwoCurrencies}
                       setAdditionalCurrencies={setAdditionalCurrencies}

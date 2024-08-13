@@ -42,7 +42,7 @@ export default function ToPay({
           searchicon={<Icon name="search" color="white" size={20} style={{ marginRight: 10 }} />}
           arrowicon={<Icon name="arrow-down" color="white" size={20} />}
           dropdownItemStyles={styles.dropdownItemStyles}
-          defaultOption={defaultCurrency}
+          defaultOption={{ key: selectedSellPlace.selectedCurency, value: selectedSellPlace.selectedCurency.name }}
           setSelected={(currency) => {
             setSelectedSellPlace({
               ...selectedSellPlace,

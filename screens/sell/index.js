@@ -54,7 +54,6 @@ export default function SellScreen({ navigation }) {
   const [withCustomerModal, setWithCustomerModal] = useState(false);
 
   const [defaultCurrency, setDefaultCurrency] = useState(null);
-  console.log("defaultCurrency: ", defaultCurrency);
   const [selectedCurrency, setSelectedCurrency] = useState(null);
 
   const totalPrice = useTotalPrice(sellCart, selectedSellPlace);

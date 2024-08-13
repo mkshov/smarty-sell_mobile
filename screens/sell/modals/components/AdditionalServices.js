@@ -5,7 +5,7 @@ import { styles } from "../styles";
 import { SelectList } from "react-native-dropdown-select-list";
 import Icon from "react-native-vector-icons/Ionicons";
 
-export default function AdditionalServices({ data, setTotalAmount, totalAmount, defaultCurrency }) {
+export default function AdditionalServices({ data, setTotalAmount, setMainCurrencyCash, setChangeAmount, defaultCurrency }) {
   const windowWidth = useWindowDimensions().width;
   const { selectedSellPlace } = useContext(sellContext);
 
@@ -62,6 +62,8 @@ export default function AdditionalServices({ data, setTotalAmount, totalAmount, 
   function handleTextChange(text) {
     let newText = text.replace(/,/g, ".");
     const parts = newText.split(".");
+    setMainCurrencyCash("");
+    setChangeAmount(0);
     if (parts.length > 2) {
       newText = parts[0] + "." + parts.slice(1).join("");
     }
