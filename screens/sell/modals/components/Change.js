@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { styles } from "../styles";
 import { Text, useWindowDimensions } from "react-native";
 import { View } from "react-native";
@@ -7,30 +7,12 @@ import SellCheckbox from "../../components/CheckBox";
 import { SelectList } from "react-native-dropdown-select-list";
 import { sellContext } from "../../../../contexts/sellContext";
 
-export default function SellChangeWithCustomer({ data, mainCurrencyCash, totalAmount, handleChangeMainCurrency, calculateChange }) {
+export default function SellChangeWithCustomer({ data, calculateChange }) {
   const windowWidth = useWindowDimensions().width;
 
   const { changeAmount, selectedSellPlace, setChangeAmount } = useContext(sellContext);
   const [balanceSheet, setBalanceSheet] = useState(false);
   const [selectedCurrency, setSelectedCurrency] = useState(selectedSellPlace.selectedCurency);
-  const [change, setChange] = useState(changeAmount);
-  console.log("changeAmount: ", changeAmount);
-  console.log("change: ", change);
-
-  const convertBalance = () => {
-    const changeInDefaultCurrency = change / selectedSellPlace.selectedCurency.rate;
-    const converted = selectedCurrency.rate * changeInDefaultCurrency;
-    return converted;
-  };
-
-  useEffect(() => {
-    const converted = convertBalance();
-    setChangeAmount(converted);
-  }, [selectedCurrency, change, totalAmount]);
-
-  useEffect(() => {
-    setChange(parseFloat(changeAmount));
-  }, [mainCurrencyCash]);
 
   return (
     <>
@@ -48,7 +30,11 @@ export default function SellChangeWithCustomer({ data, mainCurrencyCash, totalAm
             dropdownItemStyles={styles.dropdownItemStyles}
             defaultOption={{ key: selectedSellPlace.selectedCurency, value: selectedSellPlace.selectedCurency.name }}
             setSelected={(currency) => {
+              const total = calculateChange();
+              const changeInDefaultCurrency = total / selectedSellPlace.selectedCurency.rate;
+              const converted = currency.rate * changeInDefaultCurrency;
               setSelectedCurrency(currency);
+              setChangeAmount(converted);
             }}
             placeholder={"Выбрать валюту"}
             search={false}

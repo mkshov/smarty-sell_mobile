@@ -88,7 +88,9 @@ export default function NotReserve({
           mainCurrencyCash={mainCurrencyCash}
           totalAmount={totalAmount}
           handleChangeMainCurrency={handleChangeMainCurrency}
+          additionalCurrencyCash={additionalCurrencyCash}
           calculateChange={calculateChange}
+          additionalCurrencies={additionalCurrencies}
         />
       )}
 

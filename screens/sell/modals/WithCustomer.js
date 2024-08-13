@@ -123,6 +123,7 @@ export default function ModalForSellWithCustomer(props) {
     } else {
       setDisabled(false);
       setChangeAmount(change);
+      console.log("change lol: ", change);
     }
     return 0;
   };
@@ -147,9 +148,11 @@ export default function ModalForSellWithCustomer(props) {
     if (mainCash >= total) {
       setChangeAmount((mainCash - total).toFixed(2));
       setDisabled(false);
+      return (mainCash - total).toFixed(2);
     } else {
       setChangeAmount(0);
       setDisabled(true);
+      return 0;
     }
   };
   // const defaultCurrency = {
