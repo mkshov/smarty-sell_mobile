@@ -1,12 +1,11 @@
 import React, { useContext, useEffect, useState } from "react";
-import { Text, TextInput, View, useWindowDimensions } from "react-native";
+import { Text, TextInput, View } from "react-native";
 import { sellContext } from "../../../../contexts/sellContext";
 import { styles } from "../styles";
 import { SelectList } from "react-native-dropdown-select-list";
 import Icon from "react-native-vector-icons/Ionicons";
 
 export default function AdditionalServices({ data, setTotalAmount, setMainCurrencyCash, setChangeAmount, defaultCurrency }) {
-  const windowWidth = useWindowDimensions().width;
   const { selectedSellPlace } = useContext(sellContext);
 
   const [cash, setCash] = useState("");

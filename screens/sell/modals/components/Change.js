@@ -10,9 +10,13 @@ import { sellContext } from "../../../../contexts/sellContext";
 export default function SellChangeWithCustomer({ data, calculateChange }) {
   const windowWidth = useWindowDimensions().width;
 
-  const { changeAmount, selectedSellPlace, setChangeAmount } = useContext(sellContext);
+  const { changeAmount, selectedSellPlace, setChangeAmount, setSelectedSellPlace } = useContext(sellContext);
   const [balanceSheet, setBalanceSheet] = useState(false);
   const [selectedCurrency, setSelectedCurrency] = useState(selectedSellPlace.selectedCurency);
+
+  useEffect(() => {
+    setSelectedSellPlace((prev) => ({ ...prev, selectedChangeCurrency: selectedCurrency }));
+  }, [selectedCurrency]);
 
   return (
     <>

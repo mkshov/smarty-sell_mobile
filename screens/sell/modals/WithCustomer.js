@@ -29,7 +29,8 @@ export default function ModalForSellWithCustomer(props) {
 
   const navigation = useNavigation();
 
-  const { setSellCart, setChangeAmount, modalCheck, setModalCheck, modalConfirm, setModalConfirm, sellCurrencies } = useContext(sellContext);
+  const { setSellCart, setChangeAmount, modalCheck, setModalCheck, modalConfirm, setModalConfirm, sendProductsWithCustomer } =
+    useContext(sellContext);
 
   const [mainCurrencyCash, setMainCurrencyCash] = useState("");
   const [additionalCurrencyCash, setAdditionalCurrencyCash] = useState(0);
@@ -162,9 +163,50 @@ export default function ModalForSellWithCustomer(props) {
   // console.log("defaultCurrency sdsd: ", defaultCurrency);
 
   const handleClick = async () => {
-    setChangeAmount(0);
-    setTotalAmount(0);
-    setMainCurrencyCash("");
+    const requestData = {
+      place: selectedSellPlace?.selectedPlace.id, // Идентификатор места продажи
+      change_currency: selectedSellPlace?.selectedChangeCurrency.id,
+      customer: {
+        customer: selectedSellPlace?.selectedCustomer.id, // ID клиента
+        pay_from_balance: isChecked.fromTheBalance, // Оплата с баланса
+        debt: isChecked.inDebt, // Долг
+        add_change_to_balance: false, // Добавить сдачу на баланс
+      },
+      extra_service_cost: {
+        currency: selectedSellPlace?.selectedAdditionalCurrency.id, // Валюта дополнительных услуг
+        amount: mainCurrencyCash, // Сумма дополнительных услуг
+      },
+      payment: [
+        {
+          currency: selectedSellPlace?.selectedCurency?.id, // Основная валюта
+          amount: mainCurrencyCash, // Сумма оплаты в основной валюте
+        },
+        paymentInTwoCurrencies && {
+          currency: additionalCurrencies?.selectedCurrency?.id, // Дополнительная валюта
+          amount: additionalCurrencyCash, // Сумма оплаты в дополнительной валюте
+        },
+      ],
+      sell_products: sellCart.map((item) => ({
+        product: item.id, // ID товара
+        size: item.size.id, // Размер товара
+        quantity: item.quantity, // Количество товара
+        place: selectedSellPlace?.selectedPlace.id, // Место продажи
+      })),
+    };
+
+    try {
+      await sendProductsWithCustomer(requestData);
+      showMessage({
+        message: `Продажа произведена успешно!`,
+        type: "success",
+      });
+      setChangeAmount(0);
+      setTotalAmount(0);
+      setMainCurrencyCash("");
+      setSellCart([]);
+    } catch (error) {
+      console.log("error: ", error);
+    }
   };
   const handleCloseTheSell = async () => {
     setModalCheck(false);

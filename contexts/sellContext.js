@@ -8,6 +8,7 @@ const ENDPOINTS = {
   PLACE_CURRENCY: "/company/v1/places/",
   CUSTOMERS: "/customers/v1/customers/",
   SELLS: "/realization/v1/sells/",
+  SELL_TO_CUSTOMER: "/realization/v1/sell_to_customer_no_balance_payment/",
 };
 export const sellContext = createContext();
 
@@ -34,6 +35,7 @@ const SellContextProvider = ({ children }) => {
   const [selectedSellPlace, setSelectedSellPlace] = useState({
     selectedPlace: null,
     selectedCurency: null,
+    selectedChangeCurrency: null,
     selectedCustomer: null,
     withOutCustomer: false,
     customer: null,
@@ -155,6 +157,32 @@ const SellContextProvider = ({ children }) => {
     }
   }
 
+  async function sendProductsWithCustomer(params) {
+    try {
+      setIsLoading(true);
+      let res = await api.post(ENDPOINTS.SELL_TO_CUSTOMER, params);
+      dispatch({
+        type: ENDPOINTS.SELLS,
+        payload: res.data,
+      });
+      setIsLoading(false);
+      setModalCheck(true);
+    } catch (error) {
+      console.log("error: ", error);
+      // setError(error.response.data);
+      setModalCheck(false);
+      setModalConfirm(false);
+      setWithOutCustomerModal(false);
+      if (error.response.data.errors[0].code === "change_greater_than_balance") {
+        showMessage({
+          message: `Сумма сдачи превышает сумму на балансе кошелька!`,
+          type: "danger",
+          duration: 3000,
+        });
+      }
+    }
+  }
+
   async function createUser(name) {
     let res = await api.post(`${ENDPOINTS.CUSTOMERS}`, name);
     return res;
@@ -192,6 +220,7 @@ const SellContextProvider = ({ children }) => {
         setWithOutCustomerModal,
         createUser,
         getCustomer,
+        sendProductsWithCustomer,
       }}
     >
       {children}

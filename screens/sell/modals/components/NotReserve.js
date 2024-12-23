@@ -39,7 +39,7 @@ export default function NotReserve({
 
   useEffect(() => {
     let mainCurrency = parseFloat(mainCurrencyCash) || 0;
-    if (mainCurrency >= totalAmount) {
+    if (mainCurrency >= totalAmount || sellCurrencies.length <= 1) {
       setPaymentInTwoCurrencies(false);
       setIsDisabled(true);
     } else {

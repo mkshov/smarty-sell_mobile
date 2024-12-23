@@ -104,7 +104,7 @@ export default function SellScreen({ navigation }) {
 
   useEffect(() => {
     if (data) {
-      const baseCurrency = sellCurrencies.find((currency) => currency.is_base_currency);
+      const baseCurrency = sellCurrencies?.find((currency) => currency.is_base_currency) || sellCurrencies?.[0];
       if (baseCurrency) {
         setDefaultCurrency({
           key: { id: baseCurrency.currency.id, rate: baseCurrency.rate, name: baseCurrency.currency.name },
@@ -112,7 +112,7 @@ export default function SellScreen({ navigation }) {
         });
         setSelectedCurrency(baseCurrency.currency);
       }
-      setSelectedSellPlace((prev) => ({ ...prev, selectedCurency: baseCurrency.currency.key, selectedPlace: data.basePlace.key }));
+      setSelectedSellPlace((prev) => ({ ...prev, selectedCurency: baseCurrency?.currency.key, selectedPlace: data.basePlace.key }));
     }
   }, [data]);
 
@@ -151,6 +151,9 @@ export default function SellScreen({ navigation }) {
         </LinearGradient>
       </SafeAreaProvider>
     );
+
+  console.log("data: ", data);
+  console.log("defaultCurrency: ", defaultCurrency);
 
   return (
     <SafeAreaProvider>
